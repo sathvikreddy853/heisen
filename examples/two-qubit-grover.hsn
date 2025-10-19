@@ -1,0 +1,24 @@
+def two_qubit_grover() {
+    # default initialization to [0, 0]
+    let q: qubit[2]
+    let b: bit[2]
+
+    H(2) @ q
+
+    # Step 2: Oracle - phase flip |11>
+    CZ @ [q[0],q[1]] 
+
+    # Step 3: Diffusion operation (since its 2 bits only one iteration is enough cause pi/4*(root(1)))<1
+    H(2) @ [q[0],q[1]]
+    [X,X] @ [q[0],q[1]]
+    CZ    @ [q[0],q[1]]
+    [X,X] @ [q[0],q[1]]
+    [H,H] @ [q[0],q[1]]
+
+    # Step 4: Measure
+    let b: bit[2]
+    measure q => b
+    print("b[0]:", b[0], " b[1]: ", b[1])   
+}
+
+two_qubit_grover()
