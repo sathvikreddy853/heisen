@@ -35,10 +35,10 @@
 #include <variant>
 #include <vector>
 
-#define RESET "\033[0m"
-#define BOLD "\033[1m"
-#define RED "\033[31m"
-#define GREEN "\033[32m"
+#define RESET_COLOR "\033[0m"
+#define BOLD        "\033[1m"
+#define RED         "\033[31m"
+#define GREEN       "\033[32m"
 
 #define LOG(x) std::cout << x << std::endl
 #define LOGs(x) std::cout << x << ' '
@@ -53,12 +53,12 @@ template <typename... Args> void dbg (const char* file, int line, Args&&... args
     (oss << ... << args);
 
     if (type == 0) {
-        std::cout << BOLD << GREEN << "DEBUG" << RESET;
+        std::cout << BOLD << GREEN << "DEBUG" << RESET_COLOR;
     } else if (type == 1) {
-        std::cout << BOLD << RED << "ERROR" << RESET;
+        std::cout << BOLD << RED << "ERROR" << RESET_COLOR;
     }
 
-    std::cout << BOLD << " [" << file << ":" << line << "] " << RESET << oss.str () << std::endl;
+    std::cout << BOLD << " [" << file << ":" << line << "] " << RESET_COLOR << oss.str () << std::endl;
 }
 
 } // namespace Feyn

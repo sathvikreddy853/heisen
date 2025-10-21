@@ -31,7 +31,7 @@
 %token FOR WHILE DO BREAK CONTINUE
 %token IF ELIF ELSE MATCH
 
-%token MEASURE RESET
+%token MEASURE_OP RESET_OP
 %token IMPORT RETURN 
 %token PRINT PRINTLN SCAN GETLINE
 
@@ -57,22 +57,53 @@
 
 %%
 translation_unit
+    :   translation_unit external_declaration
+    |   external_declaration
+    ;
+
+external_declaration
     :   statement_list
-    |   func_definition
-    |   class_definition
+    |   function_definition
     |   %empty
     ;
-class_definition
-    :   CLASS IDENTIFIER '{' statement_list'}'
-    ; 
-compound_statement
-    : '{' statement_list '}'
 
-statement_list
-    :   %empty
-    |   statement_list EOL statement
-    |   statement_list EOL 
-    |   statement
+function_definition
+    :   function_declaration compound_statement
+    |   function_declaration return_type compound_statement
+    ;
+
+function_declaration
+    :   FUNC IDENTIFIER '(' parameter_list ')'
+    |   FUNC IDENTIFIER '(' ')'
+    ;
+
+optional_return_type
+    :   return_type
+    |   %empty
+    ;
+
+return_type
+    :   RETURN_ARROW type
+    ;
+
+parameter_list
+    :   parameter 
+    |   parameter_list ',' parameter
+    ;
+
+parameter
+    : IDENTIFIER ':' type
+    ;
+
+statement_list 
+    :   statement_list statement_line
+    |   statement_list statement_line statement
+    |   %empty
+    ;
+
+statement_line 
+    : statement EOL
+    | EOL 
     ;
 
 statement
@@ -81,40 +112,38 @@ statement
     |   print_statement
     |   quantum_statement
     |   compound_statement
-    |   condtional_statement
-    |   Iteration_statement
+    |   expression_statement
+    |   conditional_statement
+    |   iteration_statement
     |   labeled_statement
     |   jump_statement
-    |   expression_statement
-    ;
-
-condtional_statement
-    :   IF '(' expression ')' statement
-    |   IF '(' expression ')' statement ELSE statement
-    |   IF '(' expression ')' statement  ELIF statement
-    |   MATCH '(' expression ')' statement
     ;
 
 expression_statement
-    :   ';'
-    |   expression
+    :   %empty
     ;
 
-Iteration_statement
-    :   WHILE '(' expression ')' statement
-    |   DO statement WHILE '(' expression ')' ';'
-    |   FOR '(' expression_statement expression_statement ')' statement
-    |   FOR '(' expression_statement expression_statement expression ')' statement
+iteration_statement
+    :   %empty
+    ;
+
+conditional_statement
+    :   %empty
+    ;
+
+compound_statement
+    : '{' statement_list '}'
     ;
 
 jump_statement
     :   CONTINUE ';'
-    |   BREAK    ';'
-    |   RETURN   ';'
+    |   BREAK ';'
+    |   RETURN ';'
+    |   RETURN expression ';'
     ;
 
 labeled_statement 
-    :   INT_CONSTANT ':' statement
+    :   IDENTIFIER ':' statement
     ;
 
 declaration_statement
@@ -138,6 +167,10 @@ array_list
     |   '[' expression ']'
     ;
 
+type_qualifier
+    :   CONST
+    ;
+
 type_name
     :   QUBIT 
     |   BIT
@@ -152,7 +185,8 @@ assignment_statement
     ;
 
 assignment_operator
-    :   ADD_ASSIGN 
+    :   '='
+    |   ADD_ASSIGN 
     |   SUB_ASSIGN
     |   MUL_ASSIGN 
     |   DIV_ASSIGN
@@ -163,7 +197,6 @@ assignment_operator
     |   XOR_ASSIGN
     |   RIGHT_SHIFT_ASSIGN
     |   LEFT_SHIFT_ASSIGN
-    |   '='
     ;
 
 expression
@@ -192,30 +225,6 @@ print_statement
     |   SCAN '(' ')'
     ;
 
-func_declaration
-    :   FUNC IDENTIFIER '(' parameter_list ')'  optional_return_type
-    |   FUNC IDENTIFIER '(' ')'  optional_return_type
-    |   FUNC IDENTIFIER SCOPE '(' parameter_list ')' optional_return_type
-    |   FUNC IDENTIFIER SCOPE '(' ')' optional_return_type
-    ;
-
-optional_return_type
-    :   RETURN_ARROW type
-    |
-    ;
-func_definition
-    :   func_declaration '{' compound_statement '}'
-    ;
-
-parameter_list
-    :   parameter 
-    |   parameter_list ',' parameter
-    ;
-
-parameter
-    : IDENTIFIER ':' type
-    ;
-
 quantum_statement
     :   apply_gate_statement
     |   measure_statement
@@ -223,11 +232,11 @@ quantum_statement
     ;
 
 measure_statement
-    :   MEASURE state MEASURE_ARROW state
+    :   MEASURE_OP state MEASURE_ARROW state
     ;
 
 reset_statement
-    :   RESET state
+    :   RESET_OP state
     ;   
 
 apply_gate_statement
@@ -281,6 +290,10 @@ simple_gate
     |   GATE_CRX 
     |   GATE_CRY 
     |   GATE_CRZ
+    ;
+
+class_definition
+    : %empty 
     ;
 %%
 

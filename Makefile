@@ -28,7 +28,7 @@ lex:
 	flex -o $(BUILD_DIR)/lexer.yy.cpp src/lexer/lexer.l
 
 yacc: 
-	bison --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.y
+	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.y
 
 clean:
 	rm -rf $(BUILD_DIR)
