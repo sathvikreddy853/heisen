@@ -58,9 +58,13 @@
 %%
 translation_unit
     :   statement_list
+    |   func_definition
+    |   class_definition
     |   %empty
     ;
-
+class_definition
+    :   CLASS IDENTIFIER '{' statement_list'}'
+    ; 
 compound_statement
     : '{' statement_list '}'
 
@@ -77,6 +81,40 @@ statement
     |   print_statement
     |   quantum_statement
     |   compound_statement
+    |   condtional_statement
+    |   Iteration_statement
+    |   labeled_statement
+    |   jump_statement
+    |   expression_statement
+    ;
+
+condtional_statement
+    :   IF '(' expression ')' statement
+    |   IF '(' expression ')' statement ELSE statement
+    |   IF '(' expression ')' statement  ELIF statement
+    |   MATCH '(' expression ')' statement
+    ;
+
+expression_statement
+    :   ';'
+    |   expression
+    ;
+
+Iteration_statement
+    :   WHILE '(' expression ')' statement
+    |   DO statement WHILE '(' expression ')' ';'
+    |   FOR '(' expression_statement expression_statement ')' statement
+    |   FOR '(' expression_statement expression_statement expression ')' statement
+    ;
+
+jump_statement
+    :   CONTINUE ';'
+    |   BREAK    ';'
+    |   RETURN   ';'
+    ;
+
+labeled_statement 
+    :   INT_CONSTANT ':' statement
     ;
 
 declaration_statement
@@ -110,7 +148,23 @@ type_name
     ;
 
 assignment_statement
-    :   IDENTIFIER '=' expression
+    :   IDENTIFIER assignment_operator expression
+    ;
+
+assignment_operator
+    :   ADD_ASSIGN 
+    |   SUB_ASSIGN
+    |   MUL_ASSIGN 
+    |   DIV_ASSIGN
+    |   MOD_ASSIGN
+    |   EXP_ASSIGN  
+    |   AND_ASSIGN 
+    |   OR_ASSIGN 
+    |   XOR_ASSIGN
+    |   RIGHT_SHIFT_ASSIGN
+    |   LEFT_SHIFT_ASSIGN
+    |   '='
+    ;
 
 expression
     :   expression bin_op expression
@@ -136,6 +190,30 @@ print_statement
     :   PRINT '('  ')'
     |   PRINTLN '(' ')'
     |   SCAN '(' ')'
+    ;
+
+func_declaration
+    :   FUNC IDENTIFIER '(' parameter_list ')'  optional_return_type
+    |   FUNC IDENTIFIER '(' ')'  optional_return_type
+    |   FUNC IDENTIFIER SCOPE '(' parameter_list ')' optional_return_type
+    |   FUNC IDENTIFIER SCOPE '(' ')' optional_return_type
+    ;
+
+optional_return_type
+    :   RETURN_ARROW type
+    |
+    ;
+func_definition
+    :   func_declaration '{' compound_statement '}'
+    ;
+
+parameter_list
+    :   parameter 
+    |   parameter_list ',' parameter
+    ;
+
+parameter
+    : IDENTIFIER ':' type
     ;
 
 quantum_statement
