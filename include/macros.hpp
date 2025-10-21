@@ -1,16 +1,66 @@
 #ifndef FEYN_MACROS_HPP
 #define FEYN_MACROS_HPP
 
+#include <algorithm>
+#include <any>
+#include <bit>
+#include <bitset>
+#include <cassert>
+#include <cctype>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <deque>
+#include <exception>
+#include <expected>
+#include <format>
+#include <fstream>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory>
+#include <numeric>
+#include <optional>
 #include <set>
+#include <span>
+#include <sstream>
 #include <string>
+#include <tuple>
 #include <unordered_map>
 #include <unordered_set>
+#include <utility>
+#include <variant>
 #include <vector>
+
+#define RESET "\033[0m"
+#define BOLD "\033[1m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+
+#define LOG(x) std::cout << x << std::endl
+#define LOGs(x) std::cout << x << ' '
+
+#define DBG(...) dbg (__FILE__, __LINE__, __VA_ARGS__)
+#define ERROR(...) dbg (__FILE__, __LINE__, __VA_ARGS__, 1)
+
+namespace Feyn {
+
+template <typename... Args> void dbg (const char* file, int line, Args&&... args, int type = 0) {
+    std::ostringstream oss;
+    (oss << ... << args);
+
+    if (type == 0) {
+        std::cout << BOLD << GREEN << "DEBUG" << RESET;
+    } else if (type == 1) {
+        std::cout << BOLD << RED << "ERROR" << RESET;
+    }
+
+    std::cout << BOLD << " [" << file << ":" << line << "] " << RESET << oss.str () << std::endl;
+}
+
+} // namespace Feyn
 
 #endif // FEYN_MACROS_HPP
