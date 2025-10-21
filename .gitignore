@@ -16,9 +16,6 @@
 __pycache__/
 tmp/
 
-# ignore config files
-.clang-format
-
 # ignore binaries
 build/
 *.a
