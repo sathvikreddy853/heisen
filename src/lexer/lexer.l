@@ -5,7 +5,7 @@
     #include <cstdlib>
     #include <cstring>
     #include <fstream>
-     #include <parser.tab.hpp> 
+    #include <parser.tab.hpp> 
     #define LOG(x)  std::cout << x << ' ';
     #define LOGN(x) std::cout << x << std::endl;
 %}
@@ -32,6 +32,7 @@ NEWLINE     "\n"
 "bool"              { LOG ("BOOL"); return BOOL; }
     /* Keywords */
 "func"              { LOG ("FUNC"); return FUNC; }
+"let"               { LOG ("LET"); return LET; }
 "and"               { LOG ("AND"); return AND; }
 "or"                { LOG ("OR"); return OR; }
 "not"               { LOG ("NOT"); return NOT; }
@@ -60,7 +61,8 @@ NEWLINE     "\n"
 "print"             { LOG ("PRINT"); return PRINT; }
 "println"           { LOG ("PRINTLN"); return PRINTLN; }
 "scan"              { LOG ("SCAN"); return SCAN; }
-"main"              { LOG ("MAIN"); return MAIN; }
+"getline"           { LOG ("GETLINE"); return GETLINE; }
+    /* "main"              { LOG ("MAIN"); return MAIN; } */
     /* Quantum Gates */
 "H"                 { LOG ("H");  return GATE_H;  }
 "S"                 { LOG ("S");  return GATE_S;  }
@@ -124,8 +126,8 @@ NEWLINE     "\n"
 "!="                { LOG ("!="); return NE_OP; }
 ">="                { LOG (">="); return GE_OP; }
 "<="                { LOG ("<="); return LE_OP; }
-">"                 { LOG (">"); return GT_OP; }
-"<"                 { LOG ("<"); return LT_OP; }
+">"                 { LOG (">"); return '>'; }
+"<"                 { LOG ("<"); return '<'; }
     /* Punctuations */
 "::"                { LOG ("SCOPE"); return SCOPE; }
 "["                 { LOG ("["); return '['; }
@@ -143,8 +145,3 @@ NEWLINE     "\n"
 [ \t\v\f\r]         { /* do nothing */ }
 .                   { LOG ("Error here. Please check."); }
 %%
-
-int main () {
-    yylex ();
-    return 0;
-}

@@ -2,4 +2,6 @@ let q: qubit[2]
 let b: bit[2]
 
 CNOT @ [H, I] @ q
-measure => b
+measure q => b
+
+[CTRL(n), Z] @ q
