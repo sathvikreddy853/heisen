@@ -1,0 +1,82 @@
+import collections::vec
+
+func apply_oracle(n: int, q: qubit[n], target: int) {
+    for (int i = 0; i < n; i = i + 1) {
+        if (((target >> i) & 1) == 0) {
+            X @ q[i]
+        }
+    }
+
+    [CTRL(n), Z] @ q
+
+    for (int i = 0; i < n; i = i + 1) {
+        if (((target >> i) & 1) == 0) {
+            X @ q[i]
+        }
+    }
+}
+
+func diffusion(n: int, q: qubit[n]) {
+    H(n) @ q
+    for (i: int = 0; i < n; i += 1) {
+        X @ q[i]
+    }
+
+    [CTRL(n), Z] @ q
+
+    for (i: int = 0; i < n; i += 1) {
+        X @ q[i]
+    }
+
+    H(n) @ q
+    return
+}
+
+func grover_search(arr: int[], value: int) -> bit[] {
+    let n = arr.size
+    let N = 1 << n
+
+    if (arr.size != N) {
+        println("error: array length must be 2^n")
+        let z: bit[n]
+        return z
+    }
+
+    let matches: vec<int>
+    for (int idx = 0; idx < N; idx = idx + 1) {
+        if (arr[idx] == value) {
+            matches.push(idx)
+        }
+    }
+
+    let M = matches.size
+    if (M == 0) {
+        println("error: value not present in array (no marked items).")
+        let z: bit[n]
+        return z
+    }
+
+    let r = floor((pi / 4.0) * sqrt(float(N) / float(M)))
+
+    let q: qubit[n]
+    let b: bit[n]
+
+    H(n) @ q
+
+    for (int iter = 0; iter < r; iter = iter + 1) {
+        for (int k = 0; k < M; k = k + 1) {
+            let targ = matches[k]
+            apply_oracle(n, q, targ)
+        }
+
+        diffusion(n, q)
+    }
+
+    measure q => b
+    return b
+}
+
+let example: int[8] = [7, 2, 5, 0, 5, 3, 1, 6]
+let res: int = cast<int> (grover_search (example, 5))
+
+println("The index ")

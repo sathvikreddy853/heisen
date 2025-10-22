@@ -6,6 +6,7 @@
     #include <cstring>
     #include <fstream>
     #include <parser.tab.hpp> 
+    #include <macros.hpp>
 %}
 
 L   [a-zA-Z_]

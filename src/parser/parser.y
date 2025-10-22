@@ -62,9 +62,8 @@ translation_unit
     ;
 
 external_declaration
-    :   statement_list
+    :   statement_line
     |   function_definition
-    |   %empty
     ;
 
 function_definition
@@ -75,11 +74,6 @@ function_definition
 function_declaration
     :   FUNC IDENTIFIER '(' parameter_list ')'
     |   FUNC IDENTIFIER '(' ')'
-    ;
-
-optional_return_type
-    :   return_type
-    |   %empty
     ;
 
 return_type
@@ -98,7 +92,7 @@ parameter
 statement_list 
     :   statement_list statement_line
     |   statement_list statement_line statement
-    |   %empty
+    |   statement_line
     ;
 
 statement_line 
@@ -112,23 +106,8 @@ statement
     |   print_statement
     |   quantum_statement
     |   compound_statement
-    |   expression_statement
-    |   conditional_statement
-    |   iteration_statement
     |   labeled_statement
     |   jump_statement
-    ;
-
-expression_statement
-    :   %empty
-    ;
-
-iteration_statement
-    :   %empty
-    ;
-
-conditional_statement
-    :   %empty
     ;
 
 compound_statement
@@ -290,10 +269,6 @@ simple_gate
     |   GATE_CRX 
     |   GATE_CRY 
     |   GATE_CRZ
-    ;
-
-class_definition
-    : %empty 
     ;
 %%
 
