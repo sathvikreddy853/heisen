@@ -57,10 +57,14 @@ NEWLINE     "\n"
 "apply"             { LOGs ("APPLY"); return APPLY; }
     /* Reserved Keywords */
 "circuit"           { LOGs ("CIRCUIT"); return CIRCUIT; }
+"try"               { LOGs ("TRY"); return TRY; }
+"catch"             { LOGs ("CATCH"); return CATCH; }
+"throw"             { LOGs ("THROW"); return THROW; }
     /* Reserved Function Names */
 "print"             { LOGs ("PRINT"); return PRINT; }
 "println"           { LOGs ("PRINTLN"); return PRINTLN; }
 "scan"              { LOGs ("SCAN"); return SCAN; }
+"cast"              { LOGs ("CAST"); return CAST; }
 "getline"           { LOGs ("GETLINE"); return GETLINE; }
     /* "main"              { LOG ("MAIN"); return MAIN; } */
     /* Quantum Gates */
@@ -114,6 +118,7 @@ NEWLINE     "\n"
 "&"                 { LOGs ("&"); return '&'; }
 "|"                 { LOGs ("|"); return '|'; }
 "^"                 { LOGs ("^"); return '^'; }
+"!"                 { LOGs ("!"); return '!'; }
 "&="                { LOGs ("&="); return AND_ASSIGN;  }
 "|="                { LOGs ("|="); return OR_ASSIGN;  }
 "^="                { LOGs ("^="); return XOR_ASSIGN;  }

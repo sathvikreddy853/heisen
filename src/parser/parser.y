@@ -1,3 +1,6 @@
+%define parse.lac full
+%define parse.error verbose
+
 %{
     #include <macros.hpp>
 
@@ -23,7 +26,8 @@
 %token<sval> STRING_CONSTANT
 
 %token QUBIT BIT INT FLOAT STRING BOOL
-%token FUNC LET GATE APPLY
+%token LET CONST APPLY
+%token FUNC CLASS CIRCUIT GATE
 
 %token AND OR NOT
 %token TRUE FALSE
@@ -31,9 +35,11 @@
 %token FOR WHILE DO BREAK CONTINUE
 %token IF ELIF ELSE MATCH
 
+%token TRY CATCH THROW
+
 %token MEASURE_OP RESET_OP
 %token IMPORT RETURN 
-%token PRINT PRINTLN SCAN GETLINE
+%token PRINT PRINTLN SCAN GETLINE CAST
 
 %token GATE_H GATE_S GATE_T GATE_CTRL
 %token GATE_I GATE_X GATE_Y GATE_Z GATE_RX GATE_RY GATE_RZ
@@ -47,11 +53,22 @@
 %token EQ_OP NE_OP GE_OP LE_OP 
 %token SCOPE
 
-%token CONST CLASS CIRCUIT
 
+/* operators in reverse precedence order */
+%left OR
+%left AND
+%left '|'
+%left '^'
+%left '&'
+%left EQ_OP NE_OP
+%left '<' LE_OP '>' GE_OP
+%left LEFT_SHIFT RIGHT_SHIFT
 %left '+' '-'
 %left '*' '/' '%'
+%right UMINUS
 %right EXP
+%left '.'
+%left SCOPE
 
 %start translation_unit
 
@@ -63,15 +80,39 @@ translation_unit
 
 external_declaration
     :   statement_line
-    |   function_definition
+    |   statement_line statement
+    |   declaration
     ;
 
-function_definition
-    :   function_declaration compound_statement
-    |   function_declaration return_type compound_statement
+declaration
+    :   import_declaration
+    |   function_declaration
+    |   gate_declaration
+    ;
+
+gate_declaration
+    :   GATE '{' APPLY ':' gate_composition '}'
+    ;
+
+gate_definition
+    :   GATE
+    ;
+
+import_declaration
+    :   IMPORT scoped_identifier
+    ;
+
+scoped_identifier
+    :   scoped_identifier SCOPE IDENTIFIER
+    |   IDENTIFIER
     ;
 
 function_declaration
+    :   function_header compound_statement
+    |   function_header return_type compound_statement
+    ;
+
+function_header
     :   FUNC IDENTIFIER '(' parameter_list ')'
     |   FUNC IDENTIFIER '(' ')'
     ;
@@ -95,19 +136,29 @@ statement_list
     |   statement_line
     ;
 
-statement_line 
+statement_line
     : statement EOL
     | EOL 
     ;
 
 statement
     :   declaration_statement
+    |   expression_statement
     |   assignment_statement   
-    |   print_statement
     |   quantum_statement
     |   compound_statement
     |   labeled_statement
+    |   iteration_statement
     |   jump_statement
+    |   print_statement
+    ;
+
+expression_statement    
+    :   expression
+    ;
+
+iteration_statement
+    :   
     ;
 
 compound_statement
@@ -179,23 +230,35 @@ assignment_operator
     ;
 
 expression
-    :   expression bin_op expression
-    |   IDENTIFIER
-    |   constant
+    :   expression '+' expression
+    |   expression '|' expression
+    |   expression '-' expression
+    |   expression '*' expression
+    |   expression '&' expression
+    |   expression '/' expression
+    |   expression '%' expression
+    |   expression EXP expression
+    |   '+' expression %prec UMINUS
+    |   '-' expression %prec UMINUS
+    |   '!' expression %prec UMINUS
+    |   expression '^' expression 
+    |   '(' expression ')'
+    |   postfix_expression 
     ;
 
-constant
+postfix_expression
+    :   primary_expression
+    |   postfix_expression '[' expression ']'
+    |   postfix_expression '(' expression ')'
+    |   postfix_expression '(' ')'
+    |   postfix_expression '.' IDENTIFIER
+    |   CAST '<' type_name '>' '(' expression ')'
+    ;
+
+primary_expression
     :   INT_CONSTANT
     |   FLOAT_CONSTANT
-    ;
-
-bin_op
-    :   '+'
-    |   '-'
-    |   '*'
-    |   '/'
-    |   '%'
-    |   EXP
+    |   IDENTIFIER
     ;
 
 print_statement
@@ -225,6 +288,11 @@ apply_gate_statement
 gate_composition
     :   gate_composition '@' quantum_gate
     |   quantum_gate
+    ;
+
+boolean_literal
+    :   TRUE
+    |   FALSE
     ;
 
 state
