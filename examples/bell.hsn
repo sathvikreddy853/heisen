@@ -1,7 +1,8 @@
-let q: qubit[2]
-let b: bit[2]
 
-CNOT @ [H, I] @ q
-measure q => b
+func create_bell () {
+    let q: qubit[2]
+    let b: bit[2]
 
-[CTRL(n), Z] @ q
+    CNOT @ [H, I] @ q
+    measure q => b
+}

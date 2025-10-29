@@ -16,7 +16,6 @@
     long long ival;
     double fval;
     char *sval;
-
 }
 
 %token EOL 
