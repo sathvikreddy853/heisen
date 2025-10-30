@@ -105,15 +105,15 @@ NEWLINE     "\n"
 "%"                 { LOGs ("%"); return '%'; }         
 "**"                { LOGs ("**"); return EXP; }
 "@"                 { LOGs ("@"); return '@'; }
-"->"                { LOGs ("SINGLE_ARROW"); return SINGLE_ARROW; }
-"=>"                { LOGs ("DOUBLE_ARROW"); return DOUBLE_ARROW; }
+"->"                { LOGs ("->"); return SINGLE_ARROW; }
+"=>"                { LOGs ("=>"); return DOUBLE_ARROW; }
 "="                 { LOGs ("="); return '='; }
-"+="                { LOGs ("ADD_ASSIGN"); return ADD_ASSIGN; }
-"-="                { LOGs ("SUB_ASSIGN"); return SUB_ASSIGN; }
-"*="                { LOGs ("MUL_ASSIGN"); return MUL_ASSIGN; }
-"/="                { LOGs ("DIV_ASSIGN"); return DIV_ASSIGN; }
-"%="                { LOGs ("MOD_ASSIGN"); return MOD_ASSIGN; }
-"**="               { LOGs ("EXP_ASSIGN"); return EXP_ASSIGN; }
+"+="                { LOGs ("+="); return ADD_ASSIGN; }
+"-="                { LOGs ("-="); return SUB_ASSIGN; }
+"*="                { LOGs ("*="); return MUL_ASSIGN; }
+"/="                { LOGs ("/="); return DIV_ASSIGN; }
+"%="                { LOGs ("%="); return MOD_ASSIGN; }
+"**="               { LOGs ("**="); return EXP_ASSIGN; }
     /* Bitwise Operators */
 "&"                 { LOGs ("&"); return '&'; }
 "|"                 { LOGs ("|"); return '|'; }
@@ -122,10 +122,10 @@ NEWLINE     "\n"
 "&="                { LOGs ("&="); return AND_ASSIGN;  }
 "|="                { LOGs ("|="); return OR_ASSIGN;  }
 "^="                { LOGs ("^="); return XOR_ASSIGN;  }
-">>"                { LOGs ("RIGHT_SHIFT"); return RIGHT_SHIFT;  }
-"<<"                { LOGs ("LEFT_SHIFT"); return LEFT_SHIFT;  }
-">>="               { LOGs ("RIGHT_SHIFT_ASSIGN"); return RIGHT_SHIFT_ASSIGN;  }
-"<<="               { LOGs ("LEFT_SHIFT_ASSIGN"); return LEFT_SHIFT_ASSIGN;  }
+">>"                { LOGs (">>"); return RIGHT_SHIFT;  }
+"<<"                { LOGs ("<<"); return LEFT_SHIFT;  }
+">>="               { LOGs (">>="); return RIGHT_SHIFT_ASSIGN;  }
+"<<="               { LOGs ("<<="); return LEFT_SHIFT_ASSIGN;  }
     /* Comparison Operators */
 "=="                { LOGs ("=="); return EQ_OP; }
 "!="                { LOGs ("!="); return NE_OP; }
@@ -134,7 +134,7 @@ NEWLINE     "\n"
 ">"                 { LOGs (">"); return '>'; }
 "<"                 { LOGs ("<"); return '<'; }
     /* Punctuations */
-"::"                { LOGs ("SCOPE"); return SCOPE; }
+"::"                { LOGs ("::"); return SCOPE; }
 "["                 { LOGs ("["); return '['; }
 "]"                 { LOGs ("]"); return ']'; }
 "{"                 { LOGs ("{"); return '{'; }

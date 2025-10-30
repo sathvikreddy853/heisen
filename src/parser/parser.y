@@ -91,10 +91,6 @@ gate_declaration
     :   GATE '{' APPLY ':' gate_composition '}'
     ;
 
-gate_definition
-    :   GATE
-    ;
-
 import_declaration
     :   IMPORT scoped_identifier
     ;
@@ -115,7 +111,7 @@ function_header
     ;
 
 return_type
-    :   SINGLE_ARROW type
+    :   ':' type
     ;
 
 parameter_list
