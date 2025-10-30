@@ -146,7 +146,7 @@ NEWLINE     "\n"
 ","                 { LOGs (","); return ','; }
 "."                 { LOGs ("."); return '.'; }
     /* NEWLINE and WHITESPACE */
-{NEWLINE}           { LOG (""); return EOL; }
+{NEWLINE}           { LOG (""); }
 [ \t\v\f\r]         { /* do nothing */ }
 .                   { LOGs ("Error here. Please check."); }
 %%

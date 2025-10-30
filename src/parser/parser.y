@@ -18,7 +18,6 @@
     char *sval;
 }
 
-%token EOL 
 %token<sval> IDENTIFIER 
 %token<fval> FLOAT_CONSTANT 
 %token<ival> INT_CONSTANT 
@@ -78,8 +77,7 @@ translation_unit
     ;
 
 external_declaration
-    :   statement_line
-    |   statement_line statement
+    :   statement_list
     |   declaration
     ;
 
@@ -130,14 +128,8 @@ parameter
     ;
 
 statement_list 
-    :   statement_list statement_line
-    |   statement_list statement_line statement
-    |   statement_line
-    ;
-
-statement_line
-    : statement EOL
-    | EOL 
+    :   statement_list statement ';'
+    |   statement ';'
     ;
 
 statement
@@ -320,7 +312,7 @@ simple_gate
     :   GATE_H 
     |   GATE_S
     |   GATE_T 
-    |   GATE_CTRL 
+    |   GATE_CTRL
     |   GATE_I 
     |   GATE_X
     |   GATE_Y

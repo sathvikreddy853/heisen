@@ -1,24 +1,24 @@
 func generate_W_state (q: qubit) {
-    let n = qubit.size
+    let n = q.size;
 
     if (n == 1) {
-        X @ q[0]
+        X @ q[0];
     } else {
-        let k = n/2
-        generate_W_state(q[0:k])
+        let k = n/2;
+        generate_W_state(q[0:k]);
 
-        let anc: qubit
-        H @ anc
+        let anc: qubit;
+        H @ anc;
         for (i: int = 0; i < k; i += 1) {
-            CSWAP @ [anc, q[i], q[i+k]]
+            CSWAP @ [anc, q[i], q[i+k]];
         }
 
         for (i: int = k; i < n; i++) {
-            CNOT @ [q[i], anc]
+            CNOT @ [q[i], anc];
         }
     }
 }
 
-let n: int = 8
-let q: qubit[n]
-generate_W_state(q)
+let n: int = 8;
+let q: qubit[n];
+generate_W_state(q);
