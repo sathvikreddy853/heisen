@@ -19,13 +19,13 @@
 }
 
 %token<sval> IDENTIFIER 
-%token<fval> FLOAT_CONSTANT 
-%token<ival> INT_CONSTANT 
-%token<sval> STRING_CONSTANT
+%token<fval> FLOAT_LITERAL 
+%token<ival> INT_LITERAL 
+%token<sval> STRING_LITERAL
 
 %token QUBIT BIT INT FLOAT STRING BOOL
 %token LET CONST APPLY
-%token FUNC CLASS CIRCUIT GATE
+%token FUNC GATE CLASS CIRCUIT 
 
 %token AND OR NOT
 %token TRUE FALSE
@@ -44,7 +44,7 @@
 %token GATE_CNOT GATE_CZ GATE_SWAP GATE_CSWAP GATE_CCNOT 
 %token GATE_CRX GATE_CRY GATE_CRZ
 
-%token EXP RETURN_ARROW MEASURE_ARROW 
+%token EXP SINGLE_ARROW DOUBLE_ARROW 
 
 %token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN EXP_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
 %token RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_ASSIGN LEFT_SHIFT_ASSIGN
@@ -63,7 +63,7 @@
 %left LEFT_SHIFT RIGHT_SHIFT
 %left '+' '-'
 %left '*' '/' '%'
-%right UMINUS
+%right UNARY
 %right EXP
 %left '.'
 %left SCOPE
@@ -115,7 +115,7 @@ function_header
     ;
 
 return_type
-    :   RETURN_ARROW type
+    :   SINGLE_ARROW type
     ;
 
 parameter_list
@@ -128,28 +128,76 @@ parameter
     ;
 
 statement_list 
-    :   statement_list statement ';'
-    |   statement ';'
+    :   statement_list statement
+    |   statement
     ;
 
 statement
-    :   declaration_statement
-    |   expression_statement
-    |   assignment_statement   
-    |   quantum_statement
+    :   declaration_statement ';'
+    |   expression_statement ';'
+    |   assignment_statement ';'
+    |   quantum_statement ';'
     |   compound_statement
-    |   labeled_statement
+    |   labeled_statement ';'
+    |   selection_statement
     |   iteration_statement
-    |   jump_statement
-    |   print_statement
+    |   jump_statement ';'
+    |   print_statement ';'
     ;
 
 expression_statement    
     :   expression
     ;
 
+selection_statement 
+    :   IF '(' condition ')' compound_statement elif_chain
+    |   IF '(' condition ')' compound_statement elif_chain ELSE compound_statement
+    |   MATCH '(' expression ')' '{' match_list '}'
+    ;
+
+elif_chain
+    :   %empty
+    |   elif_chain ELIF '(' condition ')' compound_statement
+    ;
+
+condition   
+    :   expression '>' expression
+    |   expression '<' expression
+    |   expression GE_OP expression
+    |   expression LE_OP expression
+    |   expression EQ_OP expression
+    |   expression NE_OP expression
+    |   condition AND condition
+    |   condition OR condition
+    |   NOT condition %prec UNARY
+    |   '(' condition ')'
+    |   expression
+    ;
+
+match_list
+    :   %empty
+    |   match_list match_statement
+    |   match_statement
+    ;
+
+match_statement
+    :   expression DOUBLE_ARROW compound_statement
+    ;
+
+optional_condition
+    :   %empty
+    |   condition
+    ;
+
 iteration_statement
-    :   
+    :   WHILE '(' condition ')' compound_statement
+    |   DO compound_statement WHILE '(' condition ')'
+    |   FOR '(' variable_declarations ';' optional_condition ';' optional_assignment_statement ')' compound_statement
+    ;
+
+optional_assignment_statement
+    :   %empty
+    |   assignment_statement
     ;
 
 compound_statement
@@ -157,10 +205,10 @@ compound_statement
     ;
 
 jump_statement
-    :   CONTINUE ';'
-    |   BREAK ';'
-    |   RETURN ';'
-    |   RETURN expression ';'
+    :   CONTINUE
+    |   BREAK
+    |   RETURN
+    |   RETURN expression
     ;
 
 labeled_statement 
@@ -168,9 +216,13 @@ labeled_statement
     ;
 
 declaration_statement
-    :   LET identifier_list ':' type 
-    |   LET identifier_list ':' type '=' expression
-    |   LET identifier_list '=' expression 
+    :   LET variable_declarations
+    ;
+
+variable_declarations
+    :   identifier_list ':' type 
+    |   identifier_list ':' type '=' expression
+    |   identifier_list '=' expression
     ;
 
 identifier_list
@@ -184,12 +236,8 @@ type
     ;
 
 array_list
-    :   array_list '[' expression ']'
-    |   '[' expression ']'
-    ;
-
-type_qualifier
-    :   CONST
+    :   array_list '[' index_expression ']'
+    |   '[' index_expression ']'
     ;
 
 type_name
@@ -228,10 +276,12 @@ expression
     |   expression '&' expression
     |   expression '/' expression
     |   expression '%' expression
+    |   expression RIGHT_SHIFT expression 
+    |   expression LEFT_SHIFT expression
     |   expression EXP expression
-    |   '+' expression %prec UMINUS
-    |   '-' expression %prec UMINUS
-    |   '!' expression %prec UMINUS
+    |   '+' expression %prec UNARY
+    |   '-' expression %prec UNARY
+    |   '!' expression %prec UNARY
     |   expression '^' expression 
     |   '(' expression ')'
     |   postfix_expression 
@@ -239,23 +289,36 @@ expression
 
 postfix_expression
     :   primary_expression
-    |   postfix_expression '[' expression ']'
-    |   postfix_expression '(' expression ')'
+    |   postfix_expression '[' index_expression ']'
+    |   postfix_expression '(' expression_list ')'
     |   postfix_expression '(' ')'
     |   postfix_expression '.' IDENTIFIER
     |   CAST '<' type_name '>' '(' expression ')'
     ;
 
+expression_list
+    :   expression_list ',' expression
+    |   expression
+    ;
+
 primary_expression
-    :   INT_CONSTANT
-    |   FLOAT_CONSTANT
+    :   quantum_state
+    |   INT_LITERAL
+    |   FLOAT_LITERAL
+    |   STRING_LITERAL
     |   IDENTIFIER
+    |   boolean_literal
     ;
 
 print_statement
-    :   PRINT '('  ')'
-    |   PRINTLN '(' ')'
-    |   SCAN '(' ')'
+    :   PRINT '(' print_string ')'
+    |   PRINTLN '(' print_string ')'
+    |   SCAN '(' print_string ')'
+    ;
+
+print_string
+    :   %empty
+    |   STRING_LITERAL
     ;
 
 quantum_statement
@@ -265,15 +328,15 @@ quantum_statement
     ;
 
 measure_statement
-    :   MEASURE_OP state MEASURE_ARROW state
+    :   MEASURE_OP quantum_state DOUBLE_ARROW quantum_state
     ;
 
 reset_statement
-    :   RESET_OP state
+    :   RESET_OP quantum_state
     ;   
 
 apply_gate_statement
-    :   gate_composition '@' state
+    :   gate_composition '@' quantum_state
     ;
 
 gate_composition
@@ -286,15 +349,15 @@ boolean_literal
     |   FALSE
     ;
 
-state
-    :   '[' state_list ']'
-    |   IDENTIFIER '[' expression ']'
+quantum_state
+    :   '[' quantum_state_list ']'
+    |   IDENTIFIER '[' index_expression ']'
     |   IDENTIFIER
     ;
 
-state_list
-    :   state_list ','  state
-    |   state
+quantum_state_list
+    :   quantum_state_list ','  quantum_state
+    |   quantum_state
     ;
 
 quantum_gate
@@ -328,6 +391,17 @@ simple_gate
     |   GATE_CRX 
     |   GATE_CRY 
     |   GATE_CRZ
+    ;
+
+index_expression
+    :   expression
+    |   optional_expression ':' optional_expression
+    |   optional_expression ':' optional_expression ':' optional_expression
+    ;
+
+optional_expression
+    :   %empty
+    |   expression
     ;
 %%
 

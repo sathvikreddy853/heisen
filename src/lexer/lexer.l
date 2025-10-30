@@ -92,9 +92,9 @@ NEWLINE     "\n"
 "CRY"               { LOGs ("CRY"); return GATE_CRY; }
 "CRZ"               { LOGs ("CRZ"); return GATE_CRZ; }
     /* Constants And Identifiers */
-{FLOAT}             { LOGs ("FLOAT(" << yytext << ")"); return FLOAT_CONSTANT; }
-{INTEGER}           { LOGs ("INT(" << yytext << ")"); return INT_CONSTANT; }
-{STRING}            { LOGs ("STRING(" << yytext << ")"); return STRING_CONSTANT; }
+{FLOAT}             { LOGs ("FLOAT(" << yytext << ")"); return FLOAT_LITERAL; }
+{INTEGER}           { LOGs ("INT(" << yytext << ")"); return INT_LITERAL; }
+{STRING}            { LOGs ("STRING(" << yytext << ")"); return STRING_LITERAL; }
 {IDENTIFIER}        { LOGs ("IDENTIFIER(" << yytext << ")"); return IDENTIFIER; }
     /* Operators */
     /* Binary Operators */
@@ -105,8 +105,8 @@ NEWLINE     "\n"
 "%"                 { LOGs ("%"); return '%'; }         
 "**"                { LOGs ("**"); return EXP; }
 "@"                 { LOGs ("@"); return '@'; }
-"->"                { LOGs ("RETURN_ARROW"); return RETURN_ARROW; }
-"=>"                { LOGs ("MEASURE_ARROW"); return MEASURE_ARROW; }
+"->"                { LOGs ("SINGLE_ARROW"); return SINGLE_ARROW; }
+"=>"                { LOGs ("DOUBLE_ARROW"); return DOUBLE_ARROW; }
 "="                 { LOGs ("="); return '='; }
 "+="                { LOGs ("ADD_ASSIGN"); return ADD_ASSIGN; }
 "-="                { LOGs ("SUB_ASSIGN"); return SUB_ASSIGN; }

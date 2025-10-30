@@ -9,6 +9,7 @@ func generate_W_state (q: qubit) {
 
         let anc: qubit;
         H @ anc;
+        
         for (i: int = 0; i < k; i += 1) {
             CSWAP @ [anc, q[i], q[i+k]];
         }

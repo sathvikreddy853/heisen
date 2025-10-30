@@ -1,19 +1,59 @@
-"""
-    FILE: example_01.hsn
-    BRIEF: This file has been created to test basic function calls for quantum structures  
-"""
+func apply_oracle(n: int, q: qubit[n], target: int) {
+    for (i: int = 0; i < n; i = i + 1) {
+        if (((target >> i) & 1) == 0) {
+            X @ q[i];
+        }
+    }
 
-let a: int = 1 + +2;
+    [CTRL(n), Z] @ q;
 
-func create_bell_state (q: qubit[2]) {
-    CNOT @ [H, I] @ q;
+    for (i: int = 0; i < n; i = i + 1) {
+        if (((target >> i) & 1) == 0) {
+            X @ q[i];
+        }
+    }
 }
 
-func restore_original (q: qubit[2]) {
-    CNOT @ q;
-    H @ q[0];
+func diffusion(n: int, q: qubit[n]) {
+    H(n) @ q;
+    for (i: int = 0; i < n; i += 1) {
+        X @ q[i];
+    }
+
+    [CTRL(n), Z] @ q;
+
+    for (i: int = 0; i < n; i += 1) {
+        X @ q[i];
+    }
+
+    H(n) @ q;
+    return;
 }
 
-let q: qubit[2];
-create_bell_state(q);
-restore_original(q);
+func grover_search(n: int, target: int) -> bit[n] {
+    let q: qubit[n];
+    let b: bit[n];
+
+    H(n) @ q;
+
+    let N = 1 << n;
+    let r = floor((pi / 4.0) * sqrt(cast<float>(N)));
+
+    for (i: int = 0; i < r; i += 1) {
+        apply_oracle(n, q, target);
+        diffusion(n, q);
+    }
+
+    measure q => b;
+
+    print("Measured:");
+    for (i: int = n - 1; i >= 0; i = i - 1) {
+        print("b[i]: {b[i]}, ");
+    }
+    println();
+
+    return b;
+}
+
+let target: int = 5;
+grover_search(3, target);

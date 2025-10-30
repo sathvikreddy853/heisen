@@ -1,5 +1,5 @@
 BUILD_DIR := ./build
-TARGET_PROGRAM := feyn
+TARGET_PROGRAM := mini-heisen
 
 INCLUDE_DIR := ./include 
 INCLUDE_SUBDIRS := $(shell find $(INCLUDE_DIR) -type d)
