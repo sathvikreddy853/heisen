@@ -1,5 +1,5 @@
-#ifndef FEYN_MACROS_HPP
-#define FEYN_MACROS_HPP
+#ifndef HEISEN_MACROS_HPP
+#define HEISEN_MACROS_HPP
 
 #include <algorithm>
 #include <any>
@@ -46,7 +46,7 @@
 #define DBG(...) dbg (__FILE__, __LINE__, __VA_ARGS__)
 #define ERROR(...) dbg (__FILE__, __LINE__, __VA_ARGS__, 1)
 
-namespace Feyn {
+namespace Heisen {
 
 template <typename... Args> void dbg (const char* file, int line, Args&&... args, int type = 0) {
     std::ostringstream oss;
@@ -61,6 +61,6 @@ template <typename... Args> void dbg (const char* file, int line, Args&&... args
     std::cout << BOLD << " [" << file << ":" << line << "] " << RESET_COLOR << oss.str () << std::endl;
 }
 
-} // namespace Feyn
+} // namespace Heisen
 
-#endif // FEYN_MACROS_HPP
+#endif // HEISEN_MACROS_HPP

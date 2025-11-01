@@ -1,10 +1,6 @@
 %option noyywrap
 
 %{
-    #include <iostream>
-    #include <cstdlib>
-    #include <cstring>
-    #include <fstream>
     #include <parser.tab.hpp> 
     #include <macros.hpp>
 %}
@@ -134,7 +130,6 @@ NEWLINE     "\n"
 ">"                 { LOGs (">"); return '>'; }
 "<"                 { LOGs ("<"); return '<'; }
     /* Punctuations */
-"::"                { LOGs ("::"); return SCOPE; }
 "["                 { LOGs ("["); return '['; }
 "]"                 { LOGs ("]"); return ']'; }
 "{"                 { LOGs ("{"); return '{'; }
