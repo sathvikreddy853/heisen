@@ -1,7 +1,6 @@
-#pragma once
 #ifndef HEISEN_AST_HPP
 #define HEISEN_AST_HPP
-#include "macros.hpp"
+#include <macros.hpp>
 
 // ===================================================================
 //
@@ -852,4 +851,4 @@ public:
     GateNode* getRightGate() const { return rightGate; }
 };
 
-#endif
+#endif // HEISEN_AST_HPP
