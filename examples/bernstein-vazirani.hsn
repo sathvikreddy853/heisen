@@ -1,10 +1,10 @@
 
 func bernstein_vazirani (n: int, Uf: (qubit[], qubit) => ()) : bit[] {
     let res: bit[n];
-    let q: qubit[n + 1]
+    let q: qubit[n + 1];
 
-    let x = q[0:n];
-    let y = q[n];
+    let x: qubit[] = q[0:n];
+    let y: qubit[] = q[n];
 
     H(n) @ x;
     H @ X @ y;
