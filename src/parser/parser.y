@@ -229,6 +229,17 @@ identifier_list
 type
     :   type_name array_list
     |   type_name
+    |   function_object
+    ;
+
+type_list
+    :   type 
+    |   type_list ',' type
+    ;
+
+function_object
+    :   '(' type_list ')' DOUBLE_ARROW '('')'
+    |   '(' type_list ')' DOUBLE_ARROW type
     ;
 
 array_list

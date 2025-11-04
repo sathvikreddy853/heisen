@@ -22,7 +22,7 @@ run:
 	$(BUILD_DIR)/$(TARGET_PROGRAM)
 
 compile:
-	clang++ -I$(BUILD_DIR) $(INCLUDE_LIST) -I$(BUILD_DIR)/parser.tab.hpp $(BUILD_DIR)/parser.tab.cpp $(BUILD_DIR)/lexer.yy.cpp -o $(BUILD_DIR)/$(TARGET_PROGRAM)
+	clang++ -std=c++26 -I$(BUILD_DIR) $(INCLUDE_LIST) -I$(BUILD_DIR)/parser.tab.hpp $(BUILD_DIR)/parser.tab.cpp $(BUILD_DIR)/lexer.yy.cpp -o $(BUILD_DIR)/$(TARGET_PROGRAM)
 
 lex:
 	flex -o $(BUILD_DIR)/lexer.yy.cpp src/lexer/lexer.l

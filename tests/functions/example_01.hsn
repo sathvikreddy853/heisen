@@ -4,14 +4,14 @@
 """
 
 func create_bell_state (q: qubit[2]) {
-    CNOT @ [H, I] @ q
+    CNOT @ [H, I] @ q;
 }
 
 func restore_original (q: qubit[2]) {
-    CNOT @ q
-    H @ q[0]
+    CNOT @ q;
+    H @ q[0];
 }
 
-let q: qubit[2]
-create_bell_state(q)
-restore_original(q)
+let q: qubit[2];
+create_bell_state(q);
+restore_original(q);

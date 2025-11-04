@@ -1,4 +1,6 @@
 #pragma once
+#ifndef HEISEN_AST_HPP
+#define HEISEN_AST_HPP
 #include "macros.hpp"
 
 // ASTNode (Base node for all)
@@ -173,3 +175,5 @@ public:
     const std::vector<Expr*>& getArgs() const { return arguments; }
     size_t getArgCount() const { return arguments.size(); }
 };
+
+#endif // HEISEN_AST_HPP
