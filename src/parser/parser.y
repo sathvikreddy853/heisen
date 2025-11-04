@@ -228,6 +228,7 @@ function_object
     |   '(' type_list ')' DOUBLE_ARROW type
     ;
 
+
 array_list
     :   array_list '[' index_expression ']'
     |   '[' index_expression ']'
