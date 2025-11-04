@@ -1,56 +1,58 @@
-%define parse.lac full
 %define parse.error verbose
+%debug
 
 %{
+    #include <parser.tab.hpp>
     #include <macros.hpp>
+    #include <token.hpp>
 
-    int yylex ();
+    int yylex();
     void yyerror (const std::string &);
 %}
 
-%code requires {
-    #include <macros.hpp>
-}
-
 %union {
+    Heisen::Token* token;
     long long ival;
     double fval;
     char *sval;
 }
 
-%token<sval> IDENTIFIER 
-%token<fval> FLOAT_LITERAL 
-%token<ival> INT_LITERAL 
-%token<sval> STRING_LITERAL
+%code requires {
+    #include <macros.hpp>
+    #include <token.hpp>
+}
 
-%token QUBIT BIT INT FLOAT STRING BOOL
-%token LET CONST APPLY
-%token FUNC GATE CLASS CIRCUIT 
+%token<token> IDENTIFIER 
+%token<token> FLOAT_LITERAL 
+%token<token> INT_LITERAL 
+%token<token> STRING_LITERAL
 
-%token AND OR NOT
-%token TRUE FALSE
+%token<token> QUBIT BIT INT FLOAT STRING BOOL
+%token<token> LET CONST APPLY
+%token<token> FUNC GATE CLASS CIRCUIT 
 
-%token FOR WHILE DO BREAK CONTINUE
-%token IF ELIF ELSE MATCH
+%token<token> AND OR NOT
+%token<token> TRUE FALSE
 
-%token TRY CATCH THROW
+%token<token> FOR WHILE DO BREAK CONTINUE
+%token<token> IF ELIF ELSE MATCH
 
-%token MEASURE_OP RESET_OP
-%token IMPORT RETURN 
-%token PRINT PRINTLN SCAN GETLINE CAST
+%token<token> TRY CATCH THROW
 
-%token GATE_H GATE_S GATE_T GATE_CTRL
-%token GATE_I GATE_X GATE_Y GATE_Z GATE_RX GATE_RY GATE_RZ
-%token GATE_CNOT GATE_CZ GATE_SWAP GATE_CSWAP GATE_CCNOT 
-%token GATE_CRX GATE_CRY GATE_CRZ
+%token<token> MEASURE_OP RESET_OP
+%token<token> IMPORT RETURN 
+%token<token> PRINT PRINTLN SCAN GETLINE CAST
 
-%token EXP SINGLE_ARROW DOUBLE_ARROW 
+%token<token> GATE_H GATE_S GATE_T GATE_CTRL
+%token<token> GATE_I GATE_X GATE_Y GATE_Z GATE_RX GATE_RY GATE_RZ
+%token<token> GATE_CNOT GATE_CZ GATE_SWAP GATE_CSWAP GATE_CCNOT 
+%token<token> GATE_CRX GATE_CRY GATE_CRZ
 
-%token ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN EXP_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
-%token RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_ASSIGN LEFT_SHIFT_ASSIGN
-%token EQ_OP NE_OP GE_OP LE_OP 
-%token SCOPE
+%token<token> EXP SINGLE_ARROW DOUBLE_ARROW 
 
+%token<token> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN EXP_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
+%token<token> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_ASSIGN LEFT_SHIFT_ASSIGN
+%token<token> EQ_OP NE_OP GE_OP LE_OP 
 
 /* operators in reverse precedence order */
 %left OR
@@ -82,22 +84,12 @@ external_declaration
     ;
 
 declaration
-    :   import_declaration
-    |   function_declaration
+    :   function_declaration
     |   gate_declaration
     ;
 
 gate_declaration
     :   GATE '{' APPLY ':' gate_composition '}'
-    ;
-
-import_declaration
-    :   IMPORT scoped_identifier
-    ;
-
-scoped_identifier
-    :   scoped_identifier SCOPE IDENTIFIER
-    |   IDENTIFIER
     ;
 
 function_declaration
@@ -133,12 +125,11 @@ statement
     |   expression_statement ';'
     |   assignment_statement ';'
     |   quantum_statement ';'
-    |   compound_statement
-    |   labeled_statement ';'
-    |   selection_statement
-    |   iteration_statement
     |   jump_statement ';'
     |   print_statement ';'
+    |   compound_statement
+    |   selection_statement
+    |   iteration_statement
     ;
 
 expression_statement    
@@ -188,7 +179,7 @@ optional_condition
 iteration_statement
     :   WHILE '(' condition ')' compound_statement
     |   DO compound_statement WHILE '(' condition ')'
-    |   FOR '(' variable_declarations ';' optional_condition ';' optional_assignment_statement ')' compound_statement
+    |   FOR '(' variable_declaration_list ';' optional_condition ';' optional_assignment_statement ')' compound_statement
     ;
 
 optional_assignment_statement
@@ -207,23 +198,18 @@ jump_statement
     |   RETURN expression
     ;
 
-labeled_statement 
-    :   IDENTIFIER ':' statement
-    ;
-
 declaration_statement
-    :   LET variable_declarations
+    :   LET variable_declaration_list
     ;
 
-variable_declarations
-    :   identifier_list ':' type 
-    |   identifier_list ':' type '=' expression
-    |   identifier_list '=' expression
+variable_declaration_list
+    :   variable_declaration_list ',' variable_declaration
+    |   variable_declaration
     ;
 
-identifier_list
-    :   identifier_list ',' IDENTIFIER
-    |   IDENTIFIER
+variable_declaration
+    :   IDENTIFIER ':' type 
+    |   IDENTIFIER ':' type '=' expression
     ;
 
 type
@@ -242,9 +228,11 @@ function_object
     |   '(' type_list ')' DOUBLE_ARROW type
     ;
 
+
 array_list
     :   array_list '[' index_expression ']'
     |   '[' index_expression ']'
+    |   '[' ']'
     ;
 
 type_name
@@ -400,23 +388,24 @@ simple_gate
     |   GATE_CRZ
     ;
 
+optional_expression
+    :   %empty
+    |   expression
+    ;
+
 index_expression
     :   expression
     |   optional_expression ':' optional_expression
     |   optional_expression ':' optional_expression ':' optional_expression
     ;
-
-optional_expression
-    :   %empty
-    |   expression
-    ;
 %%
 
-void yyerror (const std::string & e) {
-    std::cout << "PARSE ERROR: " << e << std::endl;
+void yyerror(const std::string &msg) {
+    std::cerr << "Parse Error: " << msg << std::endl;
 }
 
 int main () {
+    yydebug = 0;
     yyparse ();
     return 0;
 }

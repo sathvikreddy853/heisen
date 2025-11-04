@@ -17,7 +17,7 @@
 // │   │   ├── StringLiteralExpr (STRING_LITERAL)
 // │   │   └── BoolLiteralExpr (TRUE, FALSE)
 // │   ├── IdentifierExpr (IDENTIFIER)
-// │   ├── BinaryOpExpr (+, -, *, /, ::, AND, OR, etc.)
+// │   ├── BinaryOpExpr (+, -, *, /, AND, OR, etc.)
 // │   ├── UnaryOpExpr (+, -, !, NOT)
 // │   ├── FunctionCallExpr (expr(expr_list))
 // │   ├── IndexAccessExpr (expr[index_expr])
@@ -50,18 +50,17 @@
 // │   │   ├── ApplyGateStmt (gate_composition @ quantum_state)
 // │   │   ├── MeasureStmt (MEASURE_OP state => state)
 // │   │   └── ResetStmt (RESET_OP state)
-// │   └── LabelStmt (IDENTIFIER: statement)
 // │
 // ├── Decl (Base for top-level declarations and variable definitions)
 // │   ├── FunctionDecl (FUNC ident(params) [: type] { ... })
 // │   ├── GateDecl (GATE { APPLY: ... })
-// │   ├── ImportDecl (IMPORT scoped_identifier)
 // │   ├── VariableDecl (From 'variable_declarations', holds idents, type, init)
 // │   └── ParameterDecl (IDENTIFIER: type, used in FunctionDecl)
 // │
 // ├── Type (Base for all type-specifier nodes)
 // │   ├── BaseTypeNode (INT, FLOAT, QUBIT, etc.)
 // │   └── ArrayTypeNode (type[dimension_expr])
+// |   └── FunctionTypeNode     
 // │
 // └── Quantum (Base for quantum-specific syntax nodes)
 //     └── GateNode (Abstract base for 'quantum_gate')
@@ -637,24 +636,24 @@ class ApplyGateStmt : public QuantumStmt {};
 class MeasureStmt : public QuantumStmt {};
 class ResetStmt : public QuantumStmt {};
 
-class LabelStmt : public Stmt {
-private:
-    IdentifierExpr* label;
-    Stmt* statement;
+// class LabelStmt : public Stmt {
+// private:
+//     IdentifierExpr* label;
+//     Stmt* statement;
 
-public:
-    LabelStmt(IdentifierExpr* label, Stmt* statement)
-        : label(label), statement(statement) {}
+// public:
+//     LabelStmt(IdentifierExpr* label, Stmt* statement)
+//         : label(label), statement(statement) {}
 
-    virtual ~LabelStmt() {
-        delete label;
-        delete statement;
-    }
+//     virtual ~LabelStmt() {
+//         delete label;
+//         delete statement;
+//     }
 
-    IdentifierExpr* getLabel() const { return label; }
+//     IdentifierExpr* getLabel() const { return label; }
 
-    Stmt* getStatement() const { return statement; }
-};
+//     Stmt* getStatement() const { return statement; }
+// };
 
 class MatchCase : public ASTNode {
 private:
