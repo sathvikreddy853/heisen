@@ -36,7 +36,6 @@
 
 %token<token> FOR WHILE DO BREAK CONTINUE MATCH
 %token<token> IF ELIF ELSE 
-%nonassoc LOWER_THAN_ELSE 
 
 %token<token> MEASURE_OP RESET_OP
 %token<token> RETURN 
@@ -215,7 +214,8 @@ variable_declaration_list
 variable_declaration
     :   IDENTIFIER ':' type 
     |   IDENTIFIER ':' type '=' expression
-    /* |   IDENTIFIER ':' type '=' braced_init_list */
+    |   IDENTIFIER ':' type '=' braced_init_list
+    |   IDENTIFIER ':' type '=' '[' quantum_state_list ']'
     ;
 
 type
@@ -253,12 +253,13 @@ type_name
 
 assignment_statement
     :   postfix_expression assignment_operator expression
-    /* |   postfix_expression assignment_operator braced_init_list */
+    |   postfix_expression assignment_operator braced_init_list
+    |   postfix_expression assignment_operator '[' quantum_state_list ']'
     ;
 
-/* braced_init_list
-    : '[' expression_list ']'
-    ; */
+braced_init_list
+    : '{' expression_list '}'
+    ; 
 
 assignment_operator
     :   '='
@@ -301,16 +302,10 @@ expression_list
 postfix_expression
     :   primary_expression
     |   postfix_expression '[' index_expression ']'
-    |   '[' postfix_expression_list ']'
     |   postfix_expression '(' expression_list ')'
     |   postfix_expression '(' ')'
     |   postfix_expression '.' IDENTIFIER
     |   CAST '<' type_name '>' '(' expression ')'
-    ;
-
-postfix_expression_list
-    :   postfix_expression_list ',' postfix_expression
-    |   postfix_expression
     ;
 
 primary_expression
@@ -350,21 +345,33 @@ quantum_statement
     ;
 
 measure_statement
-    :   MEASURE_OP postfix_expression DOUBLE_ARROW postfix_expression
+    :   MEASURE_OP quantum_state DOUBLE_ARROW quantum_state
     ;
 
 reset_statement
-    :   RESET_OP postfix_expression
+    :   RESET_OP quantum_state
     ;   
 
 apply_gate_statement
-    :   gate_composition '@' expression
+    :   gate_composition '@' quantum_state
     ;   
 
 gate_composition
     :   gate_composition '@' quantum_gate
     |   quantum_gate 
     ;
+
+quantum_state
+    : IDENTIFIER
+    | quantum_state '[' index_expression ']'
+    | '[' quantum_state_list ']'
+    ;
+
+quantum_state_list
+    : quantum_state
+    | quantum_state_list ',' quantum_state
+    ;
+
 
 quantum_gate
     :   '[' quantum_gate_list ']' 
