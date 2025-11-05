@@ -23,10 +23,6 @@
     Decl* decl;
     Type* type;
     
-
-    GateDecl* gateDecl;
-
-
     GateNode* gateNode;
     QuantumStmt* qstmt;
     QuantumStateExpr* qstate;
@@ -36,6 +32,7 @@
     VariableDecl* varDecl;
     ParameterDecl* paramDecl;
     FunctionDecl* funcDecl;
+    GateDecl* gateDecl;
     MatchCase* matchCase;
     ApplyGateStmt* applyStmt;
     MeasureStmt* measureStmt;
@@ -89,7 +86,7 @@
 %token<token> EQ_OP NE_OP GE_OP LE_OP 
 
 %type<node> translation_unit external_declaration
-%type<decl> declaration function_declaration 
+%type<decl> declaration function_declaration gate_declaration
 %type<funcDecl> function_header
 %type<type> return_type type type_name function_object
 %type<typeList> type_list
@@ -124,8 +121,6 @@
 %type<applyStmt> apply_gate_statement
 %type<qstate> quantum_state
 %type<qstateList> quantum_state_list
-
-%type<gateDecl> gate_declaration
 
 /* operators in reverse precedence order */
 %left OR
@@ -170,43 +165,49 @@ declaration
 
 gate_declaration
     :   GATE '{' APPLY ':' gate_composition '}'
-        { $$ = new GateDecl($5); }
+        { $$ = new GateDecl(); /* Extend GateDecl to hold gate composition */ }
     ;
 
 function_declaration
     :   function_header compound_statement
         { 
-            $1->setBody($2);
-            $$ = $1;
+            // Need to modify FunctionDecl to allow setting body after construction
+            // For now, reconstruct with all parameters
+            $$ = new FunctionDecl(
+                $1->getFunctionName(),
+                $1->getParameters(),
+                $1->getReturnType(),
+                $2
+            );
+            // Clean up the temporary function header (but not its children as they're reused)
+            $1->getFunctionName() = nullptr;
+            $1->getParameters().clear();
+            $1->getReturnType() = nullptr;
+            $1->getBody() = nullptr;
+            delete $1;
         }
     |   function_header return_type compound_statement
         { 
-            $1->setReturnType($2);
-            $1->setBody($3);
-            $$ = $1;
+            $$ = new FunctionDecl(
+                $1->getFunctionName(),
+                $1->getParameters(),
+                $2,
+                $3
+            );
+            // Clean up the temporary function header
+            $1->getFunctionName() = nullptr;
+            $1->getParameters().clear();
+            $1->getReturnType() = nullptr;
+            $1->getBody() = nullptr;
+            delete $1;
         }
     ;
 
 function_header
     :   FUNC IDENTIFIER '(' parameter_list ')'
-        { 
-            $$ = new FunctionDecl(
-                new IdentifierExpr(std::string($2)), 
-                *$4,  // Move parameters from vector
-                nullptr,  // No return type yet
-                nullptr   // No body yet
-            ); 
-            delete $4;  // Delete the vector container (not the contents)
-        }
+        { $$ = new FunctionDecl(new IdentifierExpr(std::string($2)), *$4, nullptr, nullptr); delete $4; }
     |   FUNC IDENTIFIER '(' ')'
-        { 
-            $$ = new FunctionDecl(
-                new IdentifierExpr(std::string($2)), 
-                std::vector<ParameterDecl*>(),  // Empty parameter list
-                nullptr,  // No return type yet
-                nullptr   // No body yet
-            ); 
-        }
+        { $$ = new FunctionDecl(new IdentifierExpr(std::string($2)), std::vector<ParameterDecl*>(), nullptr, nullptr); }
     ;
 
 return_type
@@ -523,7 +524,7 @@ expression
         { $$ = new UnaryOpExpr("-", $2); }
     |   '!' expression %prec UNARY
         { $$ = new UnaryOpExpr("!", $2); }
-    
+ 
 
 postfix_expression
     :   primary_expression
