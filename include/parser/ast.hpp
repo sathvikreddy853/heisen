@@ -1,6 +1,8 @@
 #ifndef HEISEN_AST_HPP
 #define HEISEN_AST_HPP
 #include <macros.hpp>
+#include <string>
+#include <vector>
 
 // ===================================================================
 //
@@ -74,8 +76,6 @@
 //                       Enum Definitions
 //
 // ===================================================================
-
-<<<<<<< HEAD:include/ast/ast.hpp
 
 
 // ===================================================================
@@ -156,90 +156,8 @@ class GateCompositionNode;
 
 
 enum BaseTypeKind { TYPE_INT, TYPE_FLOAT, TYPE_QUBIT, TYPE_BOOL, TYPE_STRING };
-=======
->>>>>>> func-obj:include/parser/ast.hpp
 
-
-// ===================================================================
-//                      Forward Declarations
-// ===================================================================
-
-// ---------- Base Nodes ----------
-class ASTNode;
-class Expr;
-class Stmt;
-class Decl;
-class Type;
-class Quantum;
-
-// ---------- Expression Nodes ----------
-class LiteralExpr;
-class IntLiteralExpr;
-class FloatLiteralExpr;
-class BoolLiteralExpr;
-class StringLiteralExpr;
-
-class IdentifierExpr;
-class BinaryOpExpr;
-class UnaryOpExpr;
-class FunctionCallExpr;
-class IndexAccessExpr;
-class SliceExpr;
-class MemberAccessExpr;
-class CastExpr;
-
-class QuantumStateExpr;
-class QuantumStateIdentifier;
-class QuantumStateIndexAccess;
-class QuantumStateList;
-
-// ---------- Statement Nodes ----------
-class CompoundStmt;
-class DeclarationStmt;
-class AssignmentStmt;
-class ExpressionStmt;
-class IfStmt;
-class MatchStmt;
-class MatchCase;
-
-class LoopStmt;
-class WhileStmt;
-class DoWhileStmt;
-class ForStmt;
-
-class JumpStmt;
-class ContinueStmt;
-class BreakStmt;
-class ReturnStmt;
-
-class PrintStmt;
-class QuantumStmt;
-class ApplyGateStmt;
-class MeasureStmt;
-class ResetStmt;
-
-// ---------- Declaration Nodes ----------
-class VariableDecl;
-class ParameterDecl;
-class FunctionDecl;
-class GateDecl;
-
-// ---------- Type Nodes ----------
-class BaseTypeNode;
-class ArrayTypeNode;
-class FunctionTypeNode; // mentioned in comment
-
-// ---------- Quantum Gate Nodes ----------
-class GateNode;
-class SimpleGateNode;
-class ParametricGateNode;
-class CompositeGateNode;
-class GateCompositionNode;
-
-
-enum struct BaseTypeKind { TYPE_INT, TYPE_FLOAT, TYPE_QUBIT, TYPE_BOOL, TYPE_STRING };
-
-enum struct GateKind {
+enum GateKind {
     H,
     S,
     T,
@@ -262,12 +180,12 @@ enum struct GateKind {
     CTRL
 };
 
-enum struct PrintOperationKind { PRINT, PRINTLN, SCAN };
+enum PrintOperationKind { PRINT, PRINTLN, SCAN };
 
 // ===================================================================
-//
+
 //                         Base AST Nodes
-//
+
 // ===================================================================
 
 class ASTNode {
