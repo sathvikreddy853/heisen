@@ -3,6 +3,7 @@
 %{
     #include <parser.tab.hpp> 
     #include <macros.hpp>
+    #include<token.hpp>
 %}
 
 L   [a-zA-Z_]
@@ -90,8 +91,9 @@ NEWLINE     "\n"
     /* Constants And Identifiers */
 {FLOAT}             { LOGs ("FLOAT(" << yytext << ")"); return FLOAT_LITERAL; }
 {INTEGER}           { LOGs ("INT(" << yytext << ")"); return INT_LITERAL; }
-{STRING}            { LOGs ("STRING(" << yytext << ")"); return STRING_LITERAL; }
-{IDENTIFIER}        { LOGs ("IDENTIFIER(" << yytext << ")"); return IDENTIFIER; }
+{STRING}            {   yylval.sval = yytext;  LOGs ("STRING(" << yytext << ")"); return STRING_LITERAL; }
+{IDENTIFIER}        {   yylval.sval = yytext; LOGs ("IDENTIFIER(" << yytext << ")"); return IDENTIFIER; 
+                    }
     /* Operators */
     /* Binary Operators */
 "+"                 { LOGs ("+"); return '+'; }         
