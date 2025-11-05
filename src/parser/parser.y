@@ -2,7 +2,6 @@
 %debug
 
 %{
-    #include <parser.tab.hpp>
     #include <macros.hpp>
     #include <token.hpp>
     #include <ast.hpp>
@@ -23,9 +22,7 @@
     Decl* decl;
     Type* type;
     
-
     GateDecl* gateDecl;
-
 
     GateNode* gateNode;
     QuantumStmt* qstmt;
@@ -54,6 +51,7 @@
 %code requires {
     #include <macros.hpp>
     #include <token.hpp>
+    #include<ast.hpp>
 }
 
 %token<sval> IDENTIFIER 
@@ -175,6 +173,7 @@ gate_declaration
         { $$ = new GateDecl($5); }
     ;
 
+
 function_declaration
     :   function_header compound_statement
         { 
@@ -210,7 +209,6 @@ function_header
             ); 
         }
     ;
-
 return_type
     :   ':' type
         { $$ = $2; }
@@ -239,7 +237,7 @@ statement
     :   declaration_statement ';'
         { $$ = $1; }
     |   expression_statement ';'
-        { $$ = new ExpressionStmt($1); }
+        { $$ = $1; }
     |   assignment_statement ';'
         { $$ = $1; }
     |   quantum_statement ';'
@@ -258,7 +256,7 @@ statement
 
 expression_statement    
     :   expression
-        { $$ = $1; }
+        { $$ = new ExpressionStmt($1); }
     ;
 
 selection_statement 
@@ -451,17 +449,17 @@ array_list
 
 type_name
     :   QUBIT 
-        { $$ = new BaseTypeNode(TYPE_QUBIT); }
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_QUBIT); }
     |   BIT
-        { $$ = new BaseTypeNode(TYPE_INT); /* Or create TYPE_BIT */ }
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT); /* Or create TYPE_BIT */ }
     |   BOOL
-        { $$ = new BaseTypeNode(TYPE_INT); /* Or create TYPE_BOOL */ }
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT); /* Or create TYPE_BOOL */ }
     |   INT 
-        { $$ = new BaseTypeNode(TYPE_INT); }
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT); }
     |   FLOAT
-        { $$ = new BaseTypeNode(TYPE_FLOAT); }
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_FLOAT); }
     |   STRING
-        { $$ = new BaseTypeNode(TYPE_INT); /* Or create TYPE_STRING */ }
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT); /* Or create TYPE_STRING */ }
     ;
 
 assignment_statement
@@ -525,6 +523,9 @@ expression
         { $$ = new UnaryOpExpr("-", $2); }
     |   '!' expression %prec UNARY
         { $$ = new UnaryOpExpr("!", $2); }
+    |   postfix_expression 
+        {$$=$1;}
+    ;
     
 
 postfix_expression

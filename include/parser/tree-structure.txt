@@ -1,0 +1,73 @@
+// ===================================================================
+//
+//                  Abstract Syntax Tree (AST) Hierarchy
+//
+// ===================================================================
+//
+// ASTNode (Base node for all)
+// ├── Expr (Base for all expressions)
+// │   ├── LiteralExpr (Abstract base for literals)
+// │   │   ├── IntLiteralExpr (INT_LITERAL)
+// │   │   ├── FloatLiteralExpr (FLOAT_LITERAL)
+// │   │   ├── StringLiteralExpr (STRING_LITERAL)
+// │   │   └── BoolLiteralExpr (TRUE, FALSE)
+// │   ├── IdentifierExpr (IDENTIFIER)
+// │   ├── BinaryOpExpr (+, -, *, /, AND, OR, etc.)
+// │   ├── UnaryOpExpr (+, -, !, NOT)
+// │   ├── FunctionCallExpr (expr(expr_list))
+// │   ├── IndexAccessExpr (expr[index_expr])
+// │   ├── SliceExpr (start:stop:step)
+// │   ├── MemberAccessExpr (expr.IDENTIFIER)
+// │   ├── CastExpr (CAST<type>(expr))
+// │   └── QuantumStateExpr (Represents 'quantum_state')
+// │       ├── QuantumStateIdentifier (IDENTIFIER)
+// │       ├── QuantumStateIndexAccess (IDENTIFIER[index_expr])
+// │       └── QuantumStateList ([quantum_state_list])
+// │
+// ├── Stmt (Base for all statements)
+// │   ├── CompoundStmt ({ statement_list })
+// │   ├── DeclarationStmt (LET variable_declarations)
+// │   ├── AssignmentStmt (IDENTIFIER assign_op expr)
+// │   ├── ExpressionStmt (expression;)
+// │   ├── IfStmt (IF/ELIF/ELSE chain)
+// │   ├── MatchStmt (MATCH (expr) { match_list })
+// │   │   └── MatchCase (expr => compound_stmt)
+// │   ├── LoopStmt (Abstract base for loops)
+// │   │   ├── WhileStmt (WHILE (cond) stmt)
+// │   │   ├── DoWhileStmt (DO stmt WHILE (cond))
+// │   │   └── ForStmt (FOR (init; cond; update) stmt)
+// │   ├── JumpStmt (Abstract base for jumps)
+// │   │   ├── ContinueStmt (CONTINUE)
+// │   │   ├── BreakStmt (BREAK)
+// │   │   └── ReturnStmt (RETURN [expr])
+// │   ├── PrintStmt (PRINT, PRINTLN, SCAN)
+// │   ├── QuantumStmt (Abstract base for quantum ops)
+// │   │   ├── ApplyGateStmt (gate_composition @ quantum_state)
+// │   │   ├── MeasureStmt (MEASURE_OP state => state)
+// │   │   └── ResetStmt (RESET_OP state)
+// │
+// ├── Decl (Base for top-level declarations and variable definitions)
+// │   ├── FunctionDecl (FUNC ident(params) [: type] { ... })
+// │   ├── GateDecl (GATE { APPLY: ... })
+// │   ├── VariableDecl (From 'variable_declarations', holds idents, type, init)
+// │   └── ParameterDecl (IDENTIFIER: type, used in FunctionDecl)
+// │
+// ├── Type (Base for all type-specifier nodes)
+// │   ├── BaseTypeNode (INT, FLOAT, QUBIT, etc.)
+// │   └── ArrayTypeNode (type[dimension_expr])
+// |   └── FunctionTypeNode
+// │
+// └── Quantum (Base for quantum-specific syntax nodes)
+//     └── GateNode (Abstract base for 'quantum_gate')
+//         ├── SimpleGateNode (GATE_H, GATE_X, etc.)
+//         ├── ParametricGateNode (GATE_RX(expr))
+//         ├── CompositeGateNode ([gate_list])
+//         └── GateCompositionNode (gate @ gate)
+//
+
+// ===================================================================
+//
+//                       Enum Definitions
+//
+// ===================================================================
+
