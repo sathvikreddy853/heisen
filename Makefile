@@ -32,7 +32,8 @@ yacc:
 # 	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.y
 
 grammar:
-	bison --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.grammar.y
+# 	bison --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.grammar.y
+	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.grammar.y
 
 clean:
 	rm -rf $(BUILD_DIR)

@@ -82,7 +82,7 @@ translation_unit
     ;
 
 external_declaration
-    :   statement_list
+    :   statement
     |   declaration
     ;
 
@@ -135,19 +135,26 @@ statement
     |   iteration_statement
     ;
 
-selection_statement 
-    :   IF '(' condition ')' compound_statement
-    |   IF '(' condition ')' compound_statement elif_chain ELSE compound_statement
+selection_statement
+    :   IF '(' condition ')' compound_statement                        
+    |   IF '(' condition ')' compound_statement ELSE compound_statement
+    |   IF '(' condition ')' compound_statement elif_clauses           
     |   MATCH '(' expression ')' '{' match_list '}'
+    ;
+
+elif_clauses
+    :   ELIF '(' condition ')' compound_statement
+    |   ELIF '(' condition ')' compound_statement ELSE compound_statement
+    |   ELIF '(' condition ')' compound_statement elif_clauses
+    ;
+
+
+compound_statement
+    :   '{' statement_list '}'
     ;
 
 expression_statement    
     :   expression
-    ;
-
-elif_chain
-    :   %empty
-    |   elif_chain ELIF '(' condition ')' compound_statement
     ;
 
 condition   
@@ -188,10 +195,6 @@ iteration_statement
 optional_assignment_statement
     :   %empty
     |   assignment_statement
-    ;
-
-compound_statement
-    :   '{' statement_list '}'
     ;
 
 jump_statement
