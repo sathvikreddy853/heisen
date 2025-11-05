@@ -174,7 +174,6 @@ condition
 match_list
     :   %empty
     |   match_list match_statement
-    |   match_statement
     ;
 
 match_statement
@@ -216,8 +215,7 @@ variable_declaration_list
 variable_declaration
     :   IDENTIFIER ':' type 
     |   IDENTIFIER ':' type '=' expression
-    |   IDENTIFIER ':' type '=' braced_init_list
-    |   IDENTIFIER ':' type '=' quantum_state
+    /* |   IDENTIFIER ':' type '=' braced_init_list */
     ;
 
 type
@@ -254,14 +252,13 @@ type_name
     ;
 
 assignment_statement
-    :   expression assignment_operator expression
-    |   expression assignment_operator braced_init_list
-    |   expression assignment_operator quantum_state
+    :   postfix_expression assignment_operator expression
+    /* |   postfix_expression assignment_operator braced_init_list */
     ;
 
-braced_init_list
+/* braced_init_list
     : '[' expression_list ']'
-    ;
+    ; */
 
 assignment_operator
     :   '='
@@ -295,28 +292,33 @@ assignment_operator
     |   '!' expression %prec UNARY
     |   postfix_expression
     ;
-    
 
+expression_list
+    :   expression_list ',' expression
+    |   expression
+    ;
+    
 postfix_expression
     :   primary_expression
     |   postfix_expression '[' index_expression ']'
+    |   '[' postfix_expression_list ']'
     |   postfix_expression '(' expression_list ')'
     |   postfix_expression '(' ')'
     |   postfix_expression '.' IDENTIFIER
     |   CAST '<' type_name '>' '(' expression ')'
     ;
 
- expression_list
-    :   expression_list ',' expression
-    |   expression
+postfix_expression_list
+    :   postfix_expression_list ',' postfix_expression
+    |   postfix_expression
     ;
 
 primary_expression
-    :   lambda_expression
-    |   INT_LITERAL
+    :   INT_LITERAL
     |   FLOAT_LITERAL
     |   STRING_LITERAL
     |   IDENTIFIER 
+    |   lambda_expression
     |   boolean_literal 
     ;
 
@@ -348,11 +350,11 @@ quantum_statement
     ;
 
 measure_statement
-    :   MEASURE_OP quantum_state DOUBLE_ARROW quantum_state
+    :   MEASURE_OP postfix_expression DOUBLE_ARROW postfix_expression
     ;
 
 reset_statement
-    :   RESET_OP quantum_state
+    :   RESET_OP postfix_expression
     ;   
 
 apply_gate_statement
@@ -363,19 +365,6 @@ gate_composition
     :   gate_composition '@' quantum_gate
     |   quantum_gate 
     ;
-
-quantum_state
-    :   '[' quantum_state_list ']'
-    |   postfix_expression
-    ;
-
-quantum_state_list
-    :   quantum_state_list ',' quantum_state
-    |   quantum_state
-    ;
-
-    /* |   IDENTIFIER '[' index_expression ']'     
-    |   IDENTIFIER */
 
 quantum_gate
     :   '[' quantum_gate_list ']' 
