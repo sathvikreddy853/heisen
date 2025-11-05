@@ -3,8 +3,11 @@
 
 %{
     #include <macros.hpp>
-    #include <token.hpp>
     #include <ast.hpp>
+
+    #include <token.hpp>
+    
+
     int yylex();
     void yyerror (const std::string &);
 %}

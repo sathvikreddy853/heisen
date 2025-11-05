@@ -1,6 +1,5 @@
-func bernstein_vazirani (n: int, Uf: ((qubit[], qubit) => ())) : bit[] {
+func deutsch_josza (n: int, Uf: ((qubit[], qubit) => ())) : bit {
     let res: bit[n];
-
     let x: qubit[n];
     let y: qubit;
 
@@ -12,12 +11,19 @@ func bernstein_vazirani (n: int, Uf: ((qubit[], qubit) => ())) : bit[] {
     H(n) @ x;
 
     measure x => res;
-    return res;
+
+    for (i: int = 0; i < n; i += 1) {
+        if (res[i] == 1) {
+            return 1;
+        }
+    }
+
+    return 0;
 }
 
 func create_oracle (s: bit[]) : ((qubit[], qubit) => ()) {
-    let Uf: ((qubit[], qubit) => ()) = (x: qubit[], y: qubit) {
-        let n: int = s.size;
+    return func Uf(x: qubit[], y: qubit) {
+        let n = s.size;
 
         for (i: int = 0; i < n; i += 1) {
             if (s[i] == 1) {
@@ -25,18 +31,16 @@ func create_oracle (s: bit[]) : ((qubit[], qubit) => ()) {
             }
         }
     };
-
-    return Uf;
 }
 
 
 let s: bit[4] = [1, 0, 1, 1];
+let Uf: ((qubit[], qubit) => ()) = create_oracle(s);
 
-let Uf: ((qubit[], qubit) => ()) = create_oracle(4, Uf);
-let res: bit[4] = bernstein_vazirani(4, Uf);
+let b: bit = deutsch_josza(4, Uf);
 
-if (s == res) {
-    println("SUCCESS");
+if (b == 0) {
+    println("Constant Function");
 } else {
     println("FAILED");
 }
