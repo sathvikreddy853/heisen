@@ -61,9 +61,9 @@
 %token<ival> INT_LITERAL 
 %token<sval> STRING_LITERAL
 
-%token<token> QUBIT BIT INT FLOAT STRING BOOL
+%token<token> QUBIT BIT INT FLOAT STRING BOOL STRUCT
 %token<token> LET CONST APPLY
-%token<token> FUNC GATE CLASS CIRCUIT 
+%token<token> FUNC GATE 
 
 %token<token> AND OR NOT
 %token<token> TRUE FALSE
@@ -71,22 +71,24 @@
 %token<token> FOR WHILE DO BREAK CONTINUE
 %token<token> IF ELIF ELSE MATCH
 
-%token<token> TRY CATCH THROW
-
 %token<token> MEASURE_OP RESET_OP
-%token<token> IMPORT RETURN 
-%token<token> PRINT PRINTLN SCAN GETLINE CAST
+%token<token> RETURN 
+%token<token> PRINT PRINTLN SCAN  CAST
 
 %token<token> GATE_H GATE_S GATE_T GATE_CTRL
 %token<token> GATE_I GATE_X GATE_Y GATE_Z GATE_RX GATE_RY GATE_RZ
 %token<token> GATE_CNOT GATE_CZ GATE_SWAP GATE_CSWAP GATE_CCNOT 
 %token<token> GATE_CRX GATE_CRY GATE_CRZ
 
-%token<token> EXP SINGLE_ARROW DOUBLE_ARROW 
+%token<token> EXP  DOUBLE_ARROW 
 
 %token<token> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN EXP_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
 %token<token> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_ASSIGN LEFT_SHIFT_ASSIGN
 %token<token> EQ_OP NE_OP GE_OP LE_OP 
+
+/* Unused Tokens */
+%token<token> IMPORT SINGLE_ARROW GETLINE
+%token<token> TRY CATCH THROW CLASS CIRCUIT 
 
 %type<node> translation_unit external_declaration
 %type<decl> declaration function_declaration 
