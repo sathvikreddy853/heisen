@@ -2,7 +2,6 @@
 #define HEISEN_TOKEN_HPP
 
 #include <macros.hpp>
-#include<optional>
 namespace Heisen {
 
 enum class Type {

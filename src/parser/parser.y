@@ -4,8 +4,11 @@
 %{
     #include <parser.tab.hpp>
     #include <macros.hpp>
-    #include <token.hpp>
     #include <ast.hpp>
+
+    #include <token.hpp>
+    
+
     int yylex();
     void yyerror (const std::string &);
 %}
@@ -54,6 +57,7 @@
 %code requires {
     #include <macros.hpp>
     #include <token.hpp>
+    #include <ast.hpp>
 }
 
 %token<sval> IDENTIFIER 
@@ -525,8 +529,9 @@ expression
         { $$ = new UnaryOpExpr("-", $2); }
     |   '!' expression %prec UNARY
         { $$ = new UnaryOpExpr("!", $2); }
+    |   postfix_expression
+    ;
     
-
 postfix_expression
     :   primary_expression
         { $$ = $1; }

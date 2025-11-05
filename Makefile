@@ -1,5 +1,5 @@
 BUILD_DIR := ./build
-TARGET_PROGRAM := mini-heisen
+TARGET_PROGRAM := heisen
 
 INCLUDE_DIR := ./include 
 INCLUDE_SUBDIRS := $(shell find $(INCLUDE_DIR) -type d)
@@ -11,9 +11,9 @@ INCLUDE_LIST := $(addprefix -I,$(INCLUDE_SUBDIRS))
 # 	@echo "$(INCLUDE_SUBDIRS)"
 # 	@echo "clang++ -I./build $(INCLUDE_LIST) build/parser.tab.cpp build/lexer.yy.cpp -o ./build/feyn"
 
-.PHONY: all yacc lex compile
+.PHONY: all yacc grammar lex compile
 
-all: build yacc lex compile
+all: build grammar lex compile
 
 build:
 	mkdir -p build
@@ -27,9 +27,12 @@ compile:
 lex:
 	flex -o $(BUILD_DIR)/lexer.yy.cpp src/lexer/lexer.l
 
-yacc: 
+yacc:
 	bison --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.y
 # 	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.y
+
+grammar:
+	bison --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.grammar.y
 
 clean:
 	rm -rf $(BUILD_DIR)
