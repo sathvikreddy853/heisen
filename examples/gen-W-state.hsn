@@ -5,6 +5,7 @@ func generate_W_state (q: qubit) {
         X @ q[0];
     } else {
         let k = n/2;
+
         generate_W_state(q[0:k]);
 
         let anc: qubit;

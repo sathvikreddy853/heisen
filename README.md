@@ -1,4 +1,16 @@
-# Feyn: Another Quantum Programming Language
+# Heisen: Programming Beyond Classical Limits
+
+You can build the program using `CMake`:
+```shell
+cmake --build build
+```
+
+To run the program:
+```shell
+cmake --build build --target run < testcase.hsn
+```
+---
+Alternatively, you can run the build and run the program using `GNU Make`.
 
 Run the following command to build the program: 
 ```shell

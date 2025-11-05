@@ -34,8 +34,9 @@
 %token<token> AND OR NOT
 %token<token> TRUE FALSE
 
-%token<token> FOR WHILE DO BREAK CONTINUE
-%token<token> IF ELIF ELSE MATCH
+%token<token> FOR WHILE DO BREAK CONTINUE MATCH
+%token<token> IF ELIF ELSE 
+%nonassoc LOWER_THAN_ELSE 
 
 %token<token> MEASURE_OP RESET_OP
 %token<token> RETURN 
@@ -75,7 +76,6 @@
 %start translation_unit
 
 %%
-
 translation_unit
     :   translation_unit external_declaration
     |   external_declaration
@@ -135,14 +135,14 @@ statement
     |   iteration_statement
     ;
 
-expression_statement    
-    :   expression
-    ;
-
 selection_statement 
-    :   IF '(' condition ')' compound_statement elif_chain
+    :   IF '(' condition ')' compound_statement
     |   IF '(' condition ')' compound_statement elif_chain ELSE compound_statement
     |   MATCH '(' expression ')' '{' match_list '}'
+    ;
+
+expression_statement    
+    :   expression
     ;
 
 elif_chain
@@ -213,6 +213,8 @@ variable_declaration_list
 variable_declaration
     :   IDENTIFIER ':' type 
     |   IDENTIFIER ':' type '=' expression
+    |   IDENTIFIER ':' type '=' braced_init_list
+    |   IDENTIFIER ':' type '=' quantum_state
     ;
 
 type
@@ -250,7 +252,12 @@ type_name
 
 assignment_statement
     :   expression assignment_operator expression
-        
+    |   expression assignment_operator braced_init_list
+    |   expression assignment_operator quantum_state
+    ;
+
+braced_init_list
+    : '[' expression_list ']'
     ;
 
 assignment_operator
@@ -302,8 +309,7 @@ postfix_expression
     ;
 
 primary_expression
-    :   quantum_state
-    |   lambda_expression
+    :   lambda_expression
     |   INT_LITERAL
     |   FLOAT_LITERAL
     |   STRING_LITERAL
@@ -312,8 +318,8 @@ primary_expression
     ;
 
 lambda_expression
-    :   '(' parameter_list ')' ':' '(' ')' compound_statement
-    |   '(' parameter_list ')' ':' type    compound_statement
+    :   '(' parameter_list ')' compound_statement
+    |   '(' parameter_list ')' ':' type compound_statement
     ;
 
 boolean_literal
@@ -347,7 +353,7 @@ reset_statement
     ;   
 
 apply_gate_statement
-    :   gate_composition '@' quantum_state
+    :   gate_composition '@' expression
     ;   
 
 gate_composition
@@ -357,14 +363,16 @@ gate_composition
 
 quantum_state
     :   '[' quantum_state_list ']'
-    |   IDENTIFIER '[' index_expression ']'
-    |   IDENTIFIER
+    |   postfix_expression
     ;
 
 quantum_state_list
     :   quantum_state_list ',' quantum_state
     |   quantum_state
     ;
+
+    /* |   IDENTIFIER '[' index_expression ']'     
+    |   IDENTIFIER */
 
 quantum_gate
     :   '[' quantum_gate_list ']' 
@@ -374,7 +382,7 @@ quantum_gate
 
 quantum_gate_list
     :   quantum_gate_list ',' quantum_gate
-    |   quantum_gate 
+    |   quantum_gate
     ;
 
 simple_gate
@@ -409,7 +417,6 @@ index_expression
     |   optional_expression ':' optional_expression
     |   optional_expression ':' optional_expression ':' optional_expression
     ;
-
 %%
 
 void yyerror(const std::string &msg) {

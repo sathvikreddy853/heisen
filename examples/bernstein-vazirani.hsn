@@ -1,18 +1,43 @@
-
-func bernstein_vazirani (n: int, Uf: (qubit[], qubit) => ()) : bit[] {
+func bernstein_vazirani (n: int, Uf: ((qubit[], qubit) => ())) : bit[] {
     let res: bit[n];
-    let q: qubit[n + 1];
 
-    let x: qubit[] = q[0:n];
-    let y: qubit[] = q[n];
+    let x: qubit[n];
+    let y: qubit;
+
+    H(n) @ [x];
+    H @ X @ [y];
+
+    Uf([x], [y]);
 
     H(n) @ x;
-    H @ X @ y;
-
-    Uf(x, y);
-
-    H(n) @ x;
-
     measure x => res;
+
     return res;
+}
+
+func create_oracle (s: bit[]) : ((qubit[], qubit) => ()) {
+    let Uf: ((qubit[], qubit) => ()) = (x: qubit[], y: qubit) {
+        let n: int = s.size;
+
+        for (i: int = 0; i < n; i += 1) {
+            if (s[i] == 1) {
+                CNOT @ [x[i], y];
+            }
+        }
+    };
+
+    let q: qubit[n + 1] = [x, y];
+
+    return Uf;
+}
+
+let s: bit[4] = [1, 0, 1, 1];
+let Uf: ((qubit[], qubit) => ()) = create_oracle(s);
+
+let res: bit[4] = bernstein_vazirani(4, Uf);
+
+if (s == res) {
+    println("SUCCESS");
+} else {
+    println("FAILED");
 }
