@@ -104,7 +104,7 @@
 
 %type<exp> expression primary_expression postfix_expression condition optional_condition
 %type<exp> index_expression optional_expression
-%type<expList> expression_list array_list
+%type<expList> expression_list array_list empty_array_list
 
 %type<literalExp> boolean_literal
 %type<sval> assignment_operator print_string
@@ -419,6 +419,7 @@ type
             delete $2;
             $$ = t;
         }
+    |   type_name empty_array_list
     |   type_name
         { $$ = $1; }
     |   function_object
@@ -432,20 +433,29 @@ type_list
         { $1->push_back($3); $$ = $1; }
     ;
 
-function_object
-    :   '(' type_list ')' DOUBLE_ARROW '(' ')'
-        { $$ = nullptr; /* Create FunctionTypeNode if defined */ }
-    |   '(' type_list ')' DOUBLE_ARROW type
-        { $$ = nullptr; /* Create FunctionTypeNode if defined */ }
-    ;
 
 array_list
     :   array_list '[' index_expression ']'
         { $1->push_back($3); $$ = $1; }
     |   '[' index_expression ']'
         { $$ = new std::vector<Expr*>({ $2 }); }
+    ;
+
+empty_array_list
+    :   empty_array_list '[' ']'
     |   '[' ']'
         { $$ = new std::vector<Expr*>({ nullptr }); }
+    ;
+
+function_object
+    :   '(' type_list ')' DOUBLE_ARROW '(' ')'
+        { $$ = nullptr; /* Create FunctionTypeNode if defined */ }
+    |   '(' type_list ')' DOUBLE_ARROW type
+        { $$ = nullptr; /* Create FunctionTypeNode if defined */ }
+    |   type DOUBLE_ARROW type
+        {   }
+    |   type DOUBLE_ARROW '(' ')'
+        {   }
     ;
 
 type_name
@@ -494,7 +504,6 @@ assignment_operator
     |   LEFT_SHIFT_ASSIGN
         { $$ = strdup("<<="); }
     ;
-
 expression
     :   expression '+' expression   
         { $$ = new BinaryOpExpr($1, "+", $3); }  
@@ -524,22 +533,38 @@ expression
         { $$ = new UnaryOpExpr("-", $2); }
     |   '!' expression %prec UNARY
         { $$ = new UnaryOpExpr("!", $2); }
- 
+    |   '(' expression ')'
+        { $$ = $2; }
+    |   postfix_expression
+        { $$ = $1; }  
+    ;
+
 
 postfix_expression
     :   primary_expression
         { $$ = $1; }
+    
+    // Array/Index access: arr[index]
     |   postfix_expression '[' index_expression ']'
         { $$ = new IndexAccessExpr($1, $3); }
+    
+    // Function call with arguments: func(arg1, arg2, ...)
     |   postfix_expression '(' expression_list ')'
         { $$ = new FunctionCallExpr($1, *$3); delete $3; }
+    
+    // Function call without arguments: func()
     |   postfix_expression '(' ')'
         { $$ = new FunctionCallExpr($1, std::vector<Expr*>()); }
+    
+    // Member access: obj.member
     |   postfix_expression '.' IDENTIFIER
         { $$ = new MemberAccessExpr($1, new IdentifierExpr(std::string($3))); }
+    
+    // Type casting: cast<type>(expr)
     |   CAST '<' type_name '>' '(' expression ')'
         { $$ = new CastExpr($3, $6); }
     ;
+
 
 expression_list
     :   expression_list ',' expression
@@ -657,7 +682,7 @@ simple_gate
     |   GATE_T 
         { $$ = new SimpleGateNode(GateKind::T); }
     |   GATE_CTRL
-        { $$ = new SimpleGateNode(GateKind::UNKNOWN); /* Define CTRL in GateKind */ }
+        { $$ = new SimpleGateNode(GateKind::CTRL);}
     |   GATE_I 
         { $$ = new SimpleGateNode(GateKind::I); }
     |   GATE_X
