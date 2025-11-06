@@ -1,4 +1,4 @@
-#include "../include/semantics/SymbolTable.hpp"
+#include <symbol_table.hpp>
 #include <iostream>
 #include <unordered_map>
 #include <optional>

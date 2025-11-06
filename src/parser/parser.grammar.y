@@ -67,6 +67,7 @@
 %left LEFT_SHIFT RIGHT_SHIFT
 %left '+' '-'
 %left '*' '/' '%'
+%right '@'
 %right UNARY
 %right EXP
 %left '.'
@@ -215,7 +216,7 @@ variable_declaration
     :   IDENTIFIER ':' type 
     |   IDENTIFIER ':' type '=' expression
     |   IDENTIFIER ':' type '=' braced_init_list
-    |   IDENTIFIER ':' type '=' '[' quantum_state_list ']'
+    |   IDENTIFIER ':' type '=' '[' postfix_expression_list ']'
     ;
 
 type
@@ -254,11 +255,11 @@ type_name
 assignment_statement
     :   postfix_expression assignment_operator expression
     |   postfix_expression assignment_operator braced_init_list
-    |   postfix_expression assignment_operator '[' quantum_state_list ']'
+    |   postfix_expression assignment_operator '[' postfix_expression_list ']'
     ;
 
 braced_init_list
-    : '{' expression_list '}'
+    :   '{' expression_list '}'
     ; 
 
 assignment_operator
@@ -362,21 +363,19 @@ gate_composition
     ;
 
 quantum_state
-    : IDENTIFIER
-    | quantum_state '[' index_expression ']'
-    | '[' quantum_state_list ']'
+    :   postfix_expression
+    |   '[' postfix_expression_list ']'
     ;
 
-quantum_state_list
-    : quantum_state
-    | quantum_state_list ',' quantum_state
+postfix_expression_list
+    : postfix_expression
+    | postfix_expression_list ',' postfix_expression
     ;
-
 
 quantum_gate
-    :   '[' quantum_gate_list ']' 
+    :   '[' quantum_gate_list ']'
     |   simple_gate '(' expression ')' 
-    |   simple_gate  
+    |   simple_gate
     ;
 
 quantum_gate_list

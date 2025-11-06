@@ -9,6 +9,8 @@ func bernstein_vazirani (n: int, Uf: ((qubit[], qubit) => ())) : bit[] {
 
     Uf(x, y);
 
+    H @ [x, y];
+
     H(n) @ x;
 
     measure x => res;

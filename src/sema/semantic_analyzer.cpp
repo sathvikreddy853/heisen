@@ -1,4 +1,4 @@
-#include "../include/semantics/SymbolTable.hpp"
+#include <symbol_table.hpp>
 
 /*
 checkpoint-1 ast_traversal for statements
