@@ -1,16 +1,21 @@
 #include <symbol_table.hpp>
+#include <semantic_analyzer.hpp>
+#include <iostream>
 
-/*
-checkpoint-1 ast_traversal for statements
-checkpoint-2  for functions
-checkpoint-3  for quantum
-*/
-//not the correct definition it should have parameter as the node of the ast
-void ast_traversal(){
 
+
+/* these are not semantic checks but for debugging  all literals  remove after testing */
+void SemanticAnalyzer::visit(IntLiteralExpr* node) {
+    std::cout << "In the IntLiteral " << node->getValue() << "\n";
 }
-
-int main(){
-    SymbolTable Table;
-    ast_traversal(); //root node should bve passed
+void SemanticAnalyzer::visit(FloatLiteralExpr* node) {
+   std::cout << "Visiting Float: " << node->getValue() << "\n";
+}
+/* not declared in grammar but there in ast (bool literal) */
+void SemanticAnalyzer::visit(BoolLiteralExpr* node) {
+    std::cout << "Visiting Bool: " << node->getValue() << "\n";
+  
+}
+void SemanticAnalyzer::visit(StringLiteralExpr* node) {
+    std::cout << "Visiting String: " << node->getValue() << "\n";
 }

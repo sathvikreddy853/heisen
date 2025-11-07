@@ -1,7 +1,7 @@
 #ifndef HEISEN_SEMANTIC_TABLE_HPP
 #define HEISEN_SYMBOL_TABLE_HPP
 
-
+#include <ast.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -9,18 +9,22 @@
 
 
 struct Symbol {
-    std::string type; //type of the node
-    int value;    //vale of the node
+    Type* type; //type of the node
+    Decl* declaration;    //vale of the node
 };
 
-class SymbolTable {
+class SymbolTable { 
     private:
     std::vector<std::unordered_map<std::string, Symbol>> scopes; //symbol table
     public:
+    SymbolTable(){
+        enterscope();
+    }
+
     void enterscope();
     void exitscope();
-    void insert(const std::string& name,const Symbol& Sym );
-   std::optional<Symbol> find(const std::string& name) const;
+    bool insert(const std::string& name,const Symbol& Sym );
+    const SymbolTable* find(const std::string& name) const;
 };
 
 

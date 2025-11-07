@@ -9,17 +9,23 @@ void SymbolTable::enterscope () {
 void SymbolTable::exitscope () { 
     scopes.pop_back ();  //removing the exited scope data 
 }
-void SymbolTable::insert (const std::string& name, const Symbol& Sym) {
-    if (scopes.size()) {  
-        scopes.back ()[name] = Sym;  //inserting the new data member
+bool SymbolTable::insert (const std::string& name, const Symbol& Sym) {
+
+    if(!scopes.size()){
+        return false;
     }
+    if (scopes.back().find(name) != current_scope.end()) {
+            return false;   //redeclaration
+        }
+    scopes.back ()[name] = Sym;  //inserting the new data member
+    return false;
 }
-std::optional<Symbol> SymbolTable::find(const std::string& name)const{
+const Symbol* SymbolTable::find(const std::string& name)const{
     for (int i=scopes.size()-1;i>=0;i--){
       auto it = scopes[i].find(name);
         if (it != scopes[i].end()) {
             return it->second;  // return the found Symbol
         }
     }
-    return {};
+    return nullptr;
 }

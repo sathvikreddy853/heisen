@@ -4,7 +4,7 @@
 #include <macros.hpp>
 #include <string>
 #include <vector>
-
+#include <ast_traversal.hpp>
 
 // ===================================================================
 //
@@ -142,6 +142,7 @@ enum class PrintOperationKind { PRINT, PRINTLN, SCAN };
 class ASTNode {
     public:
     virtual ~ASTNode () = default;
+    virtual void process(AST_Traversal* Visitor) = 0;
 };
 
 class Expr : public ASTNode {
@@ -193,6 +194,9 @@ class IntLiteralExpr : public LiteralExpr {
     public:
     IntLiteralExpr (int v) : value (v) {}
     int getValue () const { return value; }
+    void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class FloatLiteralExpr : public LiteralExpr {
@@ -201,6 +205,9 @@ class FloatLiteralExpr : public LiteralExpr {
     public:
     FloatLiteralExpr (float v) : value (v) {}
     float getValue () const { return value; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class BoolLiteralExpr : public LiteralExpr {
@@ -209,6 +216,9 @@ class BoolLiteralExpr : public LiteralExpr {
     public:
     BoolLiteralExpr (bool v) : value (v) {}
     bool getValue () const { return value; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class StringLiteralExpr : public LiteralExpr {
@@ -217,6 +227,9 @@ class StringLiteralExpr : public LiteralExpr {
     public:
     StringLiteralExpr (std::string v) : value (std::move (v)) {}
     const std::string& getValue () const { return value; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class IdentifierExpr : public Expr {
@@ -225,6 +238,9 @@ class IdentifierExpr : public Expr {
     public:
     IdentifierExpr (std::string v) : value (std::move (v)) {}
     const std::string& getValue () const { return value; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class BinaryOpExpr : public Expr {
@@ -241,6 +257,9 @@ class BinaryOpExpr : public Expr {
     Expr* getLeft () const { return left; }
     Expr* getRight () const { return right; }
     const std::string& getOperator () const { return op; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class UnaryOpExpr : public Expr {
@@ -252,6 +271,9 @@ class UnaryOpExpr : public Expr {
     ~UnaryOpExpr () { delete operand; }
     const std::string& getOperator () const { return op; }
     Expr* getOperand () const { return operand; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class FunctionCallExpr : public Expr {
@@ -266,6 +288,9 @@ class FunctionCallExpr : public Expr {
     }
     Expr* getCallee () const { return callee; }
     const std::vector<Expr*>& getArgs () const { return args; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class IndexAccessExpr : public Expr {
@@ -280,6 +305,9 @@ class IndexAccessExpr : public Expr {
     }
     Expr* getTarget () const { return target; }
     Expr* getIndex () const { return index; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class SliceExpr : public Expr {
@@ -297,6 +325,9 @@ class SliceExpr : public Expr {
     Expr* getStart () const { return start; }
     Expr* getStop () const { return stop; }
     Expr* getStep () const { return step; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class MemberAccessExpr : public Expr {
@@ -311,6 +342,9 @@ class MemberAccessExpr : public Expr {
     }
     Expr* getTarget () const { return target; }
     IdentifierExpr* getMemberName () const { return member; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class CastExpr : public Expr {
@@ -325,6 +359,9 @@ class CastExpr : public Expr {
     }
     Type* getTargetType () const { return targetType; }
     Expr* getExpression () const { return expr; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 // QuantumStateExpr must be fully defined before any Stmt uses it
@@ -340,6 +377,9 @@ class QuantumStateIdentifier : public QuantumStateExpr {
     QuantumStateIdentifier (IdentifierExpr* id) : identifier (id) {}
     ~QuantumStateIdentifier () { delete identifier; }
     IdentifierExpr* getIdentifier () const { return identifier; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class QuantumStateIndexAccess : public QuantumStateExpr {
@@ -354,6 +394,9 @@ class QuantumStateIndexAccess : public QuantumStateExpr {
     }
     IdentifierExpr* getIdentifier () const { return identifier; }
     Expr* getIndex () const { return index; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class QuantumStateList : public QuantumStateExpr {
@@ -365,6 +408,9 @@ class QuantumStateList : public QuantumStateExpr {
         for (auto* s : states) delete s;
     }
     const std::vector<QuantumStateExpr*>& getStates () const { return states; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 // ===================================================================
@@ -388,6 +434,9 @@ class VariableDecl : public Decl {
     IdentifierExpr* getVariableName () const { return name; }
     Type* getVariableType () const { return type; }
     Expr* getInitializer () const { return init; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 // Needed before DeclarationStmt
@@ -409,6 +458,9 @@ class CompoundStmt : public Stmt {
         for (auto* st : stmts) delete st;
     }
     const std::vector<Stmt*>& getStatements () const { return stmts; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class DeclarationStmt : public Stmt {
@@ -420,6 +472,9 @@ class DeclarationStmt : public Stmt {
         for (auto* d : decls) delete d;
     }
     const std::vector<VariableDecl*>& getDeclarations () const { return decls; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class AssignmentStmt : public Stmt {
@@ -433,6 +488,9 @@ class AssignmentStmt : public Stmt {
         delete left;
         delete right;
     }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class ExpressionStmt : public Stmt {
@@ -442,6 +500,9 @@ class ExpressionStmt : public Stmt {
     ExpressionStmt (Expr* e) : expr (e) {}
     ~ExpressionStmt () { delete expr; }
     Expr* getExpression () const { return expr; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class IfStmt : public Stmt {
@@ -456,6 +517,9 @@ class IfStmt : public Stmt {
         delete thenBlk;
         delete elseBlk;
     }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class MatchCase : public ASTNode {
@@ -468,6 +532,9 @@ class MatchCase : public ASTNode {
         delete matchExpr;
         delete body;
     }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class MatchStmt : public Stmt {
@@ -479,6 +546,9 @@ class MatchStmt : public Stmt {
     ~MatchStmt () {
         delete matchExpr;
         for (auto* cs : cases) delete cs;
+    }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
     }
 };
 
@@ -497,6 +567,9 @@ class WhileStmt : public LoopStmt {
         delete cond;
         delete body;
     }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class DoWhileStmt : public LoopStmt {
@@ -508,6 +581,9 @@ class DoWhileStmt : public LoopStmt {
     ~DoWhileStmt () {
         delete body;
         delete cond;
+    }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
     }
 };
 
@@ -526,6 +602,9 @@ class ForStmt : public LoopStmt {
         delete update;
         delete body;
     }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class JumpStmt : public Stmt {
@@ -543,6 +622,9 @@ class ReturnStmt : public JumpStmt {
     ~ReturnStmt () { delete value; }
     Expr* getReturnValue () const { return value; }
     bool hasReturnValue () const { return value != nullptr; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class PrintStmt : public Stmt {
@@ -554,6 +636,9 @@ class PrintStmt : public Stmt {
     ~PrintStmt () { delete arg; }
     Expr* getArgument () const { return arg; }
     PrintOperationKind getKind () const { return kind; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 // ===================================================================
@@ -573,6 +658,9 @@ class SimpleGateNode : public GateNode {
     public:
     SimpleGateNode (GateKind k) : kind (k) {}
     GateKind getGateKind () const { return kind; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class ParametricGateNode : public GateNode {
@@ -584,6 +672,9 @@ class ParametricGateNode : public GateNode {
     ~ParametricGateNode () {
         for (auto* e : params) delete e;
     }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class CompositeGateNode : public GateNode {
@@ -593,6 +684,9 @@ class CompositeGateNode : public GateNode {
     CompositeGateNode (std::vector<GateNode*> g) : gates (std::move (g)) {}
     ~CompositeGateNode () {
         for (auto* g : gates) delete g;
+    }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
     }
 };
 
@@ -605,6 +699,9 @@ class GateCompositionNode : public GateNode {
     ~GateCompositionNode () {
         delete left;
         delete right;
+    }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
     }
 };
 
@@ -667,6 +764,9 @@ class ParameterDecl : public Decl {
         delete name;
         delete type;
     }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class FunctionDecl : public Decl {
@@ -721,6 +821,9 @@ public:
         }
         body = newBody; 
     }
+    void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 class GateDecl : public Decl {
     GateNode* gate;
@@ -742,6 +845,9 @@ class BaseTypeNode : public Type {
     public:
     BaseTypeNode (BaseTypeKind t) : Type (Type::Kind::BaseType), baseType (t) {}
     BaseTypeKind getBaseType () const { return baseType; }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
+    }
 };
 
 class ArrayTypeNode : public Type {
@@ -753,6 +859,9 @@ class ArrayTypeNode : public Type {
     ~ArrayTypeNode () {
         delete elementType;
         delete dimension;
+    }
+     void process(ASTVisitor* visitor) override {
+        visitor->visit(this);
     }
 };
 
