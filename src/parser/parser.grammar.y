@@ -96,7 +96,7 @@ gate_declaration
     ;
 
 function_declaration
-    :   FUNC function_header compound_statement
+    :   FUNC function_header compound_statement 
     |   FUNC function_header return_type compound_statement
     ;
 
@@ -216,7 +216,7 @@ variable_declaration
     :   IDENTIFIER ':' type 
     |   IDENTIFIER ':' type '=' expression
     |   IDENTIFIER ':' type '=' braced_init_list
-    |   IDENTIFIER ':' type '=' '[' postfix_expression_list ']'
+    |   IDENTIFIER ':' type '=' tensored_state
     ;
 
 type
@@ -255,7 +255,7 @@ type_name
 assignment_statement
     :   postfix_expression assignment_operator expression
     |   postfix_expression assignment_operator braced_init_list
-    |   postfix_expression assignment_operator '[' postfix_expression_list ']'
+    |   postfix_expression assignment_operator tensored_state
     ;
 
 braced_init_list
@@ -364,7 +364,11 @@ gate_composition
 
 quantum_state
     :   postfix_expression
-    |   '[' postfix_expression_list ']'
+    |   tensored_state
+    ;
+
+tensored_state
+    :   '[' postfix_expression_list ']'
     ;
 
 postfix_expression_list
@@ -374,13 +378,15 @@ postfix_expression_list
 
 quantum_gate
     :   '[' quantum_gate_list ']'
-    |   simple_gate '(' expression ')' 
+    |   simple_gate '(' expression ')'
     |   simple_gate
     ;
 
 quantum_gate_list
-    :   quantum_gate_list ',' quantum_gate
-    |   quantum_gate
+    :   quantum_gate_list ',' simple_gate '(' expression ')' 
+    |   quantum_gate_list ',' simple_gate 
+    |   simple_gate '(' expression ')'
+    |   simple_gate
     ;
 
 simple_gate

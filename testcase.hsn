@@ -4,8 +4,7 @@ func bernstein_vazirani (n: int, Uf: ((qubit[], qubit) => ())) : bit[] {
     let x: qubit[n];
     let y: qubit;
 
-    H(n) @ x;
-    H @ X @ y;
+    [I(n), H] @ [H(n), X] @ [x, y];
 
     Uf(x, y);
 

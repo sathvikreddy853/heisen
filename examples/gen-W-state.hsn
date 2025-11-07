@@ -1,10 +1,10 @@
 func generate_W_state (q: qubit) {
-    let n = q.size;
+    let n: int = q.size;
 
     if (n == 1) {
         X @ q[0];
     } else {
-        let k = n/2;
+        let k: int = n/2;
 
         generate_W_state(q[0:k]);
 
@@ -15,7 +15,7 @@ func generate_W_state (q: qubit) {
             CSWAP @ [anc, q[i], q[i+k]];
         }
 
-        for (i: int = k; i < n; i++) {
+        for (i: int = k; i < n; i += 1) {
             CNOT @ [q[i], anc];
         }
     }

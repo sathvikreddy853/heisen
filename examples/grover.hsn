@@ -1,5 +1,5 @@
 func apply_oracle(n: int, q: qubit[n], target: int) {
-    for (int i = 0; i < n; i = i + 1) {
+    for (i: int = 0; i < n; i = i + 1) {
         if (((target >> i) & 1) == 0) {
             X @ q[i];
         }
@@ -7,7 +7,7 @@ func apply_oracle(n: int, q: qubit[n], target: int) {
 
     [CTRL(n), Z] @ q;
 
-    for (int i = 0; i < n; i = i + 1) {
+    for (i: int = 0; i < n; i = i + 1) {
         if (((target >> i) & 1) == 0) {
             X @ q[i];
         }
@@ -30,7 +30,7 @@ func diffusion(n: int, q: qubit[n]) {
     return;
 }
 
-func grover_search(n: int, target: int = (1 << n) - 1) -> bit[n] {
+func grover_search(n: int, target: int = (1 << n) - 1) : bit[n] {
     let q: qubit[n];
     let b: bit[n];
 
