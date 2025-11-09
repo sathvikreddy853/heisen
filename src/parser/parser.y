@@ -2,22 +2,21 @@
 %debug
 
 %{
+    #include <parser.tab.hpp>
     #include <macros.hpp>
+    #include <token.hpp>
     #include <ast.hpp>
 
-    #include <token.hpp>
-    
-
     int yylex();
-    void yyerror (const std::string &);
+    void yyerror(const std::string &);
+    
+    // Root of the AST
+    std::vector<ASTNode*> translationUnit;
 %}
 
 %union {
     Heisen::Token* token;
-    long long ival;
-    double fval;
-    char *sval;
-    
+
     ASTNode* node;
     Expr* exp;
     LiteralExpr* literalExp;
@@ -26,10 +25,10 @@
     Type* type;
     
     GateDecl* gateDecl;
-
     GateNode* gateNode;
     QuantumStmt* qstmt;
-    QuantumStateExpr* qstate;
+
+    SimpleGateNode* simpgateNode;
     
     CompoundStmt* compoundStmt;
     DeclarationStmt* declStmt;
@@ -44,7 +43,6 @@
     std::vector<Stmt*>* stmtList;
     std::vector<Expr*>* expList;
     std::vector<GateNode*>* gList;
-    std::vector<QuantumStateExpr*>* qstateList;
     std::vector<VariableDecl*>* varDeclList;
     std::vector<ParameterDecl*>* paramDeclList;
     std::vector<MatchCase*>* matchCaseList;
@@ -54,13 +52,13 @@
 %code requires {
     #include <macros.hpp>
     #include <token.hpp>
-    #include<ast.hpp>
+    #include <ast.hpp>
 }
 
-%token<sval> IDENTIFIER 
-%token<fval> FLOAT_LITERAL 
-%token<ival> INT_LITERAL 
-%token<sval> STRING_LITERAL
+%token<token> IDENTIFIER 
+%token<token> FLOAT_LITERAL 
+%token<token> INT_LITERAL 
+%token<token> STRING_LITERAL
 
 %token<token> QUBIT BIT INT FLOAT STRING BOOL STRUCT
 %token<token> LET CONST APPLY
@@ -69,68 +67,57 @@
 %token<token> AND OR NOT
 %token<token> TRUE FALSE
 
-%token<token> FOR WHILE DO BREAK CONTINUE
-%token<token> IF ELIF ELSE MATCH
+%token<token> FOR WHILE DO BREAK CONTINUE MATCH
+%token<token> IF ELIF ELSE 
 
 %token<token> MEASURE_OP RESET_OP
 %token<token> RETURN 
-%token<token> PRINT PRINTLN SCAN  CAST
+%token<token> PRINT PRINTLN SCAN CAST
 
 %token<token> GATE_H GATE_S GATE_T GATE_CTRL
 %token<token> GATE_I GATE_X GATE_Y GATE_Z GATE_RX GATE_RY GATE_RZ
 %token<token> GATE_CNOT GATE_CZ GATE_SWAP GATE_CSWAP GATE_CCNOT 
 %token<token> GATE_CRX GATE_CRY GATE_CRZ
 
-%token<token> EXP  DOUBLE_ARROW 
+%token<token> EXP DOUBLE_ARROW 
 
+%token<token> EQUAL_TO
 %token<token> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN EXP_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
 %token<token> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_ASSIGN LEFT_SHIFT_ASSIGN
 %token<token> EQ_OP NE_OP GE_OP LE_OP 
 
-/* Unused Tokens */
 %token<token> IMPORT SINGLE_ARROW GETLINE
 %token<token> TRY CATCH THROW CLASS CIRCUIT 
 
-%type<node> translation_unit external_declaration
-%type<decl> declaration function_declaration 
-%type<funcDecl> function_header
-%type<type> return_type type type_name function_object
-%type<typeList> type_list
-%type<paramDecl> parameter
-%type<paramDeclList> parameter_list
-
-%type<stmtList> statement_list
-%type<stmt> statement expression_statement assignment_statement quantum_statement
-%type<stmt> jump_statement print_statement selection_statement iteration_statement
+%type<decl>declaration
+%type<token> assignment_operator print_string 
+%type<literalExp> boolean_literal
+%type<gateNode>  quantum_gate gate_composition 
+%type<simpgateNode> simple_gate
+%type<stmt> jump_statement print_statement selection_statement iteration_statement assignment_statement statement
 %type<compoundStmt> compound_statement
 %type<declStmt> declaration_statement
-
 %type<varDecl> variable_declaration
 %type<varDeclList> variable_declaration_list
-
-%type<exp> expression primary_expression postfix_expression condition optional_condition
-%type<exp> index_expression optional_expression
-%type<expList> expression_list array_list
-
-%type<literalExp> boolean_literal
-%type<sval> assignment_operator print_string
-
+%type<paramDecl> parameter
+%type<paramDeclList> parameter_list
+%type<funcDecl> function_declaration function_header
+%type<gateDecl> gate_declaration
+%type<type> type type_name return_type function_object
+%type<typeList> type_list array_list
 %type<matchCase> match_statement
 %type<matchCaseList> match_list
-%type<stmt> elif_chain optional_assignment_statement
-
-%type<gateNode> simple_gate quantum_gate gate_composition
-%type<gList> quantum_gate_list
-
+%type<stmtList> statement_list elif_clauses
+%type<qstmt> quantum_statement
+%type<applyStmt> apply_gate_statement
 %type<measureStmt> measure_statement
 %type<resetStmt> reset_statement
-%type<applyStmt> apply_gate_statement
-%type<qstate> quantum_state
-%type<qstateList> quantum_state_list
+%type<exp> expression postfix_expression primary_expression condition optional_condition
+%type<exp> expression_statement index_expression optional_expression
+%type<exp> quantum_state tensored_state braced_init_list lambda_expression
+%type<expList> expression_list postfix_expression_list optional_assignment_statement
+%type<gList> quantum_gate_list
 
-%type<gateDecl> gate_declaration
-
-/* operators in reverse precedence order */
 %left OR
 %left AND
 %left '|'
@@ -141,573 +128,704 @@
 %left LEFT_SHIFT RIGHT_SHIFT
 %left '+' '-'
 %left '*' '/' '%'
+%right '@'
 %right UNARY
 %right EXP
 %left '.'
-%left SCOPE
 
 %start translation_unit
 
 %%
 
 translation_unit
-    :   translation_unit external_declaration
-        { $$ = nullptr; /* Root AST construction can be added here */ }
-    |   external_declaration
-        { $$ = $1; }
+    : translation_unit external_declaration
+    | external_declaration
     ;
 
 external_declaration
-    :   statement_list
-        { $$ = nullptr; /* Could wrap in a top-level node */ }
-    |   declaration
-        { $$ = $1; }
+    : statement
+        { translationUnit.push_back($1); }
+    | declaration
+        { translationUnit.push_back($1); }
     ;
 
 declaration
-    :   function_declaration
+    : function_declaration
         { $$ = $1; }
-    |   gate_declaration
+    | gate_declaration
         { $$ = $1; }
     ;
 
 gate_declaration
-    :   GATE '{' APPLY ':' gate_composition '}'
-        { $$ = new GateDecl($5); }
+    : GATE '{' APPLY ':' gate_composition '}'
+        { $$ = new GateDecl($5, $1->loc); }
     ;
 
-
 function_declaration
-    :   function_header compound_statement
+    : FUNC function_header compound_statement 
         { 
-            $1->setBody($2);
-            $$ = $1;
+            $2->setBody($3);
+            $$ = $2;
         }
-    |   function_header return_type compound_statement
+    | FUNC function_header return_type compound_statement
         { 
-            $1->setReturnType($2);
-            $1->setBody($3);
-            $$ = $1;
+            $2->setReturnType($3);
+            $2->setBody($4);
+            $$ = $2;
         }
     ;
 
 function_header
-    :   FUNC IDENTIFIER '(' parameter_list ')'
-        { 
-            $$ = new FunctionDecl(
-                new IdentifierExpr(std::string($2)), 
-                *$4,  // Move parameters from vector
-                nullptr,  // No return type yet
-                nullptr   // No body yet
-            ); 
-            delete $4;  // Delete the vector container (not the contents)
+    : IDENTIFIER '(' parameter_list ')'
+        {
+            auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
+            $$ = new FunctionDecl(name, *$3, nullptr, nullptr, $1->loc);
+            delete $3;
         }
-    |   FUNC IDENTIFIER '(' ')'
-        { 
-            $$ = new FunctionDecl(
-                new IdentifierExpr(std::string($2)), 
-                std::vector<ParameterDecl*>(),  // Empty parameter list
-                nullptr,  // No return type yet
-                nullptr   // No body yet
-            ); 
+    | IDENTIFIER '(' ')'
+        {
+            auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
+            std::vector<ParameterDecl*> empty;
+            $$ = new FunctionDecl(name, empty, nullptr, nullptr, $1->loc);
         }
     ;
+
 return_type
-    :   ':' type
+    : ':' type
         { $$ = $2; }
     ;
 
 parameter_list
-    :   parameter 
-        { $$ = new std::vector<ParameterDecl*>({ $1 }); }
-    |   parameter_list ',' parameter
-        { $1->push_back($3); $$ = $1; }
+    : parameter 
+        { 
+            $$ = new std::vector<ParameterDecl*>();
+            $$->push_back($1);
+        }
+    | parameter_list ',' parameter
+        { 
+            $1->push_back($3);
+            $$ = $1;
+        }
     ;
 
 parameter
-    :   IDENTIFIER ':' type
-        { $$ = new ParameterDecl(new IdentifierExpr(std::string($1)), $3); }
+    : IDENTIFIER ':' type
+        {
+            auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
+            $$ = new ParameterDecl(name, $3, $1->loc);
+        }
     ;
 
 statement_list 
-    :   statement_list statement
-        { $1->push_back($2); $$ = $1; }
-    |   statement
-        { $$ = new std::vector<Stmt*>({ $1 }); }
+    : statement_list statement
+        { 
+            $1->push_back($2);
+            $$ = $1;
+        }
+    | statement
+        { 
+            $$ = new std::vector<Stmt*>();
+            $$->push_back($1);
+        }
     ;
 
 statement
-    :   declaration_statement ';'
+    : declaration_statement ';'
         { $$ = $1; }
-    |   expression_statement ';'
+    | expression_statement ';'
+        { $$ = new ExpressionStmt($1); }
+    | assignment_statement ';'
         { $$ = $1; }
-    |   assignment_statement ';'
+    | quantum_statement ';'
         { $$ = $1; }
-    |   quantum_statement ';'
+    | jump_statement ';'
         { $$ = $1; }
-    |   jump_statement ';'
+    | print_statement ';'
         { $$ = $1; }
-    |   print_statement ';'
+    | compound_statement
         { $$ = $1; }
-    |   compound_statement
+    | selection_statement
         { $$ = $1; }
-    |   selection_statement
+    | iteration_statement
         { $$ = $1; }
-    |   iteration_statement
-        { $$ = $1; }
+    ;
+
+selection_statement
+    : IF '(' condition ')' compound_statement
+        { $$ = new IfStmt($3, $5, nullptr, $1->loc); }
+    | IF '(' condition ')' compound_statement ELSE compound_statement
+        { $$ = new IfStmt($3, $5, $7, $1->loc); }
+    | IF '(' condition ')' compound_statement elif_clauses
+        { 
+            // Convert elif chain to nested if-else
+            Stmt* elseBlock = (*$6)[0];
+            for (size_t i = 1; i < $6->size(); i++) {
+                elseBlock = new IfStmt(nullptr, elseBlock, (*$6)[i]);
+            }
+            $$ = new IfStmt($3, $5, elseBlock, $1->loc);
+            delete $6;
+        }
+    | MATCH '(' expression ')' '{' match_list '}'
+        { $$ = new MatchStmt($3, *$6, $1->loc); delete $6; }
+    ;
+
+elif_clauses
+    : ELIF '(' condition ')' compound_statement
+        { 
+            $$ = new std::vector<Stmt*>();
+            $$->push_back(new IfStmt($3, $5, nullptr, $1->loc));
+        }
+    | ELIF '(' condition ')' compound_statement ELSE compound_statement
+        { 
+            $$ = new std::vector<Stmt*>();
+            $$->push_back(new IfStmt($3, $5, $7, $1->loc));
+        }
+    | ELIF '(' condition ')' compound_statement elif_clauses
+        { 
+            $6->insert($6->begin(), new IfStmt($3, $5, nullptr, $1->loc));
+            $$ = $6;
+        }
+    ;
+
+compound_statement
+    : '{' statement_list '}'
+        { $$ = new CompoundStmt(*$2); delete $2; }
     ;
 
 expression_statement    
-    :   expression
-        { $$ = new ExpressionStmt($1); }
-    ;
-
-selection_statement 
-    :   IF '(' condition ')' compound_statement elif_chain
-        { $$ = new IfStmt($3, $5, $6); }
-    |   IF '(' condition ')' compound_statement elif_chain ELSE compound_statement
-        { 
-            Stmt* elseChain = $6 ? new IfStmt(nullptr, $6, $8) : $8;
-            $$ = new IfStmt($3, $5, elseChain); 
-        }
-    |   MATCH '(' expression ')' '{' match_list '}'
-        { $$ = new MatchStmt($3, *$6); delete $6; }
-    ;
-
-elif_chain
-    :   %empty
-        { $$ = nullptr; }
-    |   elif_chain ELIF '(' condition ')' compound_statement
-        { 
-            Stmt* newElif = new IfStmt($4, $6, nullptr);
-            if ($1) {
-                // Chain the new elif to the end
-                IfStmt* curr = dynamic_cast<IfStmt*>($1);
-                while (curr && curr->getElseBlock()) {
-                    curr = dynamic_cast<IfStmt*>(curr->getElseBlock());
-                }
-                if (curr) {
-                    // This is a problem: getElseBlock() returns const Stmt*
-                    // We need to traverse and set properly
-                    // For now, just create a new chain
-                }
-                $$ = $1;
-            } else {
-                $$ = newElif;
-            }
-        }
+    : expression
+        { $$ = $1; }
     ;
 
 condition   
-    :   expression '>' expression
+    : expression '>' expression
         { $$ = new BinaryOpExpr($1, ">", $3); }
-    |   expression '<' expression
+    | expression '<' expression
         { $$ = new BinaryOpExpr($1, "<", $3); }
-    |   expression GE_OP expression
+    | expression GE_OP expression
         { $$ = new BinaryOpExpr($1, ">=", $3); }
-    |   expression LE_OP expression
+    | expression LE_OP expression
         { $$ = new BinaryOpExpr($1, "<=", $3); }
-    |   expression EQ_OP expression
+    | expression EQ_OP expression
         { $$ = new BinaryOpExpr($1, "==", $3); }
-    |   expression NE_OP expression
+    | expression NE_OP expression
         { $$ = new BinaryOpExpr($1, "!=", $3); }
-    |   condition AND condition
-        { $$ = new BinaryOpExpr($1, "&&", $3); }
-    |   condition OR condition
-        { $$ = new BinaryOpExpr($1, "||", $3); }
-    |   NOT condition %prec UNARY
-        { $$ = new UnaryOpExpr("!", $2); }
-    |   '(' condition ')'
+    | condition AND condition
+        { $$ = new BinaryOpExpr($1, "and", $3); }
+    | condition OR condition
+        { $$ = new BinaryOpExpr($1, "or", $3); }
+    | NOT condition %prec UNARY
+        { $$ = new UnaryOpExpr("not", $2); }
+    | '(' condition ')'
         { $$ = $2; }
-    |   expression
+    | expression
         { $$ = $1; }
     ;
 
 match_list
-    :   %empty
+    : %empty
         { $$ = new std::vector<MatchCase*>(); }
-    |   match_list match_statement
-        { $1->push_back($2); $$ = $1; }
-    |   match_statement
-        { $$ = new std::vector<MatchCase*>({ $1 }); }
+    | match_list match_statement
+        { 
+            $1->push_back($2);
+            $$ = $1;
+        }
     ;
 
 match_statement
-    :   expression DOUBLE_ARROW compound_statement
+    : expression DOUBLE_ARROW compound_statement
         { $$ = new MatchCase($1, $3); }
     ;
 
 optional_condition
-    :   %empty
+    : %empty
         { $$ = nullptr; }
-    |   condition
+    | condition
         { $$ = $1; }
     ;
 
 iteration_statement
-    :   WHILE '(' condition ')' compound_statement
-        { $$ = new WhileStmt($3, $5); }
-    |   DO compound_statement WHILE '(' condition ')'
-        { $$ = new DoWhileStmt($2, $5); }
-    |   FOR '(' variable_declaration_list ';' optional_condition ';' optional_assignment_statement ')' compound_statement
+    : WHILE '(' condition ')' compound_statement
+        { $$ = new WhileStmt($3, $5, $1->loc); }
+    | DO compound_statement WHILE '(' condition ')'
+        { $$ = new DoWhileStmt($2, $5, $1->loc); }
+    | FOR '(' variable_declaration_list ';' optional_condition ';' optional_assignment_statement ')' compound_statement
         { 
-            // optional_assignment_statement returns Stmt*, but ForStmt expects Expr*
-            // We need to extract the expression from AssignmentStmt
-            Expr* updateExpr = nullptr;
-            if ($7) {
-                AssignmentStmt* assignStmt = dynamic_cast<AssignmentStmt*>($7);
-                if (assignStmt) {
-                    // Create a new assignment expression
-                    // For simplicity, treat the entire assignment as an expression
-                    // This is a semantic issue - FOR loop update should be expression
-                    updateExpr = nullptr; // You may need to handle this differently
-                    delete $7;
-                }
+            auto* init = new DeclarationStmt(*$3);
+            delete $3;
+            Expr* update = nullptr;
+            if ($7 && !$7->empty()) {
+                update = (*$7)[0];
+                delete $7;
             }
-            $$ = new ForStmt(new DeclarationStmt(*$3), $5, updateExpr, $9); 
-            delete $3; 
+            $$ = new ForStmt(init, $5, update, $9, $1->loc);
         }
     ;
 
 optional_assignment_statement
-    :   %empty
-        { $$ = nullptr; }
-    |   assignment_statement
-        { $$ = $1; }
-    ;
-
-compound_statement
-    :   '{' statement_list '}'
-        { $$ = new CompoundStmt(*$2); delete $2; }
+    : %empty
+        { $$ = new std::vector<Expr*>(); }
+    | assignment_statement
+        { 
+            $$ = new std::vector<Expr*>();
+            // Extract the assignment as an expression (simplified)
+            auto* assign = dynamic_cast<AssignmentStmt*>($1);
+            if (assign) {
+                $$->push_back(new BinaryOpExpr(assign->getLeft(), assign->getOperator(), assign->getRight()));
+            }
+        }
     ;
 
 jump_statement
-    :   CONTINUE
-        { $$ = new ContinueStmt(); }
-    |   BREAK
-        { $$ = new BreakStmt(); }
-    |   RETURN
-        { $$ = new ReturnStmt(); }
-    |   RETURN expression
-        { $$ = new ReturnStmt($2); }
+    : CONTINUE
+        { $$ = new ContinueStmt($1->loc); }
+    | BREAK
+        { $$ = new BreakStmt($1->loc); }
+    | RETURN
+        { $$ = new ReturnStmt($1->loc); }
+    | RETURN expression
+        { $$ = new ReturnStmt($2, $1->loc); }
     ;
 
 declaration_statement
-    :   LET variable_declaration_list
+    : LET variable_declaration_list
         { $$ = new DeclarationStmt(*$2); delete $2; }
     ;
 
 variable_declaration_list
-    :   variable_declaration_list ',' variable_declaration
-        { $1->push_back($3); $$ = $1; }
-    |   variable_declaration
-        { $$ = new std::vector<VariableDecl*>({ $1 }); }
+    : variable_declaration_list ',' variable_declaration
+        { 
+            $1->push_back($3);
+            $$ = $1;
+        }
+    | variable_declaration
+        { 
+            $$ = new std::vector<VariableDecl*>();
+            $$->push_back($1);
+        }
     ;
 
 variable_declaration
-    :   IDENTIFIER ':' type 
-        { $$ = new VariableDecl(new IdentifierExpr(std::string($1)), $3, nullptr); }
-    |   IDENTIFIER ':' type '=' expression
-        { $$ = new VariableDecl(new IdentifierExpr(std::string($1)), $3, $5); }
+    : IDENTIFIER ':' type 
+        {
+            auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
+            $$ = new VariableDecl(name, $3, nullptr, $1->loc);
+        }
+    | IDENTIFIER ':' type EQUAL_TO expression
+        {
+            auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
+            $$ = new VariableDecl(name, $3, $5, $1->loc);
+        }
+    | IDENTIFIER ':' type EQUAL_TO braced_init_list
+        {
+            auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
+            $$ = new VariableDecl(name, $3, $5, $1->loc);
+        }
+    | IDENTIFIER ':' type EQUAL_TO tensored_state
+        {
+            auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
+            $$ = new VariableDecl(name, $3, $5, $1->loc);
+        }
     ;
 
 type
-    :   type_name array_list
-        { 
-            Type* t = $1;
-            for (Expr* dim : *$2) {
-                t = new ArrayTypeNode(t, dim);
+    : type_name array_list
+        {
+            Type* baseType = $1;
+            for (auto* dim : *$2) {
+                baseType = new ArrayTypeNode(baseType, dim);
             }
+            $$ = baseType;
             delete $2;
-            $$ = t;
         }
-    |   type_name
+    | type_name
         { $$ = $1; }
-    |   function_object
-        { $$ = $1; }
+    | '(' function_object ')'
+        { $$ = $2; }
     ;
 
 type_list
-    :   type 
-        { $$ = new std::vector<Type*>({ $1 }); }
-    |   type_list ',' type
-        { $1->push_back($3); $$ = $1; }
+    : type 
+        { 
+            $$ = new std::vector<Type*>();
+            $$->push_back($1);
+        }
+    | type_list ',' type
+        { 
+            $1->push_back($3);
+            $$ = $1;
+        }
     ;
 
 function_object
-    :   '(' type_list ')' DOUBLE_ARROW '(' ')'
-        { $$ = nullptr; /* Create FunctionTypeNode if defined */ }
-    |   '(' type_list ')' DOUBLE_ARROW type
-        { $$ = nullptr; /* Create FunctionTypeNode if defined */ }
+    : '(' type_list ')' DOUBLE_ARROW '(' ')'
+        { $$ = new FunctionTypeNode(*$2, nullptr); delete $2; }
+    | '(' type_list ')' DOUBLE_ARROW type
+        { $$ = new FunctionTypeNode(*$2, $5); delete $2; }
+    | type DOUBLE_ARROW '(' ')'
+        { 
+            std::vector<Type*> params;
+            params.push_back($1);
+            $$ = new FunctionTypeNode(params, nullptr);
+        }
+    | type DOUBLE_ARROW type
+        { 
+            std::vector<Type*> params;
+            params.push_back($1);
+            $$ = new FunctionTypeNode(params, $3);
+        }
     ;
 
 array_list
-    :   array_list '[' index_expression ']'
-        { $1->push_back($3); $$ = $1; }
-    |   '[' index_expression ']'
-        { $$ = new std::vector<Expr*>({ $2 }); }
-    |   '[' ']'
-        { $$ = new std::vector<Expr*>({ nullptr }); }
+    : array_list '[' index_expression ']'
+        { 
+            $1->push_back($3);
+            $$ = $1;
+        }
+    | '[' index_expression ']'
+        { 
+            $$ = new std::vector<Type*>();
+            $$->push_back(new ArrayTypeNode(nullptr, $2));
+        }
+    | '[' ']'
+        { 
+            $$ = new std::vector<Type*>();
+            $$->push_back(new ArrayTypeNode(nullptr, nullptr));
+        }
     ;
 
 type_name
-    :   QUBIT 
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_QUBIT); }
-    |   BIT
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT); /* Or create TYPE_BIT */ }
-    |   BOOL
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT); /* Or create TYPE_BOOL */ }
-    |   INT 
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT); }
-    |   FLOAT
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_FLOAT); }
-    |   STRING
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT); /* Or create TYPE_STRING */ }
+    : QUBIT 
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_QUBIT, $1->loc); }
+    | BIT
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_BIT, $1->loc); }
+    | BOOL
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_BOOL, $1->loc); }
+    | INT 
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT, $1->loc); }
+    | FLOAT
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_FLOAT, $1->loc); }
+    | STRING
+        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_STRING, $1->loc); }
     ;
 
 assignment_statement
-    :   IDENTIFIER assignment_operator expression
-        { $$ = new AssignmentStmt(new IdentifierExpr(std::string($1)), std::string($2), $3); }
+    : postfix_expression assignment_operator expression
+        { $$ = new AssignmentStmt($1, std::get<std::string>($2->value), $3, $2->loc); }
+    | postfix_expression assignment_operator braced_init_list
+        { $$ = new AssignmentStmt($1, std::get<std::string>($2->value), $3, $2->loc); }
+    | postfix_expression assignment_operator tensored_state
+        { $$ = new AssignmentStmt($1, std::get<std::string>($2->value), $3, $2->loc); }
     ;
 
+braced_init_list
+    : '{' expression_list '}'
+        { $$ = new BracedInitList(*$2); delete $2; }
+    ; 
+
 assignment_operator
-    :   '='
-        { $$ = strdup("="); }
-    |   ADD_ASSIGN 
-        { $$ = strdup("+="); }
-    |   SUB_ASSIGN
-        { $$ = strdup("-="); }
-    |   MUL_ASSIGN 
-        { $$ = strdup("*="); }
-    |   DIV_ASSIGN
-        { $$ = strdup("/="); }
-    |   MOD_ASSIGN
-        { $$ = strdup("%="); }
-    |   EXP_ASSIGN  
-        { $$ = strdup("**="); }
-    |   AND_ASSIGN 
-        { $$ = strdup("&="); }
-    |   OR_ASSIGN 
-        { $$ = strdup("|="); }
-    |   XOR_ASSIGN
-        { $$ = strdup("^="); }
-    |   RIGHT_SHIFT_ASSIGN
-        { $$ = strdup(">>="); }
-    |   LEFT_SHIFT_ASSIGN
-        { $$ = strdup("<<="); }
+    : EQUAL_TO
+        { $$ = $1; }
+    | ADD_ASSIGN 
+        { $$ = $1; }
+    | SUB_ASSIGN
+        { $$ = $1; }
+    | MUL_ASSIGN 
+        { $$ = $1; }
+    | DIV_ASSIGN
+        { $$ = $1; }
+    | MOD_ASSIGN
+        { $$ = $1; }
+    | EXP_ASSIGN  
+        { $$ = $1; }
+    | AND_ASSIGN 
+        { $$ = $1; }
+    | OR_ASSIGN 
+        { $$ = $1; }
+    | XOR_ASSIGN
+        { $$ = $1; }
+    | RIGHT_SHIFT_ASSIGN
+        { $$ = $1; }
+    | LEFT_SHIFT_ASSIGN
+        { $$ = $1; }
     ;
 
 expression
-    :   expression '+' expression   
+    : expression '+' expression   
         { $$ = new BinaryOpExpr($1, "+", $3); }  
-    |   expression '|' expression
+    | expression '|' expression
         { $$ = new BinaryOpExpr($1, "|", $3); }  
-    |   expression '-' expression
+    | expression '-' expression
         { $$ = new BinaryOpExpr($1, "-", $3); } 
-    |   expression '*' expression
+    | expression '*' expression
         { $$ = new BinaryOpExpr($1, "*", $3); }  
-    |   expression '&' expression
+    | expression '&' expression
         { $$ = new BinaryOpExpr($1, "&", $3); }  
-    |   expression '/' expression
+    | expression '/' expression
         { $$ = new BinaryOpExpr($1, "/", $3); }  
-    |   expression '%' expression
+    | expression '%' expression
         { $$ = new BinaryOpExpr($1, "%", $3); }  
-    |   expression RIGHT_SHIFT expression 
+    | expression RIGHT_SHIFT expression 
         { $$ = new BinaryOpExpr($1, ">>", $3); } 
-    |   expression LEFT_SHIFT expression
+    | expression LEFT_SHIFT expression
         { $$ = new BinaryOpExpr($1, "<<", $3); } 
-    |   expression EXP expression
+    | expression EXP expression
         { $$ = new BinaryOpExpr($1, "**", $3); } 
-    |   expression '^' expression 
+    | expression '^' expression 
         { $$ = new BinaryOpExpr($1, "^", $3); }  
-    |   '+' expression %prec UNARY
+    | '+' expression %prec UNARY
         { $$ = new UnaryOpExpr("+", $2); }
-    |   '-' expression %prec UNARY
+    | '-' expression %prec UNARY
         { $$ = new UnaryOpExpr("-", $2); }
-    |   '!' expression %prec UNARY
+    | '!' expression %prec UNARY
         { $$ = new UnaryOpExpr("!", $2); }
-    |   postfix_expression 
-        {$$=$1;}
-    ;
-    
-
-postfix_expression
-    :   primary_expression
+    | postfix_expression 
         { $$ = $1; }
-    |   postfix_expression '[' index_expression ']'
-        { $$ = new IndexAccessExpr($1, $3); }
-    |   postfix_expression '(' expression_list ')'
-        { $$ = new FunctionCallExpr($1, *$3); delete $3; }
-    |   postfix_expression '(' ')'
-        { $$ = new FunctionCallExpr($1, std::vector<Expr*>()); }
-    |   postfix_expression '.' IDENTIFIER
-        { $$ = new MemberAccessExpr($1, new IdentifierExpr(std::string($3))); }
-    |   CAST '<' type_name '>' '(' expression ')'
-        { $$ = new CastExpr($3, $6); }
     ;
 
 expression_list
-    :   expression_list ',' expression
-        { $1->push_back($3); $$ = $1; }
-    |   expression
-        { $$ = new std::vector<Expr*>({ $1 }); }
+    : expression_list ',' expression
+        { 
+            $1->push_back($3);
+            $$ = $1;
+        }
+    | expression
+        { 
+            $$ = new std::vector<Expr*>();
+            $$->push_back($1);
+        }
+    ;
+    
+postfix_expression
+    : primary_expression
+        { $$ = $1; }
+    | postfix_expression '[' index_expression ']'
+        { $$ = new IndexAccessExpr($1, $3); }
+    | postfix_expression '(' expression_list ')'
+        { $$ = new FunctionCallExpr($1, *$3); delete $3; }
+    | postfix_expression '(' ')'
+        { 
+            std::vector<Expr*> empty;
+            $$ = new FunctionCallExpr($1, empty); 
+        }
+    | postfix_expression '.' IDENTIFIER
+        { 
+            auto* member = new IdentifierExpr(std::get<std::string>($3->value), $3->loc);
+            $$ = new MemberAccessExpr($1, member); 
+        }
+    | CAST '<' type_name '>' '(' expression ')'
+        { $$ = new CastExpr($3, $6, $1->loc); }
     ;
 
 primary_expression
-    :   quantum_state
+    : INT_LITERAL
+        { $$ = new IntLiteralExpr(std::get<long long>($1->value), $1->loc); }
+    | FLOAT_LITERAL
+        { $$ = new FloatLiteralExpr(std::get<double>($1->value), $1->loc); }
+    | STRING_LITERAL
+        { $$ = new StringLiteralExpr(std::get<std::string>($1->value), $1->loc); }
+    | IDENTIFIER
+        { $$ = new IdentifierExpr(std::get<std::string>($1->value), $1->loc); }
+    | lambda_expression
         { $$ = $1; }
-    |   INT_LITERAL
-        { $$ = new IntLiteralExpr($1); }
-    |   FLOAT_LITERAL
-        { $$ = new FloatLiteralExpr($1); }
-    |   STRING_LITERAL
-        { $$ = new StringLiteralExpr(std::string($1)); }
-    |   IDENTIFIER 
-        { $$ = new IdentifierExpr(std::string($1)); }
-    |   boolean_literal 
+    | boolean_literal 
         { $$ = $1; }
+    | '(' expression ')'
+        { $$ = $2; }
+    ;
+
+lambda_expression
+    : '(' parameter_list ')' compound_statement
+        { $$ = new LambdaExpr(*$2, nullptr, $4); delete $2; }
+    | '(' parameter_list ')' ':' type compound_statement
+        { $$ = new LambdaExpr(*$2, $5, $6); delete $2; }
     ;
 
 boolean_literal
-    :   TRUE    
-        { $$ = new BoolLiteralExpr(true); }
-    |   FALSE 
-        { $$ = new BoolLiteralExpr(false); }
+    : TRUE    
+        { $$ = new BoolLiteralExpr(true, $1->loc); }
+    | FALSE 
+        { $$ = new BoolLiteralExpr(false, $1->loc); }
     ;
 
 print_statement
-    :   PRINT '(' print_string ')'
-        { $$ = new PrintStmt(PrintOperationKind::PRINT, $3 ? new StringLiteralExpr(std::string($3)) : nullptr); }
-    |   PRINTLN '(' print_string ')'
-        { $$ = new PrintStmt(PrintOperationKind::PRINTLN, $3 ? new StringLiteralExpr(std::string($3)) : nullptr); }
-    |   SCAN '(' print_string ')'
-        { $$ = new PrintStmt(PrintOperationKind::SCAN, $3 ? new StringLiteralExpr(std::string($3)) : nullptr); }
+    : PRINT '(' print_string ')'
+        { 
+            Expr* arg = $3 ? new StringLiteralExpr(std::get<std::string>($3->value), $3->loc) : nullptr;
+            $$ = new PrintStmt(PrintOperationKind::PRINT, arg, $1->loc); 
+        }
+    | PRINTLN '(' print_string ')'
+        { 
+            Expr* arg = $3 ? new StringLiteralExpr(std::get<std::string>($3->value), $3->loc) : nullptr;
+            $$ = new PrintStmt(PrintOperationKind::PRINTLN, arg, $1->loc); 
+        }
+    | SCAN '(' print_string ')'
+        { 
+            Expr* arg = $3 ? new StringLiteralExpr(std::get<std::string>($3->value), $3->loc) : nullptr;
+            $$ = new PrintStmt(PrintOperationKind::SCAN, arg, $1->loc); 
+        }
     ;
 
 print_string
-    :   %empty
+    : %empty
         { $$ = nullptr; }
-    |   STRING_LITERAL
+    | STRING_LITERAL
         { $$ = $1; }
     ;
 
 quantum_statement
-    :   apply_gate_statement
+    : apply_gate_statement
         { $$ = $1; }
-    |   measure_statement
+    | measure_statement
         { $$ = $1; }
-    |   reset_statement
+    | reset_statement
         { $$ = $1; }
     ;
 
 measure_statement
-    :   MEASURE_OP quantum_state DOUBLE_ARROW quantum_state
-        { $$ = new MeasureStmt($2, $4); }
+    : MEASURE_OP quantum_state DOUBLE_ARROW quantum_state
+        { $$ = new MeasureStmt($2, $4, $1->loc); }
     ;
 
 reset_statement
-    :   RESET_OP quantum_state
-        { $$ = new ResetStmt($2); }
+    : RESET_OP quantum_state
+        { $$ = new ResetStmt($2, $1->loc); }
     ;   
 
 apply_gate_statement
-    :   gate_composition '@' quantum_state
+    : gate_composition '@' quantum_state
         { $$ = new ApplyGateStmt($1, $3); }
     ;   
 
 gate_composition
-    :   gate_composition '@' quantum_gate
+    : gate_composition '@' quantum_gate
         { $$ = new GateCompositionNode($1, $3); }
-    |   quantum_gate 
+    | quantum_gate 
         { $$ = $1; }
     ;
 
 quantum_state
-    :   '[' quantum_state_list ']'
-        { $$ = new QuantumStateList(*$2); delete $2; }
-    |   IDENTIFIER '[' index_expression ']'
-        { $$ = new QuantumStateIndexAccess(new IdentifierExpr(std::string($1)), $3); }
-    |   IDENTIFIER
-        { $$ = new QuantumStateIdentifier(new IdentifierExpr(std::string($1))); }
+    : postfix_expression
+        { $$ = $1; }
+    | tensored_state
+        { $$ = $1; }
     ;
 
-quantum_state_list
-    :   quantum_state_list ',' quantum_state
-        { $1->push_back($3); $$ = $1; }
-    |   quantum_state
-        { $$ = new std::vector<QuantumStateExpr*>({ $1 }); }
+tensored_state
+    : '[' postfix_expression_list ']'
+        { $$ = new QuantumStateList(*$2); delete $2; }
+    ;
+
+postfix_expression_list
+    : postfix_expression
+        { 
+            $$ = new std::vector<Expr*>();
+            $$->push_back($1);
+        }
+    | postfix_expression_list ',' postfix_expression
+        { 
+            $1->push_back($3);
+            $$ = $1;
+        }
     ;
 
 quantum_gate
-    :   '[' quantum_gate_list ']' 
+    : '[' quantum_gate_list ']'
         { $$ = new CompositeGateNode(*$2); delete $2; }
-    |   simple_gate '(' expression ')' 
-        { $$ = new ParametricGateNode($1->getGateKind(), std::vector<Expr*>(1, $3)); delete $1; }
-    |   simple_gate  
+    | simple_gate '(' expression ')'
+        { 
+            std::vector<Expr*> params;
+            params.push_back($3);
+            $$ = new ParametricGateNode($1->getGateKind(), params, $1->loc);
+            delete $1;
+        }
+    | simple_gate
         { $$ = $1; }
     ;
 
 quantum_gate_list
-    :   quantum_gate_list ',' quantum_gate
-        { $1->push_back($3); $$ = $1; }
-    |   quantum_gate 
-        { $$ = new std::vector<GateNode*>({ $1 }); }
+    : quantum_gate_list ',' simple_gate '(' expression ')' 
+        { 
+            std::vector<Expr*> params;
+            params.push_back($5);
+            $1->push_back(new ParametricGateNode($3->getGateKind(), params, $3->loc));
+            delete $3;
+            $$ = $1;
+        }
+    | quantum_gate_list ',' simple_gate 
+        { 
+            $1->push_back($3);
+            $$ = $1;
+        }
+    | simple_gate '(' expression ')'
+        { 
+            $$ = new std::vector<GateNode*>();
+            std::vector<Expr*> params;
+            params.push_back($3);
+            $$->push_back(new ParametricGateNode($1->getGateKind(), params, $1->loc));
+            delete $1;
+        }
+    | simple_gate
+        { 
+            $$ = new std::vector<GateNode*>();
+            $$->push_back($1);
+        }
     ;
 
 simple_gate
-    :   GATE_H 
-        { $$ = new SimpleGateNode(GateKind::H); }
-    |   GATE_S
-        { $$ = new SimpleGateNode(GateKind::S); }
-    |   GATE_T 
-        { $$ = new SimpleGateNode(GateKind::T); }
-    |   GATE_CTRL
-        { $$ = new SimpleGateNode(GateKind::UNKNOWN); /* Define CTRL in GateKind */ }
-    |   GATE_I 
-        { $$ = new SimpleGateNode(GateKind::I); }
-    |   GATE_X
-        { $$ = new SimpleGateNode(GateKind::X); }
-    |   GATE_Y
-        { $$ = new SimpleGateNode(GateKind::Y); }
-    |   GATE_Z 
-        { $$ = new SimpleGateNode(GateKind::Z); }
-    |   GATE_RX 
-        { $$ = new SimpleGateNode(GateKind::RX); }
-    |   GATE_RY 
-        { $$ = new SimpleGateNode(GateKind::RY); }
-    |   GATE_RZ
-        { $$ = new SimpleGateNode(GateKind::RZ); }
-    |   GATE_CNOT
-        { $$ = new SimpleGateNode(GateKind::CNOT); }
-    |   GATE_CZ 
-        { $$ = new SimpleGateNode(GateKind::CZ); }
-    |   GATE_SWAP 
-        { $$ = new SimpleGateNode(GateKind::SWAP); }
-    |   GATE_CSWAP
-        { $$ = new SimpleGateNode(GateKind::CSWAP); }
-    |   GATE_CCNOT 
-        { $$ = new SimpleGateNode(GateKind::CCNOT); }
-    |   GATE_CRX 
-        { $$ = new SimpleGateNode(GateKind::CRX); }
-    |   GATE_CRY
-        { $$ = new SimpleGateNode(GateKind::CRY); }
-    |   GATE_CRZ
-        { $$ = new SimpleGateNode(GateKind::CRZ); }
+    : GATE_H 
+        { $$ = new SimpleGateNode(GateKind::H, $1->loc); }
+    | GATE_S
+        { $$ = new SimpleGateNode(GateKind::S, $1->loc); }
+    | GATE_T 
+        { $$ = new SimpleGateNode(GateKind::T, $1->loc); }
+    | GATE_CTRL
+        { $$ = new SimpleGateNode(GateKind::CTRL, $1->loc); }
+    | GATE_I 
+        { $$ = new SimpleGateNode(GateKind::I, $1->loc); }
+    | GATE_X
+        { $$ = new SimpleGateNode(GateKind::X, $1->loc); }
+    | GATE_Y
+        { $$ = new SimpleGateNode(GateKind::Y, $1->loc); }
+    | GATE_Z 
+        { $$ = new SimpleGateNode(GateKind::Z, $1->loc); }
+    | GATE_RX 
+        { $$ = new SimpleGateNode(GateKind::RX, $1->loc); }
+    | GATE_RY 
+        { $$ = new SimpleGateNode(GateKind::RY, $1->loc); }
+    | GATE_RZ
+        { $$ = new SimpleGateNode(GateKind::RZ, $1->loc); }
+    | GATE_CNOT
+        { $$ = new SimpleGateNode(GateKind::CNOT, $1->loc); }
+    | GATE_CZ 
+        { $$ = new SimpleGateNode(GateKind::CZ, $1->loc); }
+    | GATE_SWAP 
+        { $$ = new SimpleGateNode(GateKind::SWAP, $1->loc); }
+    | GATE_CSWAP
+        { $$ = new SimpleGateNode(GateKind::CSWAP, $1->loc); }
+    | GATE_CCNOT 
+        { $$ = new SimpleGateNode(GateKind::CCNOT, $1->loc); }
+    | GATE_CRX 
+        { $$ = new SimpleGateNode(GateKind::CRX, $1->loc); }
+    | GATE_CRY
+        { $$ = new SimpleGateNode(GateKind::CRY, $1->loc); }
+    | GATE_CRZ
+        { $$ = new SimpleGateNode(GateKind::CRZ, $1->loc); }
     ;
 
 optional_expression
-    :   %empty
+    : %empty
         { $$ = nullptr; }
-    |   expression
+    | expression
         { $$ = $1; }
     ;
 
 index_expression
-    :   expression
+    : expression
         { $$ = $1; }
-    |   optional_expression ':' optional_expression
+    | optional_expression ':' optional_expression
         { $$ = new SliceExpr($1, $3, nullptr); }
-    |   optional_expression ':' optional_expression ':' optional_expression
+    | optional_expression ':' optional_expression ':' optional_expression
         { $$ = new SliceExpr($1, $3, $5); }
     ;
 
@@ -720,5 +838,14 @@ void yyerror(const std::string &msg) {
 int main() {
     yydebug = 0;
     yyparse();
+    
+    // Print AST or process it here
+    std::cout << "Translation unit contains " << translationUnit.size() << " top-level nodes." << std::endl;
+    
+    // Clean up
+    for (auto* node : translationUnit) {
+        delete node;
+    }
+    
     return 0;
 }

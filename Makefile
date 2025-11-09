@@ -13,7 +13,7 @@ INCLUDE_LIST := $(addprefix -I,$(INCLUDE_SUBDIRS))
 
 .PHONY: all yacc grammar lex compile
 
-all: build grammar lex compile
+all: build yacc lex compile
 
 build:
 	mkdir -p build

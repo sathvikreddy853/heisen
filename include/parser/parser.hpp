@@ -1,5 +1,0 @@
-#ifndef HEISEN_PARSER_HPP
-#define HEISEN_PARSER_HPP
-
-
-#endif // HEISEN_PARSER_HPP
