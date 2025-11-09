@@ -104,7 +104,8 @@
 %type<funcDecl> function_declaration function_header
 %type<gateDecl> gate_declaration
 %type<type> type type_name return_type function_object
-%type<typeList> type_list array_list
+%type<typeList> type_list 
+%type<expList>array_list
 %type<matchCase> match_statement
 %type<matchCaseList> match_list
 %type<stmtList> statement_list elif_clauses
@@ -429,14 +430,15 @@ variable_declaration
     ;
 
 type
-    : type_name array_list
+    :   type_name array_list
         {
             Type* baseType = $1;
-            for (auto* dim : *$2) {
-                baseType = new ArrayTypeNode(baseType, dim);
+            // Build from innermost to outermost
+            for (auto* dimExpr : *$2) {
+                baseType = new ArrayTypeNode(baseType, dimExpr);
             }
             $$ = baseType;
-            delete $2;
+            delete $2;  // Clean up the vector
         }
     | type_name
         { $$ = $1; }
@@ -479,18 +481,18 @@ function_object
 array_list
     : array_list '[' index_expression ']'
         { 
-            $1->push_back($3);
+            $1->push_back($3);  // Collect dimension expression
             $$ = $1;
         }
     | '[' index_expression ']'
         { 
-            $$ = new std::vector<Type*>();
-            $$->push_back(new ArrayTypeNode(nullptr, $2));
+            $$ = new std::vector<Expr*>();
+            $$->push_back($2);  // First dimension
         }
     | '[' ']'
         { 
-            $$ = new std::vector<Type*>();
-            $$->push_back(new ArrayTypeNode(nullptr, nullptr));
+            $$ = new std::vector<Expr*>();
+            $$->push_back(nullptr);  // nullptr = unspecified size
         }
     ;
 
