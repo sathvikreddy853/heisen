@@ -22,7 +22,7 @@ run:
 	$(BUILD_DIR)/$(TARGET_PROGRAM)
 
 compile:
-	clang++ -std=c++26 -I$(BUILD_DIR) $(INCLUDE_LIST) -I$(BUILD_DIR)/parser.tab.hpp $(BUILD_DIR)/parser.tab.cpp $(BUILD_DIR)/lexer.yy.cpp -o $(BUILD_DIR)/$(TARGET_PROGRAM)
+	clang++ -std=c++26 -I$(BUILD_DIR) $(INCLUDE_LIST) -I$(BUILD_DIR)/parser.tab.hpp $(BUILD_DIR)/parser.tab.cpp $(BUILD_DIR)/lexer.yy.cpp src/main.cpp -o $(BUILD_DIR)/$(TARGET_PROGRAM)
 
 lex:
 	flex -o $(BUILD_DIR)/lexer.yy.cpp src/lexer/lexer.l
@@ -32,9 +32,8 @@ yacc:
 # 	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.y
 
 grammar:
-# 	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.grammar.y
-	bison --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/parser.grammar.y
+# 	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/grammar.y
+	bison --defines=$(BUILD_DIR)/parser.tab.hpp -o $(BUILD_DIR)/parser.tab.cpp src/parser/grammar.y
 	
-
 clean:
 	rm -rf $(BUILD_DIR)

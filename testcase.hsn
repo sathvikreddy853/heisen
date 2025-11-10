@@ -4,15 +4,14 @@ func bernstein_vazirani (n: int, Uf: ((qubit[], qubit) => ())) : bit[] {
     let x: qubit[n];
     let y: qubit;
 
-    [I(n), H] @ [H(n), X] @ [x, y];
+    H(n) @ [x];
+    H @ X @ [y];
 
     Uf(x, y);
 
-    H @ [x, y];
-
     H(n) @ x;
-
     measure x => res;
+
     return res;
 }
 
@@ -30,10 +29,9 @@ func create_oracle (s: bit[]) : ((qubit[], qubit) => ()) {
     return Uf;
 }
 
+let s: bit[4] = {1, 0, 1, 1};
+let Uf: ((qubit[], qubit) => ()) = create_oracle(s);
 
-let s: bit[4] = [1, 0, 1, 1];
-
-let Uf: ((qubit[], qubit) => ()) = create_oracle(4, Uf);
 let res: bit[4] = bernstein_vazirani(4, Uf);
 
 if (s == res) {

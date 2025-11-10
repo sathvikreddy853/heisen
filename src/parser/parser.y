@@ -55,23 +55,23 @@
     #include <ast.hpp>
 }
 
-%token<token> IDENTIFIER 
-%token<token> FLOAT_LITERAL 
-%token<token> INT_LITERAL 
+%token<token> IDENTIFIER
+%token<token> FLOAT_LITERAL
+%token<token> INT_LITERAL
 %token<token> STRING_LITERAL
 
 %token<token> QUBIT BIT INT FLOAT STRING BOOL STRUCT
 %token<token> LET CONST APPLY
-%token<token> FUNC GATE 
+%token<token> FUNC GATE
 
 %token<token> AND OR NOT
 %token<token> TRUE FALSE
 
 %token<token> FOR WHILE DO BREAK CONTINUE MATCH
-%token<token> IF ELIF ELSE 
+%token<token> IF ELIF ELSE
 
 %token<token> MEASURE_OP RESET_OP
-%token<token> RETURN 
+%token<token> RETURN
 %token<token> PRINT PRINTLN SCAN CAST
 
 %token<token> GATE_H GATE_S GATE_T GATE_CTRL
@@ -81,7 +81,7 @@
 
 %token<token> EXP DOUBLE_ARROW 
 
-%token<token> EQUAL_TO
+%token<token> ASSIGN
 %token<token> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN EXP_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
 %token<token> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_ASSIGN LEFT_SHIFT_ASSIGN
 %token<token> EQ_OP NE_OP GE_OP LE_OP 
@@ -412,17 +412,17 @@ variable_declaration
             auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
             $$ = new VariableDecl(name, $3, nullptr, $1->loc);
         }
-    | IDENTIFIER ':' type EQUAL_TO expression
+    | IDENTIFIER ':' type ASSIGN expression
         {
             auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
             $$ = new VariableDecl(name, $3, $5, $1->loc);
         }
-    | IDENTIFIER ':' type EQUAL_TO braced_init_list
+    | IDENTIFIER ':' type ASSIGN braced_init_list
         {
             auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
             $$ = new VariableDecl(name, $3, $5, $1->loc);
         }
-    | IDENTIFIER ':' type EQUAL_TO tensored_state
+    | IDENTIFIER ':' type ASSIGN tensored_state
         {
             auto* name = new IdentifierExpr(std::get<std::string>($1->value), $1->loc);
             $$ = new VariableDecl(name, $3, $5, $1->loc);
@@ -440,9 +440,9 @@ type
             $$ = baseType;
             delete $2;  // Clean up the vector
         }
-    | type_name
+    |   type_name
         { $$ = $1; }
-    | '(' function_object ')'
+    |   '(' function_object ')'
         { $$ = $2; }
     ;
 
@@ -478,6 +478,8 @@ function_object
         }
     ;
 
+/* ! CHANGE REQUIRED */
+/* allow multi-dimensional arrays ? */
 array_list
     : array_list '[' index_expression ']'
         { 
@@ -498,17 +500,17 @@ array_list
 
 type_name
     : QUBIT 
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_QUBIT, $1->loc); }
+        { $$ = new BaseTypeNode(BaseTypeKind::QUBIT, $1->loc); }
     | BIT
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_BIT, $1->loc); }
+        { $$ = new BaseTypeNode(BaseTypeKind::BIT, $1->loc); }
     | BOOL
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_BOOL, $1->loc); }
+        { $$ = new BaseTypeNode(BaseTypeKind::BOOL, $1->loc); }
     | INT 
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_INT, $1->loc); }
+        { $$ = new BaseTypeNode(BaseTypeKind::INT, $1->loc); }
     | FLOAT
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_FLOAT, $1->loc); }
+        { $$ = new BaseTypeNode(BaseTypeKind::FLOAT, $1->loc); }
     | STRING
-        { $$ = new BaseTypeNode(BaseTypeKind::TYPE_STRING, $1->loc); }
+        { $$ = new BaseTypeNode(BaseTypeKind::STRING, $1->loc); }
     ;
 
 assignment_statement
@@ -526,7 +528,7 @@ braced_init_list
     ; 
 
 assignment_operator
-    : EQUAL_TO
+    : ASSIGN
         { $$ = $1; }
     | ADD_ASSIGN 
         { $$ = $1; }
@@ -597,7 +599,7 @@ expression_list
             $$->push_back($1);
         }
     ;
-    
+
 postfix_expression
     : primary_expression
         { $$ = $1; }
@@ -731,6 +733,8 @@ postfix_expression_list
         }
     ;
 
+/* ! CHANGE REQUIRED */
+/* parametric gate should allow multiple expressions */
 quantum_gate
     : '[' quantum_gate_list ']'
         { $$ = new CompositeGateNode(*$2); delete $2; }
@@ -830,24 +834,8 @@ index_expression
     | optional_expression ':' optional_expression ':' optional_expression
         { $$ = new SliceExpr($1, $3, $5); }
     ;
-
 %%
 
 void yyerror(const std::string &msg) {
     std::cerr << "Parse Error: " << msg << std::endl;
-}
-
-int main() {
-    yydebug = 0;
-    yyparse();
-    
-    // Print AST or process it here
-    std::cout << "Translation unit contains " << translationUnit.size() << " top-level nodes." << std::endl;
-    
-    // Clean up
-    for (auto* node : translationUnit) {
-        delete node;
-    }
-    
-    return 0;
 }

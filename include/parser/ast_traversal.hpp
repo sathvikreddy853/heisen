@@ -1,8 +1,8 @@
 #ifndef HEISEN_AST_VISITOR_HPP
 #define HEISEN_AST_VISITOR_HPP
 
-/*Expression classes*/
-/* LiteralExpr*/
+/* Expression Classes */
+/* LiteralExpr */
 class IntLiteralExpr;
 class FloatLiteralExpr;
 class StringLiteralExpr;
@@ -17,12 +17,12 @@ class SliceExpr;
 class MemberAccessExpr;
 class CastExpr;
 
-/*Quantum state Expr*/
+/* Quantum State Expr */
 class QuantumStateIdentifier;
 class QuantumStateIndexAccess;
 class QuantumStateList;
 
-/*statements*/
+/* Statements */
 class CompoundStmt;
 class DeclarationStmt;
 class AssignmentStmt;
@@ -41,26 +41,25 @@ class ApplyGateStmt;
 class MeasureStmt;
 class ResetStmt;
 
-/*Declarations*/
+/* Declarations */
 class VariableDecl;
 class ParameterDecl;
 class FunctionDecl;
 class GateDecl;
 
-/*Types*/
+/* Types */
 class BaseTypeNode;
 class ArrayTypeNode;
 
-/*Quantum Gate Nodes*/
+/* Quantum Gate Nodes */
 class SimpleGateNode;
 class ParametricGateNode;
 class CompositeGateNode;
 class GateCompositionNode;
 
-
 class AST_Traversal {
     public:
-    virtual ~ASTVisitor ()= default;
+    virtual ~AST_Traversal () = default;
 
     /*Expressions*/
     virtual void visit (IntLiteralExpr* node)          = 0;
@@ -79,7 +78,7 @@ class AST_Traversal {
     virtual void visit (QuantumStateIndexAccess* node) = 0;
     virtual void visit (QuantumStateList* node)        = 0;
 
-    /*Statements*/
+    /* Statements */
     virtual void visit (CompoundStmt* node)    = 0;
     virtual void visit (DeclarationStmt* node) = 0;
     virtual void visit (AssignmentStmt* node)  = 0;
@@ -113,7 +112,7 @@ class AST_Traversal {
     virtual void visit (ParametricGateNode* node)  = 0;
     virtual void visit (CompositeGateNode* node)   = 0;
     virtual void visit (GateCompositionNode* node) = 0;
-}
+};
 
 
 #endif

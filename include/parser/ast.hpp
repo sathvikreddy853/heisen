@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 #include <ast_traversal.hpp>
-#include<token.hpp>
+#include <token.hpp>
+
 // Forward declarations
 class Expr;
 class Stmt;
@@ -19,12 +20,12 @@ class VariableDecl;
 class ParameterDecl;
 
 // Enums
-enum class BaseTypeKind { TYPE_INT, TYPE_FLOAT, TYPE_QUBIT, TYPE_BIT, TYPE_BOOL, TYPE_STRING };
+enum class BaseTypeKind { INT, FLOAT, QUBIT, BIT, BOOL, STRING };
 
 enum class GateKind {
     H, S, T, I, X, Y, Z, RX, RY, RZ,
     CNOT, CZ, SWAP, CSWAP, CCNOT,
-    CRX, CRY, CRZ, UNKNOWN, CTRL
+    CRX, CRY, CRZ, CTRL, UNKNOWN
 };
 
 enum class PrintOperationKind { PRINT, PRINTLN, SCAN };

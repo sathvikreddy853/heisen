@@ -7,7 +7,6 @@
 #include <vector>
 #include <optional>
 
-
 struct Symbol {
     Type* type; //type of the node
     Decl* declaration;    //vale of the node
@@ -26,6 +25,5 @@ class SymbolTable {
     bool insert(const std::string& name,const Symbol& Sym );
     const SymbolTable* find(const std::string& name) const;
 };
-
 
 #endif

@@ -334,7 +334,7 @@ NEWLINE     "\n"
                     }
 "="                 { 
                         yylval.token = new Token(Location(yylineno, yycolumn), std::string("="));
-                        LOGs("="); return EQUAL_TO; 
+                        LOGs("="); return ASSIGN; 
                     }
 "+="                { 
                         yylval.token = new Token(Location(yylineno, yycolumn), std::string("+="));

@@ -48,7 +48,7 @@
 
 %token<token> EXP  DOUBLE_ARROW 
 
-%token<token> ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN EXP_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
+%token<token> ASSIGN ADD_ASSIGN SUB_ASSIGN MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN EXP_ASSIGN AND_ASSIGN OR_ASSIGN XOR_ASSIGN
 %token<token> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_ASSIGN LEFT_SHIFT_ASSIGN
 %token<token> EQ_OP NE_OP GE_OP LE_OP 
 
@@ -214,9 +214,7 @@ variable_declaration_list
 
 variable_declaration
     :   IDENTIFIER ':' type 
-    |   IDENTIFIER ':' type '=' expression
-    |   IDENTIFIER ':' type '=' braced_init_list
-    |   IDENTIFIER ':' type '=' tensored_state
+    |   IDENTIFIER ':' type ASSIGN assignable_value
     ;
 
 type
@@ -237,6 +235,8 @@ function_object
     |   type DOUBLE_ARROW type
     ;
 
+/* ! CHANGE REQUIRED */
+/* allow multi-dimensional arrays ? */
 array_list
     :   array_list '[' index_expression ']'
     |   '[' index_expression ']'
@@ -253,9 +253,7 @@ type_name
     ;
 
 assignment_statement
-    :   postfix_expression assignment_operator expression
-    |   postfix_expression assignment_operator braced_init_list
-    |   postfix_expression assignment_operator tensored_state
+    :   postfix_expression assignment_operator assignable_value
     ;
 
 braced_init_list
@@ -263,7 +261,7 @@ braced_init_list
     ; 
 
 assignment_operator
-    :   '='
+    :   ASSIGN
     |   ADD_ASSIGN 
     |   SUB_ASSIGN
     |   MUL_ASSIGN 
@@ -299,11 +297,25 @@ expression_list
     :   expression_list ',' expression
     |   expression
     ;
+
+
+/* ! BREAKING CHANGE MADE HERE */
+/* assignable values now consist of expressions, tensored states and braced init lists */
+assignable_value_list
+    :   assignable_value_list ',' assignable_value
+    |   assignable_value
+    ;
+
+assignable_value
+    :   expression
+    |   tensored_state
+    |   braced_init_list
+    ;
     
 postfix_expression
     :   primary_expression
     |   postfix_expression '[' index_expression ']'
-    |   postfix_expression '(' expression_list ')'
+    |   postfix_expression '(' assignable_value_list ')'
     |   postfix_expression '(' ')'
     |   postfix_expression '.' IDENTIFIER
     |   CAST '<' type_name '>' '(' expression ')'
@@ -376,16 +388,18 @@ postfix_expression_list
     | postfix_expression_list ',' postfix_expression
     ;
 
+/* ! CHANGE REQUIRED */
+/* parametric gate should allow multiple expressions */
 quantum_gate
     :   '[' quantum_gate_list ']'
-    |   simple_gate '(' expression ')'
+    |   simple_gate '(' expression_list ')'
     |   simple_gate
     ;
 
 quantum_gate_list
-    :   quantum_gate_list ',' simple_gate '(' expression ')' 
+    :   quantum_gate_list ',' simple_gate '(' expression_list ')' 
     |   quantum_gate_list ',' simple_gate 
-    |   simple_gate '(' expression ')'
+    |   simple_gate '(' expression_list ')'
     |   simple_gate
     ;
 
