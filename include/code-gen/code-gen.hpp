@@ -1,7 +1,0 @@
-#ifndef HEISEN_CODE_GEN_HPP
-#define HEISEN_CODE_GEN_HPP
-
-
-
-
-#endif // HEISEN_CODE_GEN_HPP

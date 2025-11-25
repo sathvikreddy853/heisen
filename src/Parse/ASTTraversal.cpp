@@ -1,5 +1,5 @@
-#include <ast_traversal.hpp>
-#include <ast.hpp>
+#include <ASTTraversal.hpp>
+#include <AST.hpp>
 #include <iostream>
 #include <iomanip>
 

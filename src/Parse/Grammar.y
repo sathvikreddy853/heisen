@@ -2,9 +2,9 @@
 %debug
 
 %{
-    #include <parser.tab.hpp>
-    #include <macros.hpp>
-    #include <token.hpp>
+    #include <Parser.tab.hpp>
+    #include <Macros.hpp>
+    #include <Token.hpp>
 
     int yylex();
     void yyerror (const std::string &);

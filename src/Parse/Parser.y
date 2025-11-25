@@ -2,10 +2,10 @@
 %debug
 
 %{
-    #include <parser.tab.hpp>
-    #include <macros.hpp>
-    #include <token.hpp>
-    #include <ast.hpp>
+    #include <Parser.tab.hpp>
+    #include <Macros.hpp>
+    #include <Token.hpp>
+    #include <AST.hpp>
 
     int yylex();
     void yyerror(const std::string &);
@@ -50,9 +50,9 @@
 }
 
 %code requires {
-    #include <macros.hpp>
-    #include <token.hpp>
-    #include <ast.hpp>
+    #include <Macros.hpp>
+    #include <Token.hpp>
+    #include <AST.hpp>
 }
 
 %token<token> IDENTIFIER

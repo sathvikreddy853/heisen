@@ -2,11 +2,8 @@
 #ifndef HEISEN_AST_PRINTER_HPP
 #define HEISEN_AST_PRINTER_HPP
 
-#include <ast.hpp>
-#include <iostream>
-#include <sstream>
-#include <typeinfo>
-#include <iomanip>
+#include <AST.hpp>
+#include <Macros.hpp>
 
 namespace Heisen {
 

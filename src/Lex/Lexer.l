@@ -1,9 +1,9 @@
 %option noyywrap
 
 %{
-    #include <parser.tab.hpp> 
-    #include <macros.hpp>
-    #include <token.hpp>
+    #include <Parser.tab.hpp> 
+    #include <Macros.hpp>
+    #include <Token.hpp>
     int yycolumn = 1;
 
     #define YY_USER_ACTION  yycolumn += yyleng;

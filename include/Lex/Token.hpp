@@ -1,8 +1,7 @@
 #ifndef HEISEN_TOKEN_HPP
 #define HEISEN_TOKEN_HPP
 
-#include <macros.hpp>
-#include <variant>
+#include <Macros.hpp>
 
 using TokValue = std::variant<double, long long, std::string, std::monostate>;
 

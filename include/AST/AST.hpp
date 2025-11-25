@@ -1,11 +1,9 @@
 #ifndef HEISEN_AST_HPP
 #define HEISEN_AST_HPP
 
-#include <macros.hpp>
-#include <string>
-#include <vector>
-#include <ast_traversal.hpp>
-#include <token.hpp>
+#include <Macros.hpp>
+#include <ASTTraversal.hpp>
+#include <Token.hpp>
 
 // Forward declarations
 class Expr;

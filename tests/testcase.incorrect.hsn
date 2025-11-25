@@ -3,6 +3,6 @@ func add (a: int, b: int) : int {
 }
 
 let x: int = 24;
-let y: string = "32";
+let y: int = 32;
 
 add(x, y);

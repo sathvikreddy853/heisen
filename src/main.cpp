@@ -1,11 +1,7 @@
-#include <macros.hpp>
-#include <ast.hpp>
-#include <ast_traversal.hpp>
-#include <semantic_analyzer.hpp>
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <cstring>
+#include <Macros.hpp>
+#include <AST.hpp>
+#include <ASTTraversal.hpp>
+#include <SemanticAnalyzer.hpp>
 
 extern int yydebug;
 extern int yyparse();

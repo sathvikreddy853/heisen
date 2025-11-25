@@ -1,7 +1,7 @@
 #ifndef HEISEN_AST_TRAVERSAL_HPP
 #define HEISEN_AST_TRAVERSAL_HPP
 
-#include <macros.hpp>
+#include <Macros.hpp>
 
 // Forward declarations for all AST node types
 class ASTNode;
@@ -267,13 +267,13 @@ protected:
     // Helper method for visiting gates (handles nullptr)
     void visitGate(GateNode* gate);
 };
-
 /**
  * @brief AST printer for debugging
  * 
  * This visitor prints a formatted representation of the AST to stdout,
  * useful for debugging the parser and understanding the AST structure.
  */
+
 class ASTPrinter : public RecursiveASTVisitor {
     int indentLevel;
     bool useColor;
@@ -316,6 +316,7 @@ public:
  * Counts different types of nodes in the AST for analysis and optimization
  * decisions.
  */
+
 class ASTStatistics : public RecursiveASTVisitor {
 public:
     struct Stats {

@@ -2,9 +2,9 @@
 %debug
 
 %{
-    #include <macros.hpp>
-    #include <token.hpp>
-    #include <ast.hpp>
+    #include <Macros.hpp>
+    #include <Token.hpp>
+    #include <AST.hpp>
     int yylex();
     void yyerror (const std::string &);
 %}

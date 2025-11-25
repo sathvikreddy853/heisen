@@ -8,11 +8,11 @@
 #include <cassert>
 #include <cctype>
 #include <climits>
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <stdexcept>
 #include <deque>
 #include <exception>
 #include <expected>
@@ -28,8 +28,10 @@
 #include <set>
 #include <span>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <tuple>
+#include <typeinfo>
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
@@ -37,9 +39,9 @@
 #include <vector>
 
 #define RESET_COLOR "\033[0m"
-#define BOLD        "\033[1m"
-#define RED         "\033[31m"
-#define GREEN       "\033[32m"
+#define BOLD "\033[1m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
 
 #define LOG(x) std::cout << x << std::endl
 #define LOGs(x) std::cout << x << ' '
