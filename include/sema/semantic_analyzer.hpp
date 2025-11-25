@@ -3,12 +3,13 @@
 
 #include <ast.hpp>
 #include <ast_traversal.hpp>
+#include <macros.hpp>
 #include <token.hpp>
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <vector>
 #include <memory>
-#include <stdexcept>
 
 namespace Heisen {
 
@@ -167,7 +168,7 @@ struct Symbol {
 };
 
 class Scope {
-    std::unordered_map<std::string, Symbol*> symbols;
+    std::map<std::string, Symbol*> symbols;
     Scope* parent;
     
 public:
@@ -282,7 +283,7 @@ class SemanticAnalyzer : public AST_Traversal {
     bool inQuantumContext;
     
     // Type cache for expressions
-    std::unordered_map<Expr*, SemanticType*> exprTypes;
+    std::map<Expr*, SemanticType*> exprTypes;
     
 public:
     SemanticAnalyzer() 

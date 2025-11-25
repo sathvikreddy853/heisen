@@ -37,7 +37,7 @@ public:
     virtual ~ASTNode() = default;
     ASTNode(Heisen::Location l) : loc(l) {}
     ASTNode() {}
-    virtual void process(AST_Traversal* Visitor) = 0;
+    virtual void visit(AST_Traversal* Visitor) = 0;
 };
 
 // Expression Base
@@ -101,7 +101,7 @@ class IntLiteralExpr : public LiteralExpr {
 public:
     IntLiteralExpr(long long v, Heisen::Location l) : LiteralExpr(l), value(v) {}
     long long getValue() const { return value; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class FloatLiteralExpr : public LiteralExpr {
@@ -109,7 +109,7 @@ class FloatLiteralExpr : public LiteralExpr {
 public:
     FloatLiteralExpr(double v, Heisen::Location l) : LiteralExpr(l), value(v) {}
     double getValue() const { return value; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class BoolLiteralExpr : public LiteralExpr {
@@ -117,7 +117,7 @@ class BoolLiteralExpr : public LiteralExpr {
 public:
     BoolLiteralExpr(bool v, Heisen::Location l) : LiteralExpr(l), value(v) {}
     bool getValue() const { return value; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class StringLiteralExpr : public LiteralExpr {
@@ -125,7 +125,7 @@ class StringLiteralExpr : public LiteralExpr {
 public:
     StringLiteralExpr(std::string v, Heisen::Location l) : LiteralExpr(l), value(std::move(v)) {}
     const std::string& getValue() const { return value; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class IdentifierExpr : public Expr {
@@ -133,7 +133,7 @@ class IdentifierExpr : public Expr {
 public:
     IdentifierExpr(std::string v, Heisen::Location l) : Expr(l), value(std::move(v)) {}
     const std::string& getValue() const { return value; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class BinaryOpExpr : public Expr {
@@ -150,7 +150,7 @@ public:
     Expr* getLeft() const { return left; }
     Expr* getRight() const { return right; }
     const std::string& getOperator() const { return op; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class UnaryOpExpr : public Expr {
@@ -162,7 +162,7 @@ public:
     ~UnaryOpExpr() { delete operand; }
     const std::string& getOperator() const { return op; }
     Expr* getOperand() const { return operand; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class FunctionCallExpr : public Expr {
@@ -177,7 +177,7 @@ public:
     }
     Expr* getCallee() const { return callee; }
     const std::vector<Expr*>& getArgs() const { return args; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class IndexAccessExpr : public Expr {
@@ -192,7 +192,7 @@ public:
     }
     Expr* getTarget() const { return target; }
     Expr* getIndex() const { return index; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class SliceExpr : public Expr {
@@ -210,7 +210,7 @@ public:
     Expr* getStart() const { return start; }
     Expr* getStop() const { return stop; }
     Expr* getStep() const { return step; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class MemberAccessExpr : public Expr {
@@ -225,7 +225,7 @@ public:
     }
     Expr* getTarget() const { return target; }
     IdentifierExpr* getMemberName() const { return member; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class CastExpr : public Expr {
@@ -240,7 +240,7 @@ public:
     }
     Type* getTargetType() const { return targetType; }
     Expr* getExpression() const { return expr; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class LambdaExpr : public Expr {
@@ -254,7 +254,7 @@ public:
     const std::vector<ParameterDecl*>& getParams() const { return params; }
     Type* getReturnType() const { return returnType; }
     CompoundStmt* getBody() const { return body; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class BracedInitList : public Expr {
@@ -266,7 +266,7 @@ public:
         for (auto* e : elements) delete e;
     }
     const std::vector<Expr*>& getElements() const { return elements; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 // ===================================================================
@@ -287,7 +287,7 @@ public:
         : QuantumStateExpr(loc), identifier(id) {}
     ~QuantumStateIdentifier() { delete identifier; }
     IdentifierExpr* getIdentifier() const { return identifier; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class QuantumStateIndexAccess : public QuantumStateExpr {
@@ -302,7 +302,7 @@ public:
     }
     IdentifierExpr* getIdentifier() const { return identifier; }
     Expr* getIndex() const { return index; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class QuantumStateList : public QuantumStateExpr {
@@ -314,7 +314,7 @@ public:
         for (auto* s : states) delete s;
     }
     const std::vector<Expr*>& getStates() const { return states; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 // ===================================================================
@@ -336,7 +336,7 @@ public:
     IdentifierExpr* getVariableName() const { return name; }
     Type* getVariableType() const { return type; }
     Expr* getInitializer() const { return init; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class ParameterDecl : public Decl {
@@ -351,7 +351,7 @@ public:
     }
     IdentifierExpr* getName() const { return name; }
     Type* getType() const { return type; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 // ===================================================================
@@ -367,7 +367,7 @@ public:
         for (auto* st : stmts) delete st;
     }
     const std::vector<Stmt*>& getStatements() const { return stmts; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class DeclarationStmt : public Stmt {
@@ -379,7 +379,7 @@ public:
         for (auto* d : decls) delete d;
     }
     const std::vector<VariableDecl*>& getDeclarations() const { return decls; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class AssignmentStmt : public Stmt {
@@ -396,7 +396,7 @@ public:
     Expr* getLeft() const { return left; }
     const std::string& getOperator() const { return op; }
     Expr* getRight() const { return right; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class ExpressionStmt : public Stmt {
@@ -406,7 +406,7 @@ public:
         : Stmt(loc), expr(e) {}
     ~ExpressionStmt() { delete expr; }
     Expr* getExpression() const { return expr; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class IfStmt : public Stmt {
@@ -424,7 +424,7 @@ public:
     Expr* getCondition() const { return cond; }
     Stmt* getThenBlock() const { return thenBlk; }
     Stmt* getElseBlock() const { return elseBlk; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class MatchCase : public ASTNode {
@@ -439,7 +439,7 @@ public:
     }
     Expr* getMatchExpr() const { return matchExpr; }
     Stmt* getBody() const { return body; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class MatchStmt : public Stmt {
@@ -454,7 +454,7 @@ public:
     }
     Expr* getMatchExpr() const { return matchExpr; }
     const std::vector<MatchCase*>& getCases() const { return cases; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class LoopStmt : public Stmt {
@@ -476,7 +476,7 @@ public:
     }
     Expr* getCondition() const { return cond; }
     Stmt* getBody() const { return body; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class DoWhileStmt : public LoopStmt {
@@ -491,7 +491,7 @@ public:
     }
     Stmt* getBody() const { return body; }
     Expr* getCondition() const { return cond; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class ForStmt : public LoopStmt {
@@ -512,7 +512,7 @@ public:
     Expr* getCondition() const { return cond; }
     Expr* getUpdate() const { return update; }
     Stmt* getBody() const { return body; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class JumpStmt : public Stmt {
@@ -526,14 +526,14 @@ class ContinueStmt : public JumpStmt {
 public:
     ContinueStmt() {}
     ContinueStmt(Heisen::Location l) : JumpStmt(l) {}
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class BreakStmt : public JumpStmt {
 public:
     BreakStmt() {}
     BreakStmt(Heisen::Location l) : JumpStmt(l) {}
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class ReturnStmt : public JumpStmt {
@@ -544,7 +544,7 @@ public:
     ~ReturnStmt() { if (value) delete value; }
     Expr* getReturnValue() const { return value; }
     bool hasReturnValue() const { return value != nullptr; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class PrintStmt : public Stmt {
@@ -556,7 +556,7 @@ public:
     ~PrintStmt() { if (arg) delete arg; }
     Expr* getArgument() const { return arg; }
     PrintOperationKind getKind() const { return kind; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 // ===================================================================
@@ -576,7 +576,7 @@ public:
     SimpleGateNode(GateKind k, Heisen::Location loc = Heisen::Location()) 
         : GateNode(loc), kind(k) {}
     GateKind getGateKind() const { return kind; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class ParametricGateNode : public GateNode {
@@ -590,7 +590,7 @@ public:
     }
     GateKind getGateKind() const { return kind; }
     const std::vector<Expr*>& getParams() const { return params; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class CompositeGateNode : public GateNode {
@@ -602,7 +602,7 @@ public:
         for (auto* g : gates) delete g;
     }
     const std::vector<GateNode*>& getGates() const { return gates; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class GateCompositionNode : public GateNode {
@@ -617,7 +617,7 @@ public:
     }
     GateNode* getLeft() const { return left; }
     GateNode* getRight() const { return right; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 // ===================================================================
@@ -643,7 +643,7 @@ public:
     }
     GateNode* getGate() const { return gate; }
     Expr* getTarget() const { return target; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class MeasureStmt : public QuantumStmt {
@@ -658,7 +658,7 @@ public:
     }
     Expr* getSource() const { return src; }
     Expr* getTarget() const { return tgt; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class ResetStmt : public QuantumStmt {
@@ -668,7 +668,7 @@ public:
         : QuantumStmt(loc), tgt(t) {}
     ~ResetStmt() { delete tgt; }
     Expr* getTarget() const { return tgt; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 // ===================================================================
@@ -706,7 +706,7 @@ public:
         if (body) delete body;
         body = newBody; 
     }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class GateDecl : public Decl {
@@ -715,7 +715,7 @@ public:
     GateDecl(GateNode* g, Heisen::Location l) : Decl(l), gate(g) {}
     ~GateDecl() { delete gate; }
     GateNode* getGate() const { return gate; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 // ===================================================================
@@ -728,7 +728,7 @@ public:
     BaseTypeNode(BaseTypeKind t, Heisen::Location loc = Heisen::Location()) 
         : Type(Type::Kind::BaseType), baseType(t) {}
     BaseTypeKind getBaseType() const { return baseType; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class ArrayTypeNode : public Type {
@@ -743,7 +743,7 @@ public:
     }
     Type* getElementType() const { return elementType; }
     Expr* getDimension() const { return dimension; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 class FunctionTypeNode : public Type {
@@ -758,7 +758,7 @@ public:
     }
     const std::vector<Type*>& getParamTypes() const { return paramTypes; }
     Type* getReturnType() const { return returnType; }
-    void process(AST_Traversal* v) override {}
+    void visit(AST_Traversal* v) override { v->visit(this); }
 };
 
 // LambdaExpr destructor definition (needed after CompoundStmt is defined)

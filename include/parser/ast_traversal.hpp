@@ -1,6 +1,8 @@
 #ifndef HEISEN_AST_TRAVERSAL_HPP
 #define HEISEN_AST_TRAVERSAL_HPP
 
+#include <macros.hpp>
+
 // Forward declarations for all AST node types
 class ASTNode;
 class Expr;
@@ -237,6 +239,7 @@ public:
     //                      Gate Visitors
     // ===================================================================
     
+    void visit(SimpleGateNode* node) override;
     void visit(ParametricGateNode* node) override;
     void visit(CompositeGateNode* node) override;
     void visit(GateCompositionNode* node) override;
@@ -301,6 +304,7 @@ public:
     void visit(MeasureStmt* node) override;
     void visit(SimpleGateNode* node) override;
     void visit(ParametricGateNode* node) override;
+    void visit(GateCompositionNode* node) override;
     
     // Utility method to print entire AST
     void print(ASTNode* root);

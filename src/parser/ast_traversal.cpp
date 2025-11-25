@@ -1,5 +1,5 @@
-#include "ast_traversal.hpp"
-#include "ast.hpp"
+#include <ast_traversal.hpp>
+#include <ast.hpp>
 #include <iostream>
 #include <iomanip>
 
@@ -30,17 +30,9 @@ void RecursiveASTVisitor::visitExpr(Expr* expr) {
         visit(braced);
     } else if (auto* qstate = dynamic_cast<QuantumStateList*>(expr)) {
         visit(qstate);
-    } else if (auto* id = dynamic_cast<IdentifierExpr*>(expr)) {
-        visit(id);
-    } else if (auto* intLit = dynamic_cast<IntLiteralExpr*>(expr)) {
-        visit(intLit);
-    } else if (auto* floatLit = dynamic_cast<FloatLiteralExpr*>(expr)) {
-        visit(floatLit);
-    } else if (auto* boolLit = dynamic_cast<BoolLiteralExpr*>(expr)) {
-        visit(boolLit);
-    } else if (auto* strLit = dynamic_cast<StringLiteralExpr*>(expr)) {
-        visit(strLit);
     }
+    // Leaf nodes (literals, identifiers) don't need visiting
+    // as they have no children
 }
 
 void RecursiveASTVisitor::visitStmt(Stmt* stmt) {
@@ -67,9 +59,9 @@ void RecursiveASTVisitor::visitStmt(Stmt* stmt) {
     } else if (auto* retStmt = dynamic_cast<ReturnStmt*>(stmt)) {
         visit(retStmt);
     } else if (auto* breakStmt = dynamic_cast<BreakStmt*>(stmt)) {
-        visit(breakStmt);
+        // BreakStmt is a leaf node, no children to visit
     } else if (auto* contStmt = dynamic_cast<ContinueStmt*>(stmt)) {
-        visit(contStmt);
+        // ContinueStmt is a leaf node, no children to visit
     } else if (auto* applyStmt = dynamic_cast<ApplyGateStmt*>(stmt)) {
         visit(applyStmt);
     } else if (auto* measureStmt = dynamic_cast<MeasureStmt*>(stmt)) {
@@ -77,7 +69,10 @@ void RecursiveASTVisitor::visitStmt(Stmt* stmt) {
     } else if (auto* resetStmt = dynamic_cast<ResetStmt*>(stmt)) {
         visit(resetStmt);
     } else if (auto* printStmt = dynamic_cast<PrintStmt*>(stmt)) {
-        visit(printStmt);
+        // PrintStmt has a child expression, visit it
+        if (printStmt->getArgument()) {
+            visitExpr(printStmt->getArgument());
+        }
     }
 }
 
@@ -99,7 +94,8 @@ void RecursiveASTVisitor::visitType(Type* type) {
     if (!type) return;
     
     if (auto* baseType = dynamic_cast<BaseTypeNode*>(type)) {
-        visit(baseType);
+        // BaseTypeNode is a leaf node, no children to visit
+        return;
     } else if (auto* arrayType = dynamic_cast<ArrayTypeNode*>(type)) {
         visit(arrayType);
     } else if (auto* funcType = dynamic_cast<FunctionTypeNode*>(type)) {
@@ -663,57 +659,9 @@ void ASTPrinter::print(ASTNode* root) {
 void ASTStatistics::analyzeNode(ASTNode* node) {
     if (!node) return;
     
-    // Try declarations first
-    if (auto* funcDecl = dynamic_cast<FunctionDecl*>(node)) {
-        visit(funcDecl);
-        return;
-    }
-    if (auto* varDecl = dynamic_cast<VariableDecl*>(node)) {
-        visit(varDecl);
-        return;
-    }
-    if (auto* gateDecl = dynamic_cast<GateDecl*>(node)) {
-        visit(gateDecl);
-        return;
-    }
-    
-    // Try statements
-    if (auto* declStmt = dynamic_cast<DeclarationStmt*>(node)) {
-        visit(declStmt);
-        return;
-    }
-    if (auto* applyStmt = dynamic_cast<ApplyGateStmt*>(node)) {
-        visit(applyStmt);
-        return;
-    }
-    if (auto* measureStmt = dynamic_cast<MeasureStmt*>(node)) {
-        visit(measureStmt);
-        return;
-    }
-    if (auto* resetStmt = dynamic_cast<ResetStmt*>(node)) {
-        visit(resetStmt);
-        return;
-    }
-    if (auto* exprStmt = dynamic_cast<ExpressionStmt*>(node)) {
-        visit(exprStmt);
-        return;
-    }
-    if (auto* ifStmt = dynamic_cast<IfStmt*>(node)) {
-        visit(ifStmt);
-        return;
-    }
-    if (auto* whileStmt = dynamic_cast<WhileStmt*>(node)) {
-        visit(whileStmt);
-        return;
-    }
-    if (auto* forStmt = dynamic_cast<ForStmt*>(node)) {
-        visit(forStmt);
-        return;
-    }
-    if (auto* compoundStmt = dynamic_cast<CompoundStmt*>(node)) {
-        visit(compoundStmt);
-        return;
-    }
+    // Use the visitor pattern: call the node's visit method which will
+    // dispatch back to the appropriate visit method in this class
+    node->visit(this);
 }
 
 void ASTStatistics::printStats() const {
