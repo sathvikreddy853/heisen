@@ -361,8 +361,8 @@ private:
                 for (auto* p : pg->getParams()) printExpr(p, level+2);
                 return;
             }
-            if (auto cg = dynamic_cast<CompositeGateNode*>(gn)) {
-                indent(level); out << "CompositeGateNode " << cg->loc << "\n";
+            if (auto cg = dynamic_cast<TensoredGateNode*>(gn)) {
+                indent(level); out << "TensoredGateNode " << cg->loc << "\n";
                 for (auto* g : cg->getGates()) printQuantum(g, level+1);
                 return;
             }

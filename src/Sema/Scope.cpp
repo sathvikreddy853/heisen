@@ -6,6 +6,7 @@ bool Scope::declare (const std::string& name, Symbol* symbol) {
     if (symbols.find (name) != symbols.end ()) {
         return false; // Already declared in this scope
     }
+
     symbols[name] = symbol;
     return true;
 }

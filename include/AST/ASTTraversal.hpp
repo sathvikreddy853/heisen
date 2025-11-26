@@ -68,7 +68,7 @@ class ResetStmt;
 // Gate nodes
 class SimpleGateNode;
 class ParametricGateNode;
-class CompositeGateNode;
+class TensoredGateNode;
 class GateCompositionNode;
 
 // Type nodes
@@ -156,7 +156,7 @@ public:
     
     virtual void visit(SimpleGateNode* node) {}
     virtual void visit(ParametricGateNode* node) {}
-    virtual void visit(CompositeGateNode* node) {}
+    virtual void visit(TensoredGateNode* node) {}
     virtual void visit(GateCompositionNode* node) {}
     
     // ===================================================================
@@ -241,7 +241,7 @@ public:
     
     void visit(SimpleGateNode* node) override;
     void visit(ParametricGateNode* node) override;
-    void visit(CompositeGateNode* node) override;
+    void visit(TensoredGateNode* node) override;
     void visit(GateCompositionNode* node) override;
     
     // ===================================================================

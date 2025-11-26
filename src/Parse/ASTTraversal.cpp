@@ -110,7 +110,7 @@ void RecursiveASTVisitor::visitGate(GateNode* gate) {
         visit(simpleGate);
     } else if (auto* paramGate = dynamic_cast<ParametricGateNode*>(gate)) {
         visit(paramGate);
-    } else if (auto* compGate = dynamic_cast<CompositeGateNode*>(gate)) {
+    } else if (auto* compGate = dynamic_cast<TensoredGateNode*>(gate)) {
         visit(compGate);
     } else if (auto* gateComp = dynamic_cast<GateCompositionNode*>(gate)) {
         visit(gateComp);
@@ -287,7 +287,7 @@ void RecursiveASTVisitor::visit(ParametricGateNode* node) {
     }
 }
 
-void RecursiveASTVisitor::visit(CompositeGateNode* node) {
+void RecursiveASTVisitor::visit(TensoredGateNode* node) {
     for (auto* gate : node->getGates()) {
         visitGate(gate);
     }

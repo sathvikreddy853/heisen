@@ -2,10 +2,6 @@
 
 namespace Heisen {
 
-// ===================================================================
-//                      Initialization
-// ===================================================================
-
 void SemanticAnalyzer::initializeBuiltins () {
     // Math functions
     auto* piType = new PrimitiveType (SemanticType::Kind::FLOAT);
@@ -28,17 +24,13 @@ void SemanticAnalyzer::initializeBuiltins () {
     symbolTable.declare ("float", new Symbol ("float", floatFuncType, Symbol::Kind::FUNCTION, Location ()));
 }
 
-// ===================================================================
-//                      Main Analysis
-// ===================================================================
-
 bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
     // First pass: collect all function declarations
     for (auto* node : translationUnit) {
         if (auto* funcDecl = dynamic_cast<FunctionDecl*> (node)) { visitFunctionDecl (funcDecl); }
     }
 
-    // Second pass: analyze function bodies and statements
+    // Second pass: analyze function bodies and statements 
     for (auto* node : translationUnit) {
         if (auto* funcDecl = dynamic_cast<FunctionDecl*> (node)) {
             if (funcDecl->getBody ()) {
@@ -222,6 +214,7 @@ SemanticType* SemanticAnalyzer::getExprType (Expr* expr) {
 // ===================================================================
 
 void SemanticAnalyzer::visitFunctionDecl (FunctionDecl* decl) {
+    /* FUTURE: Add name mangling here for function overloading */
     std::string funcName = decl->getFunctionName ()->getValue ();
 
     // Check if already declared
