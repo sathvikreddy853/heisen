@@ -1,8 +1,0 @@
-func add (a: int, b: int) : int {
-    return a + b;
-}
-
-let x: int = 24;
-let y: int = 32;
-
-add(x, y);
