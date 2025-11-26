@@ -21,24 +21,31 @@ SRC_FILES := $(shell find $(SRC_DIR) -type f -name '*.cpp')
 all: build yacc lex compile
 
 build:
-	mkdir -p build
+	@printf "[MKDIR] Create build directory\n"
+	@mkdir -p build
 
-run: 
-	$(BUILD_DIR)/$(TARGET_PROGRAM)
+run:
+	@printf "[RUN] Running heisen..\n" 
+	@$(BUILD_DIR)/$(TARGET_PROGRAM)
 
 compile:
-	clang++ -std=c++26 -I$(BUILD_DIR) $(INCLUDE_LIST) -I$(BUILD_DIR)/Parser.tab.hpp $(BUILD_DIR)/Parser.tab.cpp $(BUILD_DIR)/Lexer.yy.cpp $(SRC_FILES) -o $(BUILD_DIR)/$(TARGET_PROGRAM)
+	@printf "[COMPILE] Compile to generate heisen\n"
+	@clang++ -std=c++26 -I$(BUILD_DIR) $(INCLUDE_LIST) -I$(BUILD_DIR)/Parser.tab.hpp $(BUILD_DIR)/Parser.tab.cpp $(BUILD_DIR)/Lexer.yy.cpp $(SRC_FILES) -o $(BUILD_DIR)/$(TARGET_PROGRAM)
 
 lex:
-	flex -o $(BUILD_DIR)/Lexer.yy.cpp src/Lex/Lexer.l
+	@printf "[BUILD] Constructing Lexer files from Flex\n"
+	@flex -o $(BUILD_DIR)/Lexer.yy.cpp src/Lex/Lexer.l
 
 yacc:
-	bison --defines=$(BUILD_DIR)/Parser.tab.hpp -o $(BUILD_DIR)/Parser.tab.cpp src/Parse/Parser.y
+	@printf "[BUILD] Constructing Parser files from Bison\n"
+	@bison --defines=$(BUILD_DIR)/Parser.tab.hpp -o $(BUILD_DIR)/Parser.tab.cpp src/Parse/Parser.y
 # 	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/Parser.tab.hpp -o $(BUILD_DIR)/Parser.tab.cpp src/Parse/Parser.y
 
 grammar:
-	bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/Parser.tab.hpp -o $(BUILD_DIR)/Parser.tab.cpp src/Parse/Grammar.y
+	@printf "[BUILD] Constructing Parser files from Bison\n"
+	@bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/Parser.tab.hpp -o $(BUILD_DIR)/Parser.tab.cpp src/Parse/Grammar.y
 # 	bison --defines=$(BUILD_DIR)/Parser.tab.hpp -o $(BUILD_DIR)/Parser.tab.cpp src/Parse/Grammar.y
 	
 clean:
-	rm -rf $(BUILD_DIR)
+	@printf "[CLEAN] Cleaning up build files\n"
+	@rm -rf $(BUILD_DIR)
