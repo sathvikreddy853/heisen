@@ -760,17 +760,17 @@ class DoWhileStmt : public LoopStmt {
 class ForStmt : public LoopStmt {
     DeclarationStmt* init;
     Expr* cond;
-    Expr* update;
+    Stmt* update;
     Stmt* body;
 
     public:
-    ForStmt (DeclarationStmt* i, Expr* c, Expr* u, Stmt* b, Heisen::Location loc = Heisen::Location ())
+    ForStmt (DeclarationStmt* i, Expr* c, Stmt* u, Stmt* b, Heisen::Location loc = Heisen::Location ())
     : LoopStmt (loc), init (i), cond (c), update (u), body (b) {
     }
     ~ForStmt () {
         delete init;
         delete cond;
-        delete update;
+        if (update) delete update;
         delete body;
     }
     DeclarationStmt* getInit () const {
@@ -779,7 +779,7 @@ class ForStmt : public LoopStmt {
     Expr* getCondition () const {
         return cond;
     }
-    Expr* getUpdate () const {
+    Stmt* getUpdate () const {
         return update;
     }
     Stmt* getBody () const {

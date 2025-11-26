@@ -253,7 +253,7 @@ void RecursiveASTVisitor::visit(DoWhileStmt* node) {
 void RecursiveASTVisitor::visit(ForStmt* node) {
     visit(node->getInit());
     visitExpr(node->getCondition());
-    visitExpr(node->getUpdate());
+    visitStmt(node->getUpdate());
     visitStmt(node->getBody());
 }
 
@@ -516,7 +516,7 @@ void ASTPrinter::visit(ForStmt* node) {
         indent();
         std::cout << "Update:" << std::endl;
         indentLevel++;
-        visitExpr(node->getUpdate());
+        visitStmt(node->getUpdate());
         indentLevel--;
     }
     

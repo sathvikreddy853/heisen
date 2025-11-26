@@ -8,11 +8,16 @@ void SemanticAnalyzer::initializeBuiltins () {
     symbolTable.declare ("pi", new Symbol ("pi", piType, Symbol::Kind::VARIABLE, Location ()));
 
     // Built-in functions
-    std::vector<std::string> mathFuncs = { "sqrt", "floor", "ceil", "sin", "cos", "tan", "abs" };
+    std::vector<std::string> mathFuncs = { "sqrt", "round", "floor", "ceil", "sin", "cos", "tan", "abs" };
     for (const auto& func : mathFuncs) {
         std::vector<SemanticType*> params;
         params.push_back (new PrimitiveType (SemanticType::Kind::FLOAT));
-        auto* retType  = new PrimitiveType (SemanticType::Kind::FLOAT);
+        PrimitiveType* retType = nullptr;
+        if (func == "round" || func == "floor" || func == "ceil") {
+            retType  = new PrimitiveType (SemanticType::Kind::INT);
+        } else {
+            retType  = new PrimitiveType (SemanticType::Kind::FLOAT);
+        }
         auto* funcType = new FunctionType (params, retType);
         symbolTable.declare (func, new Symbol (func, funcType, Symbol::Kind::FUNCTION, Location ()));
     }
@@ -57,10 +62,6 @@ bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
 
     return !hasErrors ();
 }
-
-// ===================================================================
-//                      Type Utilities
-// ===================================================================
 
 SemanticType* SemanticAnalyzer::cloneType (SemanticType* type) {
     if (!type) return nullptr;
@@ -279,8 +280,9 @@ void SemanticAnalyzer::visitVariableDecl (VariableDecl* decl) {
         }
     }
 
-    auto* sym          = new Symbol (varName, declaredType, Symbol::Kind::VARIABLE, decl->loc);
-    sym->isInitialized = (decl->getInitializer () != nullptr);
+    // All variables have default initialization:
+    // int = 0, float = 0.0, string = "", qubit = |0>, bit = 0, bool = false
+    auto* sym = new Symbol (varName, declaredType, Symbol::Kind::VARIABLE, decl->loc);
     symbolTable.declare (varName, sym);
 }
 
@@ -467,7 +469,14 @@ void SemanticAnalyzer::visitForStmt (ForStmt* stmt) {
         }
     }
 
-    if (stmt->getUpdate ()) { getExprType (stmt->getUpdate ()); }
+    if (stmt->getUpdate ()) {
+        // The update is a statement (typically an assignment statement)
+        if (auto* assignStmt = dynamic_cast<AssignmentStmt*> (stmt->getUpdate ())) {
+            visitAssignmentStmt (assignStmt);
+        } else if (auto* exprStmt = dynamic_cast<ExpressionStmt*> (stmt->getUpdate ())) {
+            visitExpressionStmt (exprStmt);
+        }
+    }
 
     bool wasInLoop = inLoop;
     inLoop         = true;
@@ -528,77 +537,6 @@ void SemanticAnalyzer::visitMatchStmt (MatchStmt* stmt) {
             visitCompoundStmt (body);
         }
         symbolTable.exitScope ();
-    }
-}
-
-// ===================================================================
-//                      Quantum Statement Visitors
-// ===================================================================
-
-void SemanticAnalyzer::visitApplyGateStmt (ApplyGateStmt* stmt) {
-    checkGateApplication (stmt->getGate (), stmt->getTarget (), stmt->loc);
-}
-
-void SemanticAnalyzer::checkGateApplication (GateNode* gate, Expr* target, Location loc) {
-    SemanticType* targetType = getExprType (target);
-
-    if (!targetType) return;
-
-    // Target must be qubit or qubit array
-    if (!isQubitType (targetType)) {
-        reportError (loc, "Gate can only be applied to qubits");
-        return;
-    }
-
-    // Additional validation for specific gates could be added here
-    // For example, CNOT requires 2 qubits, etc.
-}
-
-void SemanticAnalyzer::visitMeasureStmt (MeasureStmt* stmt) {
-    SemanticType* srcType = getExprType (stmt->getSource ());
-    SemanticType* tgtType = getExprType (stmt->getTarget ());
-
-    if (!srcType || !tgtType) return;
-
-    // Source must be qubit or qubit array
-    if (!isQubitType (srcType)) {
-        reportError (stmt->loc, "Measurement source must be a qubit");
-        return;
-    }
-
-    // Target must be bit or bit array
-    if (tgtType->getKind () != SemanticType::Kind::BIT) {
-        if (tgtType->getKind () == SemanticType::Kind::ARRAY) {
-            auto* arrType = static_cast<ArrayType*> (tgtType);
-            if (arrType->getElementType ()->getKind () != SemanticType::Kind::BIT) {
-                reportError (stmt->loc, "Measurement target must be a bit");
-                return;
-            }
-        } else {
-            reportError (stmt->loc, "Measurement target must be a bit");
-            return;
-        }
-    }
-
-    // Check dimension compatibility for arrays
-    if (srcType->getKind () == SemanticType::Kind::ARRAY && tgtType->getKind () == SemanticType::Kind::ARRAY) {
-        auto* srcArr = static_cast<ArrayType*> (srcType);
-        auto* tgtArr = static_cast<ArrayType*> (tgtType);
-
-        if (srcArr->getDimension () != tgtArr->getDimension () && srcArr->getDimension () != -1 &&
-        tgtArr->getDimension () != -1) {
-            reportError (stmt->loc, "Array dimension mismatch in measurement");
-        }
-    }
-}
-
-void SemanticAnalyzer::visitResetStmt (ResetStmt* stmt) {
-    SemanticType* targetType = getExprType (stmt->getTarget ());
-
-    if (!targetType) return;
-
-    if (!isQubitType (targetType)) {
-        reportError (stmt->loc, "Reset can only be applied to qubits");
     }
 }
 
@@ -682,10 +620,7 @@ SemanticType* SemanticAnalyzer::visitIdentifierExpr (IdentifierExpr* expr) {
         return new PrimitiveType (SemanticType::Kind::ERROR);
     }
 
-    if (!sym->isInitialized && sym->kind == Symbol::Kind::VARIABLE) {
-        reportError (expr->loc, "Variable '" + name + "' used before initialization");
-    }
-
+    // All variables are default-initialized, no need to check isInitialized
     return cloneType (sym->type);
 }
 

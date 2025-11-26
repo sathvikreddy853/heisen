@@ -117,7 +117,8 @@
 %type<exp> expression postfix_expression primary_expression condition optional_condition
 %type<exp> expression_statement index_expression optional_expression
 %type<exp> quantum_state tensored_state braced_init_list lambda_expression
-%type<expList> expression_list postfix_expression_list optional_assignment_statement
+%type<expList> expression_list postfix_expression_list
+%type<stmt> optional_assignment_statement
 %type<gList> quantum_gate_list
 
 %left OR
@@ -300,26 +301,26 @@ expression_statement
     ;
 
 condition   
-    : expression '>' expression
+    :   expression '>' expression
         { $$ = new BinaryOpExpr($1, ">", $3); }
-    | expression '<' expression
+    |   expression '<' expression
         { $$ = new BinaryOpExpr($1, "<", $3); }
-    | expression GE_OP expression
+    |   expression GE_OP expression
         { $$ = new BinaryOpExpr($1, ">=", $3); }
-    | expression LE_OP expression
+    |   expression LE_OP expression
         { $$ = new BinaryOpExpr($1, "<=", $3); }
-    | expression EQ_OP expression
+    |   expression EQ_OP expression
         { $$ = new BinaryOpExpr($1, "==", $3); }
-    | expression NE_OP expression
+    |   expression NE_OP expression
         { $$ = new BinaryOpExpr($1, "!=", $3); }
-    | condition AND condition
+    |   condition AND condition
         { $$ = new BinaryOpExpr($1, "and", $3); }
-    | condition OR condition
+    |   condition OR condition
         { $$ = new BinaryOpExpr($1, "or", $3); }
-    | NOT condition %prec UNARY
+    |   NOT condition %prec UNARY
         { $$ = new UnaryOpExpr("not", $2); }
-    | expression
-        { $$ = $1; }
+    |   '(' condition ')'
+        { $$ = $2; }
     ;
 
 match_list
@@ -353,27 +354,15 @@ iteration_statement
         { 
             auto* init = new DeclarationStmt(*$3);
             delete $3;
-            Expr* update = nullptr;
-            if ($7 && !$7->empty()) {
-                update = (*$7)[0];
-                delete $7;
-            }
-            $$ = new ForStmt(init, $5, update, $9, $1->loc);
+            $$ = new ForStmt(init, $5, $7, $9, $1->loc);
         }
     ;
 
 optional_assignment_statement
     : %empty
-        { $$ = new std::vector<Expr*>(); }
+        { $$ = nullptr; }
     | assignment_statement
-        { 
-            $$ = new std::vector<Expr*>();
-            // Extract the assignment as an expression (simplified)
-            auto* assign = dynamic_cast<AssignmentStmt*>($1);
-            if (assign) {
-                $$->push_back(new BinaryOpExpr(assign->getLeft(), assign->getOperator(), assign->getRight()));
-            }
-        }
+        { $$ = $1; }
     ;
 
 jump_statement
