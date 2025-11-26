@@ -22,8 +22,8 @@ func deutsch_josza (n: int, Uf: ((qubit[], qubit) => ())) : bit {
 }
 
 func create_oracle (s: bit[]) : ((qubit[], qubit) => ()) {
-    return func Uf(x: qubit[], y: qubit) {
-        let n = s.size;
+    return (x: qubit[], y: qubit) {
+        let n: int = s.size;
 
         for (i: int = 0; i < n; i += 1) {
             if (s[i] == 1) {
