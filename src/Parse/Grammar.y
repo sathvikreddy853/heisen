@@ -5,6 +5,7 @@
     #include <Parser.tab.hpp>
     #include <Macros.hpp>
     #include <Token.hpp>
+    #include <AST.hpp>
 
     int yylex();
     void yyerror (const std::string &);
@@ -14,12 +15,13 @@
     Heisen::Token* token;
     long long ival;
     double fval;
-    char *sval;
+    char* sval;
 }
 
 %code requires {
-    #include <macros.hpp>
-    #include <token.hpp>
+    #include <Macros.hpp>
+    #include <Token.hpp>
+    #include <AST.hpp>
 }
 
 %token<sval> IDENTIFIER 

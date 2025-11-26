@@ -60,8 +60,8 @@
 %token<token> INT_LITERAL
 %token<token> STRING_LITERAL
 
-%token<token> QUBIT BIT INT FLOAT STRING BOOL STRUCT
-%token<token> LET CONST APPLY
+%token<token> QUBIT BIT INT FLOAT STRING BOOL
+%token<token> LET APPLY
 %token<token> FUNC GATE
 
 %token<token> AND OR NOT
@@ -86,6 +86,7 @@
 %token<token> RIGHT_SHIFT LEFT_SHIFT RIGHT_SHIFT_ASSIGN LEFT_SHIFT_ASSIGN
 %token<token> EQ_OP NE_OP GE_OP LE_OP 
 
+%token<token> STRUCT CONST
 %token<token> IMPORT SINGLE_ARROW GETLINE
 %token<token> TRY CATCH THROW CLASS CIRCUIT 
 
@@ -634,8 +635,6 @@ primary_expression
         { $$ = $1; }
     | boolean_literal 
         { $$ = $1; }
-    | '(' expression ')'
-        { $$ = $2; }
     ;
 
 lambda_expression

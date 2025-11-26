@@ -5,3 +5,4 @@ func create_bell () {
     CNOT @ [H, I] @ q;
     measure q => b;
 }
+
