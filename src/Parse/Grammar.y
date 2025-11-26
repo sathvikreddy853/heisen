@@ -169,7 +169,6 @@ condition
     |   condition AND condition
     |   condition OR condition
     |   NOT condition %prec UNARY
-    |   '(' condition ')'
     |   expression
     ;
 
@@ -292,6 +291,7 @@ assignment_operator
     |   '+' expression %prec UNARY
     |   '-' expression %prec UNARY
     |   '!' expression %prec UNARY
+    |   '(' expression ')'
     |   postfix_expression
     ;
 

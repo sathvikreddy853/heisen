@@ -318,8 +318,6 @@ condition
         { $$ = new BinaryOpExpr($1, "or", $3); }
     | NOT condition %prec UNARY
         { $$ = new UnaryOpExpr("not", $2); }
-    | '(' condition ')'
-        { $$ = $2; }
     | expression
         { $$ = $1; }
     ;
@@ -584,7 +582,9 @@ expression
         { $$ = new UnaryOpExpr("-", $2); }
     | '!' expression %prec UNARY
         { $$ = new UnaryOpExpr("!", $2); }
-    | postfix_expression 
+    |   '(' expression ')'
+        { $$ = $2; }
+    |   postfix_expression 
         { $$ = $1; }
     ;
 
@@ -736,7 +736,7 @@ postfix_expression_list
 /* parametric gate should allow multiple expressions */
 quantum_gate
     : '[' quantum_gate_list ']'
-        { $$ = new CompositeGateNode(*$2); delete $2; }
+        { $$ = new TensoredGateNode(*$2); delete $2; }
     | simple_gate '(' expression ')'
         { 
             std::vector<Expr*> params;
