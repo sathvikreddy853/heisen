@@ -1,4 +1,9 @@
+#ifndef HEISEN_FORMATTING_FUNCTIONS_HPP
+#define HEISEN_FORMATTING_FUNCTIONS_HPP
+
 #include <Macros.hpp>
+
+namespace Heisen {
 
 void printHeader (const std::string& title, bool useColor = true) {
     std::string separator (60, '=');
@@ -29,3 +34,7 @@ void printError (const std::string& message, bool useColor = true) {
         std::cerr << "✗ " << message << std::endl;
     }
 }
+
+} // namespace Heisen
+
+#endif // HEISEN_FORMATTING_FUNCTIONS_HPP

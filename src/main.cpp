@@ -14,29 +14,29 @@ int main (int argc, char** argv) {
 
     // Banner
     if (opts.verbose) {
-        printHeader ("Heisen Quantum Programming Language Compiler", opts.enableColor);
+        Heisen::printHeader ("Heisen Quantum Programming Language Compiler", opts.enableColor);
         std::cout << std::endl;
     }
 
     // ===================================================================
     // Phase 1: Parsing
     // ===================================================================
-    if (opts.verbose) { printHeader ("Phase 1: Parsing", opts.enableColor); }
+    if (opts.verbose) { Heisen::printHeader ("Phase 1: Parsing", opts.enableColor); }
 
     yydebug         = 0;
     int parseResult = yyparse ();
 
     if (parseResult != 0) {
-        printError ("Parsing failed", opts.enableColor);
+        Heisen::printError ("Parsing failed", opts.enableColor);
         return 1;
     }
 
     if (translationUnit.empty ()) {
-        printError ("No translation unit generated", opts.enableColor);
+        Heisen::printError ("No translation unit generated", opts.enableColor);
         return 1;
     }
 
-    printSuccess ("Parsing completed successfully", opts.enableColor);
+    Heisen::printSuccess ("Parsing completed successfully", opts.enableColor);
     if (opts.verbose) {
         std::cout << "  Generated " << translationUnit.size ()
                   << " top-level declarations" << std::endl;
@@ -47,7 +47,7 @@ int main (int argc, char** argv) {
     // Optional: Print AST
     // ===================================================================
     if (opts.printAST) {
-        printHeader ("Abstract Syntax Tree", opts.enableColor);
+        Heisen::printHeader ("Abstract Syntax Tree", opts.enableColor);
         ASTPrinter printer (opts.enableColor);
 
         for (auto* node : translationUnit) { printer.print (node); }
@@ -58,7 +58,7 @@ int main (int argc, char** argv) {
     // Optional: Print Statistics
     // ===================================================================
     if (opts.printStats) {
-        printHeader ("AST Statistics", opts.enableColor);
+        Heisen::printHeader ("AST Statistics", opts.enableColor);
         ASTStatistics stats;
 
         for (auto* node : translationUnit) { stats.analyzeNode (node); }
@@ -71,14 +71,14 @@ int main (int argc, char** argv) {
     // Phase 2: Semantic Analysis
     // ===================================================================
     if (opts.verbose) {
-        printHeader ("Phase 2: Semantic Analysis", opts.enableColor);
+        Heisen::printHeader ("Phase 2: Semantic Analysis", opts.enableColor);
     }
 
     Heisen::SemanticAnalyzer analyzer;
     bool semanticSuccess = analyzer.analyze (translationUnit);
 
     if (!semanticSuccess) {
-        printError ("Semantic analysis failed with errors:", opts.enableColor);
+        Heisen::printError ("Semantic analysis failed with errors:", opts.enableColor);
         std::cout << std::endl;
 
         // Print all errors
@@ -114,7 +114,7 @@ int main (int argc, char** argv) {
         return 1;
     }
 
-    printSuccess ("Semantic analysis completed successfully", opts.enableColor);
+    Heisen::printSuccess ("Semantic analysis completed successfully", opts.enableColor);
     if (opts.verbose) {
         std::cout << "  All type checks passed" << std::endl;
         std::cout << "  Quantum semantics validated" << std::endl;
@@ -127,7 +127,7 @@ int main (int argc, char** argv) {
     // ===================================================================
     if (!opts.semanticOnly) {
         if (opts.verbose) {
-            printHeader ("Phase 3: Code Generation", opts.enableColor);
+            Heisen::printHeader ("Phase 3: Code Generation", opts.enableColor);
         }
 
         // TODO: Implement code generation
@@ -161,8 +161,8 @@ int main (int argc, char** argv) {
     // Success Summary
     // ===================================================================
     if (opts.verbose) {
-        printHeader ("Compilation Summary", opts.enableColor);
-        printSuccess ("Compilation successful!", opts.enableColor);
+        Heisen::printHeader ("Compilation Summary", opts.enableColor);
+        Heisen::printSuccess ("Compilation successful!", opts.enableColor);
         std::cout << std::endl;
     }
 

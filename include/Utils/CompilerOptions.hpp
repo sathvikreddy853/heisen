@@ -30,7 +30,7 @@ struct CompilerOptions {
     }
 };
 
-CompilerOptions parseArgs (int argc, char** argv) {
+inline CompilerOptions parseArgs (int argc, char** argv) {
     CompilerOptions opts;
 
     for (int i = 1; i < argc; ++i) {
