@@ -1,5 +1,7 @@
 #include <AST.hpp>
 #include <ASTTraversal.hpp>
+#include <CompilerOptions.hpp>
+#include <FormattingFunctions.hpp>
 #include <Macros.hpp>
 #include <SemanticAnalyzer.hpp>
 
@@ -7,115 +9,19 @@ extern int yydebug;
 extern int yyparse ();
 extern std::vector<ASTNode*> translationUnit;
 
-// Command-line options
-struct CompilerOptions {
-    bool verbose      = false;
-    bool printAST     = false;
-    bool printStats   = false;
-    bool enableColor  = true;
-    bool semanticOnly = false;
-    std::string outputFile;
-
-    void printHelp (const char* programName) {
-        std::cout << "Usage: " << programName << " [options] <input-file>\n\n";
-        std::cout << "Options:\n";
-        std::cout << "  -v, --verbose        Enable verbose output\n";
-        std::cout
-        << "  -a, --print-ast      Print the AST after parsing\n";
-        std::cout << "  -s, --stats          Print AST statistics\n";
-        std::cout << "  -c, --semantic-only  Only perform semantic "
-                     "analysis (no codegen)\n";
-        std::cout << "  -o, --output <file>  Specify output file\n";
-        std::cout
-        << "  --no-color           Disable colored output\n";
-        std::cout
-        << "  -d, --debug          Enable parser debug output\n";
-        std::cout
-        << "  -h, --help           Show this help message\n";
-        std::cout << std::endl;
-    }
-};
-
-CompilerOptions parseArgs (int argc, char** argv) {
-    CompilerOptions opts;
-
-    for (int i = 1; i < argc; ++i) {
-        std::string arg = argv[i];
-
-        if (arg == "-v" || arg == "--verbose") {
-            opts.verbose = true;
-        } else if (arg == "-a" || arg == "--print-ast") {
-            opts.printAST = true;
-        } else if (arg == "-s" || arg == "--stats") {
-            opts.printStats = true;
-        } else if (arg == "-c" || arg == "--semantic-only") {
-            opts.semanticOnly = true;
-        } else if (arg == "-o" || arg == "--output") {
-            if (i + 1 < argc) {
-                opts.outputFile = argv[++i];
-            } else {
-                std::cerr << "Error: -o requires an argument\n";
-                exit (1);
-            }
-        } else if (arg == "--no-color") {
-            opts.enableColor = false;
-        } else if (arg == "-d" || arg == "--debug") {
-            yydebug = 1;
-        } else if (arg == "-h" || arg == "--help") {
-            opts.printHelp (argv[0]);
-            exit (0);
-        }
-    }
-
-    return opts;
-}
-
-void printHeader (const std::string& title, bool useColor = true) {
-    std::string separator (60, '=');
-
-    if (useColor) {
-        std::cout << "\033[1;36m" << separator << "\033[0m" << std::endl;
-        std::cout << "\033[1;36m  " << title << "\033[0m" << std::endl;
-        std::cout << "\033[1;36m" << separator << "\033[0m" << std::endl;
-    } else {
-        std::cout << separator << std::endl;
-        std::cout << "  " << title << std::endl;
-        std::cout << separator << std::endl;
-    }
-}
-
-void printSuccess (const std::string& message, bool useColor = true) {
-    if (useColor) {
-        std::cout << "\033[1;32m✓ " << message << "\033[0m" << std::endl;
-    } else {
-        std::cout << "✓ " << message << std::endl;
-    }
-}
-
-void printError (const std::string& message, bool useColor = true) {
-    if (useColor) {
-        std::cerr << "\033[1;31m✗ " << message << "\033[0m" << std::endl;
-    } else {
-        std::cerr << "✗ " << message << std::endl;
-    }
-}
-
 int main (int argc, char** argv) {
-    CompilerOptions opts = parseArgs (argc, argv);
+    Heisen::CompilerOptions opts = Heisen::parseArgs (argc, argv);
 
     // Banner
     if (opts.verbose) {
-        printHeader ("Heisen Quantum Programming Language Compiler",
-        opts.enableColor);
+        printHeader ("Heisen Quantum Programming Language Compiler", opts.enableColor);
         std::cout << std::endl;
     }
 
     // ===================================================================
     // Phase 1: Parsing
     // ===================================================================
-    if (opts.verbose) {
-        printHeader ("Phase 1: Parsing", opts.enableColor);
-    }
+    if (opts.verbose) { printHeader ("Phase 1: Parsing", opts.enableColor); }
 
     yydebug         = 0;
     int parseResult = yyparse ();
@@ -155,9 +61,7 @@ int main (int argc, char** argv) {
         printHeader ("AST Statistics", opts.enableColor);
         ASTStatistics stats;
 
-        for (auto* node : translationUnit) {
-            stats.analyzeNode (node);
-        }
+        for (auto* node : translationUnit) { stats.analyzeNode (node); }
 
         stats.printStats ();
         std::cout << std::endl;
@@ -228,9 +132,8 @@ int main (int argc, char** argv) {
 
         // TODO: Implement code generation
         std::cout << "Code generation not yet implemented" << std::endl;
-        std::cout
-        << "Use --semantic-only flag to stop after semantic analysis"
-        << std::endl;
+        std::cout << "Use --semantic-only flag to stop after semantic analysis"
+                  << std::endl;
         std::cout << std::endl;
 
         /*
