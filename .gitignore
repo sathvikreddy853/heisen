@@ -29,4 +29,7 @@ build/
 # ignore files generated from compiling LATEX code
 docs/*
 !docs/*.pdf
+
+# other specific files
 examples/test.qs
+testcase.hsn
