@@ -30,6 +30,7 @@ void SemanticAnalyzer::initializeBuiltins () {
 }
 
 bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
+    LOG("============ SEM ANALYSIS START=============");
     // First pass: collect all function declarations
     for (auto* node : translationUnit) {
         if (auto* funcDecl = dynamic_cast<FunctionDecl*> (node)) { visitFunctionDecl (funcDecl); }
@@ -51,38 +52,53 @@ bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
             }
         } else if (auto* stmt = dynamic_cast<Stmt*> (node)) {
             if (auto* declStmt = dynamic_cast<DeclarationStmt*> (stmt)) {
+                LOG("visitDeclarationStmt");
                 visitDeclarationStmt (declStmt);
             } else if (auto* assignStmt = dynamic_cast<AssignmentStmt*> (stmt)) {
+                LOG("visitAssignmentStmt");
                 visitAssignmentStmt (assignStmt);
             } else if (auto* exprStmt = dynamic_cast<ExpressionStmt*> (stmt)) {
+                LOG("visitExpressionStmt");
                 visitExpressionStmt (exprStmt);
             } else if (auto* ifStmt = dynamic_cast<IfStmt*> (stmt)) {
+                LOG("visitIfStmt");
                 visitIfStmt (ifStmt);
             } else if (auto* whileStmt = dynamic_cast<WhileStmt*> (stmt)) {
+                LOG("visitWhileStmt");
                 visitWhileStmt (whileStmt);
             } else if (auto* doWhileStmt = dynamic_cast<DoWhileStmt*> (stmt)) {
+                LOG("visitDoWhileStmt");
                 visitDoWhileStmt (doWhileStmt);
             } else if (auto* forStmt = dynamic_cast<ForStmt*> (stmt)) {
+                LOG("visitForStmt");
                 visitForStmt (forStmt);
             } else if (auto* matchStmt = dynamic_cast<MatchStmt*> (stmt)) {
+                LOG("visitMatchStmt");
                 visitMatchStmt (matchStmt);
             } else if (auto* compStmt = dynamic_cast<CompoundStmt*> (stmt)) {
+                LOG("visitCompoundStmt");
                 symbolTable.enterScope ();
                 visitCompoundStmt (compStmt);
                 symbolTable.exitScope ();
             } else if (auto* applyStmt = dynamic_cast<ApplyGateStmt*> (stmt)) {
+                LOG("visitApplyGateStmt");
                 visitApplyGateStmt (applyStmt);
             } else if (auto* measureStmt = dynamic_cast<MeasureStmt*> (stmt)) {
+                LOG("visitMeasureStmt");
                 visitMeasureStmt (measureStmt);
             } else if (auto* resetStmt = dynamic_cast<ResetStmt*> (stmt)) {
+                LOG("visitResetStmt");
                 visitResetStmt (resetStmt);
             } else {
+                LOG("reportError");
                 reportError (stmt->loc, "Invalid stmt use in global scope");   
             }
         }
     }
 
+    LOG("============ SEM ANALYSIS END=============");
     return !hasErrors ();
+
 }
 
 SemanticType* SemanticAnalyzer::cloneType (SemanticType* type) {
@@ -331,41 +347,57 @@ void SemanticAnalyzer::visitParameterDecl (ParameterDecl* decl) {
 // ===================================================================
 
 void SemanticAnalyzer::visitCompoundStmt (CompoundStmt* stmt) {
+    LOG("=============== COMPOUND STATEMENT START ===============");
     for (auto* s : stmt->getStatements ()) {
         if (auto* declStmt = dynamic_cast<DeclarationStmt*> (s)) {
+            LOG("visitDeclarationStmt");
             visitDeclarationStmt (declStmt);
         } else if (auto* assignStmt = dynamic_cast<AssignmentStmt*> (s)) {
+            LOG("visitAssignmentStmt");
             visitAssignmentStmt (assignStmt);
         } else if (auto* exprStmt = dynamic_cast<ExpressionStmt*> (s)) {
+            LOG("visitExpressionStmt");
             visitExpressionStmt (exprStmt);
         } else if (auto* ifStmt = dynamic_cast<IfStmt*> (s)) {
+            LOG("visitIfStmt");
             visitIfStmt (ifStmt);
         } else if (auto* whileStmt = dynamic_cast<WhileStmt*> (s)) {
+            LOG("visitWhileStmt");
             visitWhileStmt (whileStmt);
         } else if (auto* doWhileStmt = dynamic_cast<DoWhileStmt*> (s)) {
+            LOG("visitDoWhileStmt");
             visitDoWhileStmt (doWhileStmt);
         } else if (auto* forStmt = dynamic_cast<ForStmt*> (s)) {
+            LOG("visitForStmt");
             visitForStmt (forStmt);
         } else if (auto* retStmt = dynamic_cast<ReturnStmt*> (s)) {
             visitReturnStmt (retStmt);
         } else if (auto* breakStmt = dynamic_cast<BreakStmt*> (s)) {
+             LOG("visitBreakStmt");
             visitBreakStmt (breakStmt);
         } else if (auto* contStmt = dynamic_cast<ContinueStmt*> (s)) {
+             LOG("visitContinueStmt");
             visitContinueStmt (contStmt);
         } else if (auto* matchStmt = dynamic_cast<MatchStmt*> (s)) {
+            LOG("visitMatchStmt");
             visitMatchStmt (matchStmt);
         } else if (auto* compStmt = dynamic_cast<CompoundStmt*> (s)) {
+            LOG("visitCompoundStmt");
             symbolTable.enterScope ();
             visitCompoundStmt (compStmt);
             symbolTable.exitScope ();
         } else if (auto* applyStmt = dynamic_cast<ApplyGateStmt*> (s)) {
+            LOG("visitApplyGateStmt");
             visitApplyGateStmt (applyStmt);
         } else if (auto* measureStmt = dynamic_cast<MeasureStmt*> (s)) {
+            LOG("visitMeasureStmt");
             visitMeasureStmt (measureStmt);
         } else if (auto* resetStmt = dynamic_cast<ResetStmt*> (s)) {
+             LOG("visitResetStmt");
             visitResetStmt (resetStmt);
         }
     }
+      LOG("=============== COMPOUND STATEMENT END ===============");
 }
 
 void SemanticAnalyzer::visitDeclarationStmt (DeclarationStmt* stmt) {
