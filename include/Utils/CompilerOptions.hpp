@@ -14,6 +14,7 @@ struct CompilerOptions {
     bool enableColor  = true;
     bool semanticOnly = false;
     std::string outputFile;
+    std::string inputFile;
 
     void printHelp (const char* programName) {
         std::cout << "Usage: " << programName << " [options] <input-file>\n\n";
@@ -58,6 +59,9 @@ inline CompilerOptions parseArgs (int argc, char** argv) {
         } else if (arg == "-h" || arg == "--help") {
             opts.printHelp (argv[0]);
             exit (0);
+        } else if (arg[0] != '-') {
+            // Input file (no flag)
+            opts.inputFile = arg;
         }
     }
 

@@ -25,9 +25,11 @@
 #include <memory>
 #include <numeric>
 #include <optional>
+#include <queue>
 #include <set>
 #include <span>
 #include <sstream>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -38,11 +40,6 @@
 #include <variant>
 #include <vector>
 
-#define RESET_COLOR "\033[0m"
-#define BOLD "\033[1m"
-#define RED "\033[31m"
-#define GREEN "\033[32m"
-
 #define LOG(x) std::cout << x << std::endl
 #define LOGs(x) std::cout << x << ' '
 
@@ -51,7 +48,14 @@
 
 namespace Heisen {
 
-template <typename... Args> void dbg (const char* file, int line, Args&&... args, int type = 0) {
+static constexpr std::string GREEN       = "\033[32m";
+static constexpr std::string RED         = "\033[31m";
+static constexpr std::string BOLD        = "\033[1m";
+static constexpr std::string RESET_COLOR = "\033[0m";
+
+
+template <typename... Args>
+void dbg (const char* file, int line, Args&&... args, int type = 0) {
     std::ostringstream oss;
     (oss << ... << args);
 
@@ -61,7 +65,8 @@ template <typename... Args> void dbg (const char* file, int line, Args&&... args
         std::cout << BOLD << RED << "ERROR" << RESET_COLOR;
     }
 
-    std::cout << BOLD << " [" << file << ":" << line << "] " << RESET_COLOR << oss.str () << std::endl;
+    std::cout << BOLD << " [" << file << ":" << line << "] " << RESET_COLOR
+              << oss.str () << std::endl;
 }
 
 } // namespace Heisen
