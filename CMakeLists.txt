@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 4.1)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.22.1)
 PROJECT(mini-heisen LANGUAGES CXX)
 
 SET(CMAKE_CXX_STANDARD 17)
@@ -13,13 +13,13 @@ FIND_PACKAGE(BISON REQUIRED)
 FIND_PACKAGE(FLEX REQUIRED)
 
 BISON_TARGET(Parser
-    ${SRC_DIR}/parser/parser.y
-    ${CMAKE_BINARY_DIR}/parser.tab.cpp
-    DEFINES_FILE ${CMAKE_BINARY_DIR}/parser.tab.hpp
+    ${SRC_DIR}/Parse/Parser.y
+    ${CMAKE_BINARY_DIR}/Parser.tab.cpp
+    DEFINES_FILE ${CMAKE_BINARY_DIR}/Parser.tab.hpp
 )
 
 FLEX_TARGET(Lexer
-    ${SRC_DIR}/lexer/lexer.l
+    ${SRC_DIR}/Lex/Lexer.l
     ${CMAKE_BINARY_DIR}/lexer.yy.cpp
 )
 
@@ -38,6 +38,11 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE
     ${INC_DIR}
+    ${INC_DIR}/Lex     
+    ${INC_DIR}/AST
+    ${INC_DIR}/Parse
+    ${INC_DIR}/Sema
+    ${INC_DIR}/Utils
     ${CMAKE_BINARY_DIR}
 )
 
@@ -53,3 +58,37 @@ ADD_CUSTOM_TARGET(run
 )
 
 INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+
+
+enable_testing()
+find_package(GTest REQUIRED)
+include(GoogleTest)
+
+file(GLOB_RECURSE TEST_SOURCES
+    ${CMAKE_SOURCE_DIR}/test/Lex/*.cpp
+)
+
+add_executable(lexer_tests
+    ${TEST_SOURCES}
+    ${BISON_Parser_OUTPUTS}
+    ${FLEX_Lexer_OUTPUTS}
+)
+
+target_include_directories(lexer_tests PRIVATE
+    ${INC_DIR}
+    ${INC_DIR}/Lex   
+    ${INC_DIR}/AST
+    ${INC_DIR}/Parse
+    ${INC_DIR}/Sema
+    ${INC_DIR}/Utils   
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_SOURCE_DIR}/test/Lex
+)
+
+target_link_libraries(lexer_tests PRIVATE
+    GTest::gtest
+    GTest::gtest_main
+)
+
+gtest_discover_tests(lexer_tests)
+
