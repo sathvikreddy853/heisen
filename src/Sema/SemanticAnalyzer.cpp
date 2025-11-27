@@ -52,10 +52,32 @@ bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
         } else if (auto* stmt = dynamic_cast<Stmt*> (node)) {
             if (auto* declStmt = dynamic_cast<DeclarationStmt*> (stmt)) {
                 visitDeclarationStmt (declStmt);
+            } else if (auto* assignStmt = dynamic_cast<AssignmentStmt*> (stmt)) {
+                visitAssignmentStmt (assignStmt);
             } else if (auto* exprStmt = dynamic_cast<ExpressionStmt*> (stmt)) {
                 visitExpressionStmt (exprStmt);
+            } else if (auto* ifStmt = dynamic_cast<IfStmt*> (stmt)) {
+                visitIfStmt (ifStmt);
+            } else if (auto* whileStmt = dynamic_cast<WhileStmt*> (stmt)) {
+                visitWhileStmt (whileStmt);
+            } else if (auto* doWhileStmt = dynamic_cast<DoWhileStmt*> (stmt)) {
+                visitDoWhileStmt (doWhileStmt);
+            } else if (auto* forStmt = dynamic_cast<ForStmt*> (stmt)) {
+                visitForStmt (forStmt);
+            } else if (auto* matchStmt = dynamic_cast<MatchStmt*> (stmt)) {
+                visitMatchStmt (matchStmt);
+            } else if (auto* compStmt = dynamic_cast<CompoundStmt*> (stmt)) {
+                symbolTable.enterScope ();
+                visitCompoundStmt (compStmt);
+                symbolTable.exitScope ();
             } else if (auto* applyStmt = dynamic_cast<ApplyGateStmt*> (stmt)) {
                 visitApplyGateStmt (applyStmt);
+            } else if (auto* measureStmt = dynamic_cast<MeasureStmt*> (stmt)) {
+                visitMeasureStmt (measureStmt);
+            } else if (auto* resetStmt = dynamic_cast<ResetStmt*> (stmt)) {
+                visitResetStmt (resetStmt);
+            } else {
+                reportError (stmt->loc, "Invalid stmt use in global scope");   
             }
         }
     }
