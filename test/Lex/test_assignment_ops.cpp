@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "Test.hpp"
 
 TEST(AssignOps, Assign)     { EXPECT_EQ(run_lexer("="), ASSIGN); }
 TEST(AssignOps, AddAssign)  { EXPECT_EQ(run_lexer("+="), ADD_ASSIGN); }

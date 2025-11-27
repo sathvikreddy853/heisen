@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "Test.hpp"
 
 TEST(CompOps, Eq)      { EXPECT_EQ(run_lexer("=="), EQ_OP); }
 TEST(CompOps, Ne)      { EXPECT_EQ(run_lexer("!="), NE_OP); }

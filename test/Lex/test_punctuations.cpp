@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "TestL.hpp"
 
 TEST(PunctTest, LBracket) { EXPECT_EQ(run_lexer("["), '['); }
 TEST(PunctTest, RBracket) { EXPECT_EQ(run_lexer("]"), ']'); }

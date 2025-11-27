@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "TestL.hpp"
 
 TEST(PauliGates, I) { EXPECT_EQ(run_lexer("I"), GATE_I); }
 TEST(PauliGates, X) { EXPECT_EQ(run_lexer("X"), GATE_X); }

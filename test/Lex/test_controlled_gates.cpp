@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "Test.hpp"
 
 TEST(ControlledGates, CNOT)  { EXPECT_EQ(run_lexer("CNOT"), GATE_CNOT); }
 TEST(ControlledGates, CZ)    { EXPECT_EQ(run_lexer("CZ"), GATE_CZ); }

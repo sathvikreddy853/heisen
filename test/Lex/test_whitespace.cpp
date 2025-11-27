@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "Test.hpp"
 
 TEST(Whitespace, LeadingSpaces) {
     EXPECT_EQ(run_lexer("   let"), LET);

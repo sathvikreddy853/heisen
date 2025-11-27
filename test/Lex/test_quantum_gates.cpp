@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "TestL.hpp"
 
 TEST(QuantumGates, H)    { EXPECT_EQ(run_lexer("H"), GATE_H); }
 TEST(QuantumGates, S)    { EXPECT_EQ(run_lexer("S"), GATE_S); }

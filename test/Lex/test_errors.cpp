@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "TestL.hpp"
 
 TEST(ErrorTest, UnknownCharacter) {
     int t = run_lexer("@");

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "Test.hpp"
 
 TEST(BitwiseOps, And)      { EXPECT_EQ(run_lexer("&"), '&'); }
 TEST(BitwiseOps, Or)       { EXPECT_EQ(run_lexer("|"), '|'); }

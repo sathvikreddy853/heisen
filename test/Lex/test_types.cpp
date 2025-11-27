@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "TestL.hpp"
 
 TEST(TypeTest, Qubit)  { EXPECT_EQ(run_lexer("qubit"), QUBIT); }
 TEST(TypeTest, Bit)    { EXPECT_EQ(run_lexer("bit"), BIT); }

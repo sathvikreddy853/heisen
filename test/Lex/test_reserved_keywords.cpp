@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "TestL.hpp"
 
 TEST(ReservedKeywordTest, Circuit) { EXPECT_EQ(run_lexer("circuit"), CIRCUIT); }
 TEST(ReservedKeywordTest, Try)     { EXPECT_EQ(run_lexer("try"), TRY); }

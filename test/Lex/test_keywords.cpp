@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <Test.hpp>
+#include "Test.hpp"
 
 TEST(TypeTest, Qubit)  { EXPECT_EQ(run_lexer("qubit"), QUBIT); }
 TEST(TypeTest, Bit)    { EXPECT_EQ(run_lexer("bit"), BIT); }
@@ -32,8 +32,3 @@ TEST(KeywordTest, Reset)    { EXPECT_EQ(run_lexer("reset"), RESET_OP); }
 TEST(KeywordTest, Gate)     { EXPECT_EQ(run_lexer("gate"), GATE); }
 TEST(KeywordTest, Apply)    { EXPECT_EQ(run_lexer("apply"), APPLY); }
 
-
-TEST(ReservedKeywordTest, Circuit) { EXPECT_EQ(run_lexer("circuit"), CIRCUIT); }
-TEST(ReservedKeywordTest, Try)     { EXPECT_EQ(run_lexer("try"), TRY); }
-TEST(ReservedKeywordTest, Catch)   { EXPECT_EQ(run_lexer("catch"), CATCH); }
-TEST(ReservedKeywordTest, Throw)   { EXPECT_EQ(run_lexer("throw"), THROW); }
