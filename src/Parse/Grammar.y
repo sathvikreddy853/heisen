@@ -219,7 +219,7 @@ variable_declaration
     ;
 
 type
-    :   type_name array_list
+    :   type_name array_suffix
     |   type_name
     |   '(' function_object ')'
     ;
@@ -237,11 +237,10 @@ function_object
     ;
 
 /* ! CHANGE REQUIRED */
-/* allow multi-dimensional arrays ? */
-array_list
-    :   array_list '[' index_expression ']'
-    |   '[' index_expression ']'
-    |   '[' ']'   
+/* allow multi-dimensional arrays - NOPE */
+array_suffix
+    :   '[' index_expression ']'
+    |   '[' ']'
     ;
 
 type_name
