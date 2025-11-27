@@ -236,7 +236,7 @@ statement
     : declaration_statement ';'
         { $$ = $1; }
     | expression_statement ';'
-        { $$ = new ExpressionStmt($1); }
+        { $$ = new ExpressionStmt($1,$1->loc); }
     | assignment_statement ';'
         { $$ = $1; }
     | quantum_statement ';'
@@ -544,33 +544,33 @@ assignment_operator
 
 expression
     : expression '+' expression   
-        { $$ = new BinaryOpExpr($1, "+", $3); }  
+        { $$ = new BinaryOpExpr($1, "+", $3,$1->loc); }  
     | expression '|' expression
-        { $$ = new BinaryOpExpr($1, "|", $3); }  
+        { $$ = new BinaryOpExpr($1, "|", $3,$1->loc); }  
     | expression '-' expression
-        { $$ = new BinaryOpExpr($1, "-", $3); } 
+        { $$ = new BinaryOpExpr($1, "-", $3,$1->loc); } 
     | expression '*' expression
-        { $$ = new BinaryOpExpr($1, "*", $3); }  
+        { $$ = new BinaryOpExpr($1, "*", $3,$1->loc); }  
     | expression '&' expression
-        { $$ = new BinaryOpExpr($1, "&", $3); }  
+        { $$ = new BinaryOpExpr($1, "&", $3,$1->loc); }  
     | expression '/' expression
-        { $$ = new BinaryOpExpr($1, "/", $3); }  
+        { $$ = new BinaryOpExpr($1, "/", $3,$1->loc); }  
     | expression '%' expression
-        { $$ = new BinaryOpExpr($1, "%", $3); }  
+        { $$ = new BinaryOpExpr($1, "%", $3,$1->loc); }  
     | expression RIGHT_SHIFT expression 
-        { $$ = new BinaryOpExpr($1, ">>", $3); } 
+        { $$ = new BinaryOpExpr($1, ">>", $3,$1->loc); } 
     | expression LEFT_SHIFT expression
-        { $$ = new BinaryOpExpr($1, "<<", $3); } 
+        { $$ = new BinaryOpExpr($1, "<<", $3,$1->loc); } 
     | expression EXP expression
-        { $$ = new BinaryOpExpr($1, "**", $3); } 
+        { $$ = new BinaryOpExpr($1, "**", $3,$1->loc); } 
     | expression '^' expression 
-        { $$ = new BinaryOpExpr($1, "^", $3); }  
+        { $$ = new BinaryOpExpr($1, "^", $3,$1->loc); }  
     | '+' expression %prec UNARY
-        { $$ = new UnaryOpExpr("+", $2); }
+        { $$ = new UnaryOpExpr("+", $2,$2->loc); }
     | '-' expression %prec UNARY
-        { $$ = new UnaryOpExpr("-", $2); }
+        { $$ = new UnaryOpExpr("-", $2,$2->loc); }
     | '!' expression %prec UNARY
-        { $$ = new UnaryOpExpr("!", $2); }
+        { $$ = new UnaryOpExpr("!", $2,$2->loc); }
     |   '(' expression ')'
         { $$ = $2; }
     |   postfix_expression 

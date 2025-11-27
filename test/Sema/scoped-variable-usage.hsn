@@ -2,10 +2,10 @@
     let x: int = 2;
 }
 
-let x: int = 3;
+# let x: int = 3;
 
 func foo () : int {
-    let x: int = 2;
+    # let x: int = 2;
     let y: int = x + 2;
     return x + y;
 }
