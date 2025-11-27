@@ -30,7 +30,7 @@ run:
 
 compile:
 	@printf "[COMPILE] Compile to generate heisen\n"
-	@clang++ -std=c++26 -I$(BUILD_DIR) $(INCLUDE_LIST) -I$(BUILD_DIR)/Parser.tab.hpp $(BUILD_DIR)/Parser.tab.cpp $(BUILD_DIR)/Lexer.yy.cpp $(SRC_FILES) -o $(BUILD_DIR)/$(TARGET_PROGRAM)
+	@clang++ -std=c++23 -I$(BUILD_DIR) $(INCLUDE_LIST) -I$(BUILD_DIR)/Parser.tab.hpp $(BUILD_DIR)/Parser.tab.cpp $(BUILD_DIR)/Lexer.yy.cpp $(SRC_FILES) -o $(BUILD_DIR)/$(TARGET_PROGRAM)
 
 lex:
 	@printf "[BUILD] Constructing Lexer files from Flex\n"
