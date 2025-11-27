@@ -9,6 +9,9 @@ SRC_DIR := ./src
 SRC_SUBDIRS := $(shell find $(SRC_DIR) -type d)
 SRC_FILES := $(shell find $(SRC_DIR) -type f -name '*.cpp')
 
+
+SRC_NO_MAIN := $(shell find $(SRC_DIR) -type f -name '*.cpp' ! -name 'main.cpp')
+
 # view:
 # 	@echo "$(INCLUDE_LIST)"
 # 	@echo "$(INCLUDE_DIR)"
@@ -61,11 +64,13 @@ endif
 		-I$(BUILD_DIR) \
 		$(BUILD_DIR)/Parser.tab.cpp \
 		$(BUILD_DIR)/Lexer.yy.cpp \
+		$(SRC_NO_MAIN) \
 		$(FILE) \
 		$(GTEST_LIBS) \
 		-o $(BUILD_DIR)/single_test
 
 	@./$(BUILD_DIR)/single_test
+
 
 
 clean:
