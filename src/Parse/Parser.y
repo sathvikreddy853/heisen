@@ -291,6 +291,8 @@ elif_clauses
 compound_statement
     :   '{' statement_list '}'
             { $$ = new CompoundStmt(*$2); delete $2; }
+    |   '{' '}'
+            { $$ = new CompoundStmt(); }
     ;
 
 expression_statement    

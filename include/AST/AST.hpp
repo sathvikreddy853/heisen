@@ -551,6 +551,8 @@ class CompoundStmt : public Stmt {
     std::vector<Stmt*> stmts;
 
     public:
+    CompoundStmt () = default;
+
     CompoundStmt (std::vector<Stmt*> s, Heisen::Location loc = Heisen::Location ())
     : Stmt (loc), stmts (std::move (s)) {
     }

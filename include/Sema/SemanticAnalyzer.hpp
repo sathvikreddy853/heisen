@@ -11,10 +11,6 @@
 
 namespace Heisen {
 
-// ===================================================================
-//                      Semantic Error Handling
-// ===================================================================
-
 class SemanticError {
     public:
     Location loc;
@@ -27,10 +23,6 @@ class SemanticError {
         std::to_string (loc.column) + ": " + message;
     }
 };
-
-// ===================================================================
-//                      Semantic Analyzer
-// ===================================================================
 
 class SemanticAnalyzer : public AST_Traversal {
     SymbolTable symbolTable;
