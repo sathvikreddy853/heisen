@@ -45,7 +45,29 @@ grammar:
 	@printf "[BUILD] Constructing Parser files from Bison\n"
 	@bison -Wcounterexamples -Wother --update --defines=$(BUILD_DIR)/Parser.tab.hpp -o $(BUILD_DIR)/Parser.tab.cpp src/Parse/Grammar.y
 # 	bison --defines=$(BUILD_DIR)/Parser.tab.hpp -o $(BUILD_DIR)/Parser.tab.cpp src/Parse/Grammar.y
-	
+GTEST_LIBS := -lgtest -lgtest_main -pthread
+
+#single test file
+test: build yacc lex
+ifndef FILE
+	$(error Please specify FILE=path/to/test.cpp, e.g. make test FILE=test/Lex/test_arithmetic_ops.cpp)
+endif
+
+	@printf "[TEST] Building test: $(FILE)\n"
+
+	clang++ -std=c++20 \
+		$(INCLUDE_LIST) \
+		$(TEST_INCLUDE_LIST) \
+		-I$(BUILD_DIR) \
+		$(BUILD_DIR)/Parser.tab.cpp \
+		$(BUILD_DIR)/Lexer.yy.cpp \
+		$(FILE) \
+		$(GTEST_LIBS) \
+		-o $(BUILD_DIR)/single_test
+
+	@./$(BUILD_DIR)/single_test
+
+
 clean:
 	@printf "[CLEAN] Cleaning up build files\n"
 	@rm -rf $(BUILD_DIR)
