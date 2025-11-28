@@ -1,4 +1,1 @@
-let q1: qubit;
-let q2: qubit;
-
-[H, H, H] @ CNOT @ [q1, q2];
+const int a = 2;
