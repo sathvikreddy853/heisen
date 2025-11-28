@@ -20,6 +20,11 @@ class SymbolTable {
     Symbol* lookup (const std::string& name);
     Symbol* lookupLocal (const std::string& name);
     Scope* getCurrentScope () const;
+
+    void print () const;
+    const std::vector<Scope*>& getAllScopes () const {
+        return allScopes;
+    }
 };
 
 } // namespace Heisen

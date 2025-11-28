@@ -11,7 +11,8 @@ class Scope {
     Scope* parent;
 
     public:
-    Scope (Scope* p = nullptr) : parent (p) {}
+    Scope (Scope* p = nullptr) : parent (p) {
+    }
 
     ~Scope () {
         for (auto& pair : symbols) {
@@ -24,6 +25,11 @@ class Scope {
     Symbol* lookup (const std::string& name);
     Symbol* lookupLocal (const std::string& name);
     Scope* getParent () const;
+
+    void print (int indent = 0) const;
+    const std::map<std::string, Symbol*>& getSymbols () const {
+        return symbols;
+    }
 };
 
 } // namespace Heisen

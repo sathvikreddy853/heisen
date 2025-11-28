@@ -111,6 +111,10 @@ class SemanticAnalyzer : public AST_Traversal {
         }
     }
 
+    const SymbolTable& getSymbolTable () const {
+        return symbolTable;
+    }
+
     SemanticType* getExprType (Expr* expr);
     bool isTypeCompatible (SemanticType* expected, SemanticType* actual);
     bool canImplicitlyCast (SemanticType* from, SemanticType* to);

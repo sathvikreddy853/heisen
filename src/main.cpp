@@ -45,18 +45,18 @@ int main (int argc, char** argv) {
     Heisen::SemanticAnalyzer analyzer;
     analyzer.setSourceFilename (opts.inputFile);
 
-    if (!analyzer.analyze (translationUnit)) {
+    bool analysisSuccess = analyzer.analyze (translationUnit);
+
+    if (!analysisSuccess) {
         Heisen::printError ("Semantic analysis Failed");
         analyzer.printErrors ();
-        return 1;
     } else {
         Heisen::printSuccess ("Semantic Analysis Passed");
     }
 
-    if (opts.dumpSymbolTable) {
-        // TODO: Implement symbol table dumping
-        std::cout << "Symbol table dumping not yet implemented" << std::endl;
-    }
+    if (opts.dumpSymbolTable) { analyzer.getSymbolTable ().print (); }
+
+    if (!analysisSuccess) { return 1; }
 
 #ifdef ENABLE_CODEGEN
     try {

@@ -1,4 +1,5 @@
 #include "Sema/SymbolTable.hpp"
+#include "Macros.hpp"
 
 namespace Heisen {
 
@@ -37,6 +38,23 @@ Symbol* SymbolTable::lookupLocal (const std::string& name) {
 
 Scope* SymbolTable::getCurrentScope () const {
     return currentScope;
+}
+
+void SymbolTable::print () const {
+    std::cout << BOLD << "=== Symbol Table ===" << RESET_COLOR << std::endl;
+
+    int scopeNum = 0;
+    for (const auto* scope : allScopes) {
+        const auto& symbols = scope->getSymbols ();
+        if (!symbols.empty ()) {
+            std::cout << BOLD << CYAN << "Scope " << scopeNum << ":"
+                      << RESET_COLOR << std::endl;
+            scope->print (0);
+        }
+        scopeNum++;
+    }
+
+    std::cout << BOLD << "====================" << RESET_COLOR << std::endl;
 }
 
 }; // namespace Heisen

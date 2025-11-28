@@ -1,4 +1,5 @@
 #include "Sema/Scope.hpp"
+#include "Macros.hpp"
 
 namespace Heisen {
 
@@ -25,6 +26,33 @@ Symbol* Scope::lookupLocal (const std::string& name) {
 
 Scope* Scope::getParent () const {
     return parent;
+}
+
+void Scope::print (int indent) const {
+    std::string prefix (indent * 2, ' ');
+
+    for (const auto& pair : symbols) {
+        const Symbol* sym = pair.second;
+        std::cout << prefix << "  " << BOLD << CYAN << sym->name << RESET_COLOR << ": ";
+
+        // Print type
+        if (sym->type) {
+            std::cout << sym->type->toString ();
+        } else {
+            std::cout << "???";
+        }
+
+        // Print kind
+        std::cout << " (" << GREEN;
+        switch (sym->kind) {
+        case Symbol::Kind::VARIABLE: std::cout << "variable"; break;
+        case Symbol::Kind::FUNCTION: std::cout << "function"; break;
+        case Symbol::Kind::PARAMETER: std::cout << "parameter"; break;
+        }
+        std::cout << RESET_COLOR << ")";
+
+        std::cout << std::endl;
+    }
 }
 
 } // namespace Heisen
