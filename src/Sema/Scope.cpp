@@ -45,9 +45,9 @@ void Scope::print (int indent) const {
         // Print kind
         std::cout << " (" << GREEN;
         switch (sym->kind) {
-        case Symbol::Kind::VARIABLE: std::cout << "variable"; break;
-        case Symbol::Kind::FUNCTION: std::cout << "function"; break;
-        case Symbol::Kind::PARAMETER: std::cout << "parameter"; break;
+        case Symbol::Kind::VARIABLE: std::cout << "var"; break;
+        case Symbol::Kind::FUNCTION: std::cout << "func"; break;
+        case Symbol::Kind::PARAMETER: std::cout << "param"; break;
         }
         std::cout << RESET_COLOR << ")";
 

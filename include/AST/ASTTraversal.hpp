@@ -322,7 +322,6 @@ class ASTPrinter : public RecursiveASTVisitor {
  * Counts different types of nodes in the AST for analysis and optimization
  * decisions.
  */
-
 class ASTStatistics : public RecursiveASTVisitor {
     public:
     struct Stats {
