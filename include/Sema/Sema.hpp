@@ -1,13 +1,13 @@
 #ifndef HEISEN_SEMANTIC_ANALYZER_HPP
 #define HEISEN_SEMANTIC_ANALYZER_HPP
 
-#include <AST.hpp>
-#include <ASTTraversal.hpp>
-#include <Macros.hpp>
-#include <Symbol.hpp>
-#include <SymbolTable.hpp>
-#include <Scope.hpp>
-#include <SemaType.hpp>
+#include "AST/AST.hpp"
+#include "AST/ASTTraversal.hpp"
+#include "Macros.hpp"
+#include "Symbol.hpp"
+#include "Sema/SymbolTable.hpp"
+#include "Sema/Scope.hpp"
+#include "Sema/SemaType.hpp"
 
 namespace Heisen {
 

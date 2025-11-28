@@ -40,8 +40,8 @@
 #include <variant>
 #include <vector>
 
-#define LOG(x) std::cout << x << std::endl
-#define LOGs(x) std::cout << x << ' '
+#define LOG(x) /* std::cout << x << std::endl */
+#define LOGs(x) /* std::cout << x << ' ' */
 
 #define DBG(...) dbg (__FILE__, __LINE__, __VA_ARGS__)
 #define ERROR(...) dbg (__FILE__, __LINE__, __VA_ARGS__, 1)
