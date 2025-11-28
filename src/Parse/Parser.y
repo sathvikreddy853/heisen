@@ -302,23 +302,23 @@ expression_statement
 
 condition   
     :   expression '>' expression
-            { $$ = new BinaryOpExpr($1, ">", $3); }
+            { $$ = new BinaryOpExpr($1, ">", $3,$1->loc); }
     |   expression '<' expression
-            { $$ = new BinaryOpExpr($1, "<", $3); }
+            { $$ = new BinaryOpExpr($1, "<", $3,$1->loc); }
     |   expression GE_OP expression
-            { $$ = new BinaryOpExpr($1, ">=", $3); }
+            { $$ = new BinaryOpExpr($1, ">=", $3,$1->loc); }
     |   expression LE_OP expression
-            { $$ = new BinaryOpExpr($1, "<=", $3); }
+            { $$ = new BinaryOpExpr($1, "<=", $3,$1->loc); }
     |   expression EQ_OP expression
-            { $$ = new BinaryOpExpr($1, "==", $3); }
+            { $$ = new BinaryOpExpr($1, "==", $3,$1->loc); }
     |   expression NE_OP expression
-            { $$ = new BinaryOpExpr($1, "!=", $3); }
+            { $$ = new BinaryOpExpr($1, "!=", $3,$1->loc); }
     |   condition AND condition
-            { $$ = new BinaryOpExpr($1, "and", $3); }
+            { $$ = new BinaryOpExpr($1, "and", $3,$1->loc); }
     |   condition OR condition
-            { $$ = new BinaryOpExpr($1, "or", $3); }
+            { $$ = new BinaryOpExpr($1, "or", $3,$1->loc); }
     |   NOT condition %prec UNARY
-            { $$ = new UnaryOpExpr("not", $2); }
+            { $$ = new UnaryOpExpr("not", $2,$2->loc); }
     |   '(' condition ')'
             { $$ = $2; }
     ;
