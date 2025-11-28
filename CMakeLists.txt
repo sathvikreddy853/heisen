@@ -1,5 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22.1)
-PROJECT(heisen LANGUAGES CXX)
+PROJECT(heisen LANGUAGES C CXX)
 
 SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -76,16 +76,14 @@ TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE
 )
 
 if(CODEGEN)
-    # Link against LLVM libraries
     llvm_map_components_to_libnames(llvm_libs core support irreader bitwriter)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${llvm_libs})
 endif()
 
 TARGET_COMPILE_OPTIONS(${PROJECT_NAME} PRIVATE
-    -Wall -Wextra -Wpedantic
+    # -Wall -Wextra -Wpedantic
 )
 
-# convenience: 'make run' or 'cmake --build . --target run'
 ADD_CUSTOM_TARGET(run
     COMMAND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}
     DEPENDS ${PROJECT_NAME}
@@ -94,8 +92,7 @@ ADD_CUSTOM_TARGET(run
 
 INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
-
-
+# UNIT TESTS
 option(BUILD_TESTS "Build unit tests" OFF)
 
 if(BUILD_TESTS)
