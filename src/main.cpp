@@ -15,29 +15,30 @@ extern FILE* yyin;
 int main (int argc, char** argv) {
     Heisen::CompilerOptions opts = Heisen::parseArgs (argc, argv);
 
-    FILE* inputFile = nullptr;
-    if (!opts.inputFile.empty ()) {
-        inputFile = fopen (opts.inputFile.c_str (), "r");
-        if (!inputFile) {
-            Heisen::printError ("Failed to open input file: " + opts.inputFile);
-            return 1;
-        }
-        yyin = inputFile;
+    if (opts.inputFile.empty ()) {
+        Heisen::printError ("No input file specified");
+        std::cerr << "Usage: " << argv[0] << " [options] <input-file>" << std::endl;
+        std::cerr << "Use -h or --help for more information" << std::endl;
+        return 1;
     }
+
+    FILE* inputFile = fopen (opts.inputFile.c_str (), "r");
+    if (!inputFile) {
+        Heisen::printError ("Failed to open input file: " + opts.inputFile);
+        return 1;
+    }
+    yyin = inputFile;
 
     if (yyparse () != 0) {
         Heisen::printError ("Parsing failed");
-        if (inputFile) fclose (inputFile);
+        fclose (inputFile);
         return 1;
     } else {
         Heisen::printSuccess ("Parsing Successful");
     }
 
     Heisen::SemanticAnalyzer analyzer;
-
-    if (!opts.inputFile.empty ()) {
-        analyzer.setSourceFilename (opts.inputFile);
-    }
+    analyzer.setSourceFilename (opts.inputFile);
 
     if (!analyzer.analyze (translationUnit)) {
         Heisen::printError ("Semantic analysis Failed");
@@ -76,6 +77,6 @@ int main (int argc, char** argv) {
 #endif
 
     for (auto* node : translationUnit) delete node;
-    if (inputFile) fclose (inputFile);
+    fclose (inputFile);
     return 0;
 }

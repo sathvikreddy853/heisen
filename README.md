@@ -48,21 +48,15 @@ This generates the `heisen` executable in the `build/` directory.
 
 ### 3. Run the Compiler
 
-#### Using CMake
-
-```shell
-cmake --build build --target run < examples/testcase.hsn
-```
-
-#### Direct Execution
+The compiler requires an input file to be specified.
 
 ```shell
 ./build/heisen [options] <input-file>
 ```
 
-Or with stdin:
+Example:
 ```shell
-./build/heisen [options] < examples/testcase.hsn
+./build/heisen examples/testcase.hsn
 ```
 
 ## Compiler Options
