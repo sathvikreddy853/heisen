@@ -39,7 +39,7 @@ int main (int argc, char** argv) {
 
     if (opts.dumpAST) {
         ASTPrinter printer (true);
-        for (auto* node : translationUnit) { printer.print (node); }
+        printer.printTranslationUnit (translationUnit);
     }
 
     Heisen::SemanticAnalyzer analyzer;

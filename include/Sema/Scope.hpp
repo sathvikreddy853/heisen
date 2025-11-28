@@ -1,8 +1,8 @@
 #ifndef HEISEN_SCOPE_HPP
 #define HEISEN_SCOPE_HPP
 
-#include <Macros.hpp>
-#include <Symbol.hpp>
+#include "Macros.hpp"
+#include "Symbol.hpp"
 
 namespace Heisen {
 

@@ -1,9 +1,9 @@
 #ifndef HEISEN_AST_HPP
 #define HEISEN_AST_HPP
 
-#include <ASTTraversal.hpp>
-#include <Macros.hpp>
-#include <Token.hpp>
+#include "ASTTraversal.hpp"
+#include "Macros.hpp"
+#include "Token.hpp"
 
 class Expr;
 class Stmt;
@@ -931,7 +931,7 @@ class TensoredGateNode : public GateNode {
     const std::vector<GateNode*>& getGates () const {
         return gates;
     }
-    
+
     void visit (AST_Traversal* v) override {
         v->visit (this);
     }
