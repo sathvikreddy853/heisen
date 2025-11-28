@@ -1,9 +1,9 @@
-#include <AST.hpp>
-#include <ASTTraversal.hpp>
-#include <CompilerOptions.hpp>
-#include <FormattingFunctions.hpp>
-#include <Macros.hpp>
-#include <SemanticAnalyzer.hpp>
+#include "AST/AST.hpp"
+#include "AST/ASTTraversal.hpp"
+#include "Utils/CompilerOptions.hpp"
+#include "Utils/FormattingFunctions.hpp"
+#include "Macros.hpp"
+#include "Sema/Sema.hpp"
 #ifdef ENABLE_CODEGEN
 #include <QIRCodeGen.hpp>
 #endif

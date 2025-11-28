@@ -1,4 +1,4 @@
-#include <SemanticAnalyzer.hpp>
+#include "Sema/Sema.hpp"
 
 namespace Heisen {
 
