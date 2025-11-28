@@ -37,6 +37,11 @@ int main (int argc, char** argv) {
         Heisen::printSuccess ("Parsing Successful");
     }
 
+    if (opts.dumpAST) {
+        ASTPrinter printer (true);
+        for (auto* node : translationUnit) { printer.print (node); }
+    }
+
     Heisen::SemanticAnalyzer analyzer;
     analyzer.setSourceFilename (opts.inputFile);
 
