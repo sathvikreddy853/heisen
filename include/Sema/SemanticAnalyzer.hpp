@@ -74,6 +74,13 @@ class SemanticAnalyzer : public AST_Traversal {
     void checkQubitUsage (Expr* expr, Location loc);
     void checkGateApplication (GateNode* gate, Expr* target, Location loc);
 
+    //helpers
+    int  getGateQubitRequirement(GateKind kind);
+    int countQubitsInTarget(Expr* target);
+    int countGatesInNode(GateNode* gate);
+    std::string getGateName(GateNode* gate);
+    void validateGateParameters(GateNode* gate, Location loc);
+
     private:
     void initializeBuiltins ();
 

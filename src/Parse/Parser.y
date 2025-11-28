@@ -587,18 +587,18 @@ postfix_expression
     :   primary_expression
             { $$ = $1; }
     |   postfix_expression '[' index_expression ']'
-            { $$ = new IndexAccessExpr($1, $3); }
+            { $$ = new IndexAccessExpr($1, $3, $1->loc); }
     |   postfix_expression '(' expression_list ')'
-            { $$ = new FunctionCallExpr($1, *$3); delete $3; }
+            { $$ = new FunctionCallExpr($1, *$3, $1->loc); delete $3; }
     |   postfix_expression '(' ')'
             { 
                 std::vector<Expr*> empty;
-                $$ = new FunctionCallExpr($1, empty); 
+                $$ = new FunctionCallExpr($1, empty, $1->loc); 
             }
     |   postfix_expression '.' IDENTIFIER
             { 
                 auto* member = new IdentifierExpr(std::get<std::string>($3->value), $3->loc);
-                $$ = new MemberAccessExpr($1, member); 
+                $$ = new MemberAccessExpr($1, member, $1->loc); 
             }
     |   CAST '<' type_name '>' '(' expression ')'
             { $$ = new CastExpr($3, $6, $1->loc); }
@@ -679,12 +679,12 @@ reset_statement
 
 apply_gate_statement
     :   gate_composition '@' quantum_state
-            { $$ = new ApplyGateStmt($1, $3); }
+            { $$ = new ApplyGateStmt($1, $3, $1->loc); }
     ;   
 
 gate_composition
     :   gate_composition '@' quantum_gate
-            { $$ = new GateCompositionNode($1, $3); }
+            { $$ = new GateCompositionNode($1, $3, $1->loc); }
     |   quantum_gate 
             { $$ = $1; }
     ;
@@ -698,7 +698,7 @@ quantum_state
 
 tensored_state
     :   '[' postfix_expression_list ']'
-            { $$ = new QuantumStateList(*$2); delete $2; }
+            { $$ = new QuantumStateList(*$2, $2->at(0)->loc); delete $2; }
     ;
 
 postfix_expression_list
@@ -716,7 +716,7 @@ postfix_expression_list
 
 quantum_gate
     :   '[' quantum_gate_list ']'
-            { $$ = new TensoredGateNode(*$2); delete $2; }
+            { $$ = new TensoredGateNode(*$2, $2->at(0)->loc); delete $2; }
     |   simple_gate '(' expression_list ')'
             {
                 $$ = new ParametricGateNode($1->getGateKind(), *$3, $1->loc);
