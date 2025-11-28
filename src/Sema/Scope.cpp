@@ -33,7 +33,7 @@ void Scope::print (int indent) const {
 
     for (const auto& pair : symbols) {
         const Symbol* sym = pair.second;
-        std::cout << prefix << "  " << BOLD << CYAN << sym->name << RESET_COLOR << ": ";
+        std::cout << prefix << "  " << CYAN << sym->name << RESET_COLOR << ": ";
 
         // Print type
         if (sym->type) {

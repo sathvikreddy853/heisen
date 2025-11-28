@@ -41,20 +41,19 @@ Scope* SymbolTable::getCurrentScope () const {
 }
 
 void SymbolTable::print () const {
-    std::cout << BOLD << "=== Symbol Table ===" << RESET_COLOR << std::endl;
+    std::cout << "=== Symbol Table ===" << std::endl;
 
     int scopeNum = 0;
     for (const auto* scope : allScopes) {
         const auto& symbols = scope->getSymbols ();
         if (!symbols.empty ()) {
-            std::cout << BOLD << CYAN << "Scope " << scopeNum << ":"
-                      << RESET_COLOR << std::endl;
+            std::cout << CYAN << "Scope " << scopeNum << ":" << RESET_COLOR << std::endl;
             scope->print (0);
         }
         scopeNum++;
     }
 
-    std::cout << BOLD << "====================" << RESET_COLOR << std::endl;
+    std::cout << "====================" << std::endl;
 }
 
 }; // namespace Heisen
