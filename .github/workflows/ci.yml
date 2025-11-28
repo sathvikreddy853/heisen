@@ -11,38 +11,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential ccache
+          sudo apt-get install -y build-essential cmake bison flex llvm-dev libclang-dev libgtest-dev
 
-      - name: (Optional) Setup ccache
+      - name: Configure CMake
         run: |
-          mkdir -p ~/.ccache
-          ccache -M 1G || true
+          cmake -S . -B build -DCODEGEN=ON
 
-      - name: Build (make)
+      - name: Build
         run: |
-          # change this if your Makefile target is different
-          make -j$(nproc)
+          cmake --build build --parallel $(nproc)
 
-      - name: Run tests (if present)
+      - name: Run Tests
         run: |
-          if [ -x test/run_unit_tests.sh ]; then
-            bash test/run_unit_tests.sh
-          elif [ -f test/run_tests.sh ]; then
-            bash test/run_tests.sh
-          else
-            echo "No test script found under test/ — skipping tests"
-          fi
+          cd build
+          ctest --output-on-failure
 
       - name: Upload build artifacts
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v4
         with:
           name: heisen-build
           path: |
-            bin/
-            build/
+            build/mini-heisen
+            build/lexer_tests

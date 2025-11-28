@@ -5,6 +5,22 @@ SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_POSITION_INDEPENDENT_CODE OFF)
 
+
+option(CODEGEN "Enable code generation with LLVM" ON)
+
+if(CODEGEN)
+    find_package(LLVM REQUIRED CONFIG)
+    message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+    message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+    
+    # Add LLVM definitions
+    add_definitions(${LLVM_DEFINITIONS})
+    add_definitions(-DENABLE_CODEGEN)
+    
+    # Include LLVM headers
+    include_directories(${LLVM_INCLUDE_DIRS})
+endif()
+
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 SET(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
 SET(INC_DIR ${CMAKE_SOURCE_DIR}/include)
@@ -25,9 +41,22 @@ FLEX_TARGET(Lexer
 
 ADD_FLEX_BISON_DEPENDENCY(Lexer Parser)
 
-FILE(GLOB_RECURSE PROJECT_SOURCES
+# Collect all sources first
+FILE(GLOB_RECURSE ALL_SOURCES
     "${SRC_DIR}/*.cpp"
 )
+
+# Filter sources based on CODEGEN option
+if(CODEGEN)
+    set(PROJECT_SOURCES ${ALL_SOURCES})
+else()
+    # Exclude CodeGen sources if CODEGEN is OFF
+    foreach(source ${ALL_SOURCES})
+        if(NOT source MATCHES ".*/CodeGen/.*")
+            list(APPEND PROJECT_SOURCES ${source})
+        endif()
+    endforeach()
+endif()
 
 LIST(APPEND PROJECT_SOURCES
     ${BISON_Parser_OUTPUTS}
@@ -43,8 +72,15 @@ TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE
     ${INC_DIR}/Parse
     ${INC_DIR}/Sema
     ${INC_DIR}/Utils
+    ${INC_DIR}/CodeGen
     ${CMAKE_BINARY_DIR}
 )
+
+if(CODEGEN)
+    # Link against LLVM libraries
+    llvm_map_components_to_libnames(llvm_libs core support irreader bitwriter)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${llvm_libs})
+endif()
 
 TARGET_COMPILE_OPTIONS(${PROJECT_NAME} PRIVATE
     -Wall -Wextra -Wpedantic

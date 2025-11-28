@@ -48,10 +48,10 @@
 
 namespace Heisen {
 
-static constexpr std::string GREEN       = "\033[32m";
-static constexpr std::string RED         = "\033[31m";
-static constexpr std::string BOLD        = "\033[1m";
-static constexpr std::string RESET_COLOR = "\033[0m";
+static const std::string GREEN       = "\033[32m";
+static const std::string RED         = "\033[31m";
+static const std::string BOLD        = "\033[1m";
+static const std::string RESET_COLOR = "\033[0m";
 
 
 template <typename... Args>
