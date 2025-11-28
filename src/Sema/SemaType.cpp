@@ -1,4 +1,4 @@
-#include <SemaType.hpp>
+#include "Sema/SemaType.hpp"
 
 namespace Heisen {
 
@@ -34,8 +34,7 @@ int ArrayType::getDimension () const {
 }
 
 std::string ArrayType::toString () const {
-    std::string dimStr =
-    (dimension >= 0) ? "[" + std::to_string (dimension) + "]" : "[]";
+    std::string dimStr = (dimension >= 0) ? "[" + std::to_string (dimension) + "]" : "[]";
     return elementType->toString () + dimStr;
 }
 
@@ -76,12 +75,10 @@ bool FunctionType::equals (const SemanticType* other) const {
     if (!other || other->getKind () != Kind::FUNCTION) return false;
     auto* otherFunc = static_cast<const FunctionType*> (other);
 
-    if (paramTypes.size () != otherFunc->paramTypes.size ())
-        return false;
+    if (paramTypes.size () != otherFunc->paramTypes.size ()) return false;
 
     for (size_t i = 0; i < paramTypes.size (); ++i) {
-        if (!paramTypes[i]->equals (otherFunc->paramTypes[i]))
-            return false;
+        if (!paramTypes[i]->equals (otherFunc->paramTypes[i])) return false;
     }
 
     if (returnType && otherFunc->returnType) {

@@ -87,8 +87,7 @@ class FunctionType : public SemanticType {
 
     public:
     FunctionType (std::vector<SemanticType*> params, SemanticType* ret)
-    : SemanticType (Kind::FUNCTION), paramTypes (std::move (params)),
-      returnType (ret) {
+    : SemanticType (Kind::FUNCTION), paramTypes (std::move (params)), returnType (ret) {
     }
 
     ~FunctionType () {

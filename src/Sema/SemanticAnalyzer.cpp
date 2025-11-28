@@ -1,42 +1,49 @@
-#include <SemanticAnalyzer.hpp>
+#include "Sema/SemanticAnalyzer.hpp"
 
 namespace Heisen {
 
 void SemanticAnalyzer::initializeBuiltins () {
     // Math functions
     auto* piType = new PrimitiveType (SemanticType::Kind::FLOAT);
-    symbolTable.declare ("pi", new Symbol ("pi", piType, Symbol::Kind::VARIABLE, Location ()));
+    symbolTable.declare (
+    "pi", new Symbol ("pi", piType, Symbol::Kind::VARIABLE, Location ()));
 
     // Built-in functions
-    std::vector<std::string> mathFuncs = { "sqrt", "round", "floor", "ceil", "sin", "cos", "tan", "abs" };
+    std::vector<std::string> mathFuncs = { "sqrt", "round", "floor", "ceil",
+        "sin", "cos", "tan", "abs" };
     for (const auto& func : mathFuncs) {
         std::vector<SemanticType*> params;
         params.push_back (new PrimitiveType (SemanticType::Kind::FLOAT));
         PrimitiveType* retType = nullptr;
         if (func == "round" || func == "floor" || func == "ceil") {
-            retType  = new PrimitiveType (SemanticType::Kind::INT);
+            retType = new PrimitiveType (SemanticType::Kind::INT);
         } else {
-            retType  = new PrimitiveType (SemanticType::Kind::FLOAT);
+            retType = new PrimitiveType (SemanticType::Kind::FLOAT);
         }
         auto* funcType = new FunctionType (params, retType);
-        symbolTable.declare (func, new Symbol (func, funcType, Symbol::Kind::FUNCTION, Location ()));
+        symbolTable.declare (
+        func, new Symbol (func, funcType, Symbol::Kind::FUNCTION, Location ()));
     }
 
     // String conversion
     std::vector<SemanticType*> floatParam;
     floatParam.push_back (new PrimitiveType (SemanticType::Kind::FLOAT));
-    auto* floatFuncType = new FunctionType (floatParam, new PrimitiveType (SemanticType::Kind::FLOAT));
-    symbolTable.declare ("float", new Symbol ("float", floatFuncType, Symbol::Kind::FUNCTION, Location ()));
+    auto* floatFuncType =
+    new FunctionType (floatParam, new PrimitiveType (SemanticType::Kind::FLOAT));
+    symbolTable.declare ("float",
+    new Symbol ("float", floatFuncType, Symbol::Kind::FUNCTION, Location ()));
 }
 
 bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
-    LOG("============ SEM ANALYSIS START=============");
+    LOG ("============ SEM ANALYSIS START=============");
     // First pass: collect all function declarations
     for (auto* node : translationUnit) {
-        if (auto* funcDecl = dynamic_cast<FunctionDecl*> (node)) { visitFunctionDecl (funcDecl); }
+        if (auto* funcDecl = dynamic_cast<FunctionDecl*> (node)) {
+            visitFunctionDecl (funcDecl);
+        }
     }
 
-    // Second pass: analyze function bodies and statements 
+    // Second pass: analyze function bodies and statements
     for (auto* node : translationUnit) {
         if (auto* funcDecl = dynamic_cast<FunctionDecl*> (node)) {
             if (funcDecl->getBody ()) {
@@ -44,7 +51,9 @@ bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
                 symbolTable.enterScope ();
 
                 // Add parameters to scope
-                for (auto* param : funcDecl->getParameters ()) { visitParameterDecl (param); }
+                for (auto* param : funcDecl->getParameters ()) {
+                    visitParameterDecl (param);
+                }
 
                 visitCompoundStmt (funcDecl->getBody ());
                 symbolTable.exitScope ();
@@ -52,53 +61,52 @@ bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
             }
         } else if (auto* stmt = dynamic_cast<Stmt*> (node)) {
             if (auto* declStmt = dynamic_cast<DeclarationStmt*> (stmt)) {
-                LOG("visitDeclarationStmt");
+                LOG ("visitDeclarationStmt");
                 visitDeclarationStmt (declStmt);
             } else if (auto* assignStmt = dynamic_cast<AssignmentStmt*> (stmt)) {
-                LOG("visitAssignmentStmt");
+                LOG ("visitAssignmentStmt");
                 visitAssignmentStmt (assignStmt);
             } else if (auto* exprStmt = dynamic_cast<ExpressionStmt*> (stmt)) {
-                LOG("visitExpressionStmt");
+                LOG ("visitExpressionStmt");
                 visitExpressionStmt (exprStmt);
             } else if (auto* ifStmt = dynamic_cast<IfStmt*> (stmt)) {
-                LOG("visitIfStmt");
+                LOG ("visitIfStmt");
                 visitIfStmt (ifStmt);
             } else if (auto* whileStmt = dynamic_cast<WhileStmt*> (stmt)) {
-                LOG("visitWhileStmt");
+                LOG ("visitWhileStmt");
                 visitWhileStmt (whileStmt);
             } else if (auto* doWhileStmt = dynamic_cast<DoWhileStmt*> (stmt)) {
-                LOG("visitDoWhileStmt");
+                LOG ("visitDoWhileStmt");
                 visitDoWhileStmt (doWhileStmt);
             } else if (auto* forStmt = dynamic_cast<ForStmt*> (stmt)) {
-                LOG("visitForStmt");
+                LOG ("visitForStmt");
                 visitForStmt (forStmt);
             } else if (auto* matchStmt = dynamic_cast<MatchStmt*> (stmt)) {
-                LOG("visitMatchStmt");
+                LOG ("visitMatchStmt");
                 visitMatchStmt (matchStmt);
             } else if (auto* compStmt = dynamic_cast<CompoundStmt*> (stmt)) {
-                LOG("visitCompoundStmt");
+                LOG ("visitCompoundStmt");
                 symbolTable.enterScope ();
                 visitCompoundStmt (compStmt);
                 symbolTable.exitScope ();
             } else if (auto* applyStmt = dynamic_cast<ApplyGateStmt*> (stmt)) {
-                LOG("visitApplyGateStmt");
+                LOG ("visitApplyGateStmt");
                 visitApplyGateStmt (applyStmt);
             } else if (auto* measureStmt = dynamic_cast<MeasureStmt*> (stmt)) {
-                LOG("visitMeasureStmt");
+                LOG ("visitMeasureStmt");
                 visitMeasureStmt (measureStmt);
             } else if (auto* resetStmt = dynamic_cast<ResetStmt*> (stmt)) {
-                LOG("visitResetStmt");
+                LOG ("visitResetStmt");
                 visitResetStmt (resetStmt);
             } else {
-                LOG("reportError");
-                reportError (stmt->loc, "Invalid stmt use in global scope");   
+                LOG ("reportError");
+                reportError (stmt->loc, "Invalid stmt use in global scope");
             }
         }
     }
 
-    LOG("============ SEM ANALYSIS END=============");
+    LOG ("============ SEM ANALYSIS END=============");
     return !hasErrors ();
-
 }
 
 SemanticType* SemanticAnalyzer::cloneType (SemanticType* type) {
@@ -116,13 +124,16 @@ SemanticType* SemanticAnalyzer::cloneType (SemanticType* type) {
 
     case SemanticType::Kind::ARRAY: {
         auto* arrType = static_cast<ArrayType*> (type);
-        return new ArrayType (cloneType (arrType->getElementType ()), arrType->getDimension ());
+        return new ArrayType (
+        cloneType (arrType->getElementType ()), arrType->getDimension ());
     }
 
     case SemanticType::Kind::FUNCTION: {
         auto* funcType = static_cast<FunctionType*> (type);
         std::vector<SemanticType*> params;
-        for (auto* p : funcType->getParamTypes ()) { params.push_back (cloneType (p)); }
+        for (auto* p : funcType->getParamTypes ()) {
+            params.push_back (cloneType (p));
+        }
         return new FunctionType (params, cloneType (funcType->getReturnType ()));
     }
     }
@@ -135,12 +146,18 @@ SemanticType* SemanticAnalyzer::resolveType (Type* astType) {
 
     if (auto* baseType = dynamic_cast<BaseTypeNode*> (astType)) {
         switch (baseType->getBaseType ()) {
-        case BaseTypeKind::INT: return new PrimitiveType (SemanticType::Kind::INT);
-        case BaseTypeKind::FLOAT: return new PrimitiveType (SemanticType::Kind::FLOAT);
-        case BaseTypeKind::BOOL: return new PrimitiveType (SemanticType::Kind::BOOL);
-        case BaseTypeKind::STRING: return new PrimitiveType (SemanticType::Kind::STRING);
-        case BaseTypeKind::QUBIT: return new PrimitiveType (SemanticType::Kind::QUBIT);
-        case BaseTypeKind::BIT: return new PrimitiveType (SemanticType::Kind::BIT);
+        case BaseTypeKind::INT:
+            return new PrimitiveType (SemanticType::Kind::INT);
+        case BaseTypeKind::FLOAT:
+            return new PrimitiveType (SemanticType::Kind::FLOAT);
+        case BaseTypeKind::BOOL:
+            return new PrimitiveType (SemanticType::Kind::BOOL);
+        case BaseTypeKind::STRING:
+            return new PrimitiveType (SemanticType::Kind::STRING);
+        case BaseTypeKind::QUBIT:
+            return new PrimitiveType (SemanticType::Kind::QUBIT);
+        case BaseTypeKind::BIT:
+            return new PrimitiveType (SemanticType::Kind::BIT);
         }
     }
 
@@ -158,7 +175,9 @@ SemanticType* SemanticAnalyzer::resolveType (Type* astType) {
 
     if (auto* funcType = dynamic_cast<FunctionTypeNode*> (astType)) {
         std::vector<SemanticType*> params;
-        for (auto* p : funcType->getParamTypes ()) { params.push_back (resolveType (p)); }
+        for (auto* p : funcType->getParamTypes ()) {
+            params.push_back (resolveType (p));
+        }
         SemanticType* retType = resolveType (funcType->getReturnType ());
         return new FunctionType (params, retType);
     }
@@ -169,7 +188,8 @@ SemanticType* SemanticAnalyzer::resolveType (Type* astType) {
 bool SemanticAnalyzer::isTypeCompatible (SemanticType* expected, SemanticType* actual) {
     if (!expected || !actual) return false;
 
-    if (expected->getKind () == SemanticType::Kind::ERROR || actual->getKind () == SemanticType::Kind::ERROR) {
+    if (expected->getKind () == SemanticType::Kind::ERROR ||
+    actual->getKind () == SemanticType::Kind::ERROR) {
         return true; // Don't cascade errors
     }
 
@@ -180,12 +200,14 @@ bool SemanticAnalyzer::canImplicitlyCast (SemanticType* from, SemanticType* to) 
     if (!from || !to) return false;
 
     // INT -> FLOAT
-    if (from->getKind () == SemanticType::Kind::INT && to->getKind () == SemanticType::Kind::FLOAT) {
+    if (from->getKind () == SemanticType::Kind::INT &&
+    to->getKind () == SemanticType::Kind::FLOAT) {
         return true;
     }
 
     // BIT -> INT
-    if (from->getKind () == SemanticType::Kind::BIT && to->getKind () == SemanticType::Kind::INT) {
+    if (from->getKind () == SemanticType::Kind::BIT &&
+    to->getKind () == SemanticType::Kind::INT) {
         return true;
     }
 
@@ -205,7 +227,9 @@ bool SemanticAnalyzer::isQubitType (SemanticType* type) {
     return false;
 }
 
-bool SemanticAnalyzer::canCopyType (SemanticType* type) { return type && type->isCopyable (); }
+bool SemanticAnalyzer::canCopyType (SemanticType* type) {
+    return type && type->isCopyable ();
+}
 
 SemanticType* SemanticAnalyzer::getExprType (Expr* expr) {
     if (!expr) return nullptr;
@@ -275,7 +299,8 @@ void SemanticAnalyzer::visitFunctionDecl (FunctionDecl* decl) {
     auto* funcType = new FunctionType (paramTypes, retType);
 
     // Add to symbol table
-    symbolTable.declare (funcName, new Symbol (funcName, funcType, Symbol::Kind::FUNCTION, decl->loc));
+    symbolTable.declare (funcName,
+    new Symbol (funcName, funcType, Symbol::Kind::FUNCTION, decl->loc));
 }
 
 void SemanticAnalyzer::visitVariableDecl (VariableDecl* decl) {
@@ -295,8 +320,8 @@ void SemanticAnalyzer::visitVariableDecl (VariableDecl* decl) {
 
         if (!isTypeCompatible (declaredType, initType)) {
             reportError (decl->loc,
-            "Type mismatch: cannot initialize '" + declaredType->toString () + "' with '" +
-            initType->toString () + "'");
+            "Type mismatch: cannot initialize '" + declaredType->toString () +
+            "' with '" + initType->toString () + "'");
             delete declaredType;
             return;
         }
@@ -305,7 +330,8 @@ void SemanticAnalyzer::visitVariableDecl (VariableDecl* decl) {
         if (isQubitType (declaredType)) {
             // Check if initializer is a simple identifier (reference)
             if (auto* idExpr = dynamic_cast<IdentifierExpr*> (decl->getInitializer ())) {
-                auto* sym = new Symbol (varName, declaredType, Symbol::Kind::VARIABLE, decl->loc);
+                auto* sym =
+                new Symbol (varName, declaredType, Symbol::Kind::VARIABLE, decl->loc);
                 sym->isInitialized = true;
                 sym->isQubitAlias  = true;
                 symbolTable.declare (varName, sym);
@@ -333,8 +359,8 @@ void SemanticAnalyzer::visitParameterDecl (ParameterDecl* decl) {
     }
 
     SemanticType* paramType = resolveType (decl->getType ());
-    auto* sym               = new Symbol (paramName, paramType, Symbol::Kind::PARAMETER, decl->loc);
-    sym->isInitialized      = true; // Parameters are always initialized
+    auto* sym = new Symbol (paramName, paramType, Symbol::Kind::PARAMETER, decl->loc);
+    sym->isInitialized = true; // Parameters are always initialized
 
     // Parameters of qubit type are always references
     if (isQubitType (paramType)) { sym->isQubitAlias = true; }
@@ -347,57 +373,57 @@ void SemanticAnalyzer::visitParameterDecl (ParameterDecl* decl) {
 // ===================================================================
 
 void SemanticAnalyzer::visitCompoundStmt (CompoundStmt* stmt) {
-    LOG("=============== COMPOUND STATEMENT START ===============");
+    LOG ("=============== COMPOUND STATEMENT START ===============");
     for (auto* s : stmt->getStatements ()) {
         if (auto* declStmt = dynamic_cast<DeclarationStmt*> (s)) {
-            LOG("visitDeclarationStmt");
+            LOG ("visitDeclarationStmt");
             visitDeclarationStmt (declStmt);
         } else if (auto* assignStmt = dynamic_cast<AssignmentStmt*> (s)) {
-            LOG("visitAssignmentStmt");
+            LOG ("visitAssignmentStmt");
             visitAssignmentStmt (assignStmt);
         } else if (auto* exprStmt = dynamic_cast<ExpressionStmt*> (s)) {
-            LOG("visitExpressionStmt");
+            LOG ("visitExpressionStmt");
             visitExpressionStmt (exprStmt);
         } else if (auto* ifStmt = dynamic_cast<IfStmt*> (s)) {
-            LOG("visitIfStmt");
+            LOG ("visitIfStmt");
             visitIfStmt (ifStmt);
         } else if (auto* whileStmt = dynamic_cast<WhileStmt*> (s)) {
-            LOG("visitWhileStmt");
+            LOG ("visitWhileStmt");
             visitWhileStmt (whileStmt);
         } else if (auto* doWhileStmt = dynamic_cast<DoWhileStmt*> (s)) {
-            LOG("visitDoWhileStmt");
+            LOG ("visitDoWhileStmt");
             visitDoWhileStmt (doWhileStmt);
         } else if (auto* forStmt = dynamic_cast<ForStmt*> (s)) {
-            LOG("visitForStmt");
+            LOG ("visitForStmt");
             visitForStmt (forStmt);
         } else if (auto* retStmt = dynamic_cast<ReturnStmt*> (s)) {
             visitReturnStmt (retStmt);
         } else if (auto* breakStmt = dynamic_cast<BreakStmt*> (s)) {
-             LOG("visitBreakStmt");
+            LOG ("visitBreakStmt");
             visitBreakStmt (breakStmt);
         } else if (auto* contStmt = dynamic_cast<ContinueStmt*> (s)) {
-             LOG("visitContinueStmt");
+            LOG ("visitContinueStmt");
             visitContinueStmt (contStmt);
         } else if (auto* matchStmt = dynamic_cast<MatchStmt*> (s)) {
-            LOG("visitMatchStmt");
+            LOG ("visitMatchStmt");
             visitMatchStmt (matchStmt);
         } else if (auto* compStmt = dynamic_cast<CompoundStmt*> (s)) {
-            LOG("visitCompoundStmt");
+            LOG ("visitCompoundStmt");
             symbolTable.enterScope ();
             visitCompoundStmt (compStmt);
             symbolTable.exitScope ();
         } else if (auto* applyStmt = dynamic_cast<ApplyGateStmt*> (s)) {
-            LOG("visitApplyGateStmt");
+            LOG ("visitApplyGateStmt");
             visitApplyGateStmt (applyStmt);
         } else if (auto* measureStmt = dynamic_cast<MeasureStmt*> (s)) {
-            LOG("visitMeasureStmt");
+            LOG ("visitMeasureStmt");
             visitMeasureStmt (measureStmt);
         } else if (auto* resetStmt = dynamic_cast<ResetStmt*> (s)) {
-             LOG("visitResetStmt");
+            LOG ("visitResetStmt");
             visitResetStmt (resetStmt);
         }
     }
-      LOG("=============== COMPOUND STATEMENT END ===============");
+    LOG ("=============== COMPOUND STATEMENT END ===============");
 }
 
 void SemanticAnalyzer::visitDeclarationStmt (DeclarationStmt* stmt) {
@@ -434,8 +460,8 @@ void SemanticAnalyzer::visitAssignmentStmt (AssignmentStmt* stmt) {
     if (op == "=") {
         if (!isTypeCompatible (leftType, rightType)) {
             reportError (stmt->loc,
-            "Type mismatch in assignment: cannot assign '" + rightType->toString () + "' to '" +
-            leftType->toString () + "'");
+            "Type mismatch in assignment: cannot assign '" +
+            rightType->toString () + "' to '" + leftType->toString () + "'");
         }
 
         // Check no-cloning for qubits
@@ -489,7 +515,9 @@ void SemanticAnalyzer::visitWhileStmt (WhileStmt* stmt) {
     inLoop         = true;
 
     symbolTable.enterScope ();
-    if (auto* body = dynamic_cast<CompoundStmt*> (stmt->getBody ())) { visitCompoundStmt (body); }
+    if (auto* body = dynamic_cast<CompoundStmt*> (stmt->getBody ())) {
+        visitCompoundStmt (body);
+    }
     symbolTable.exitScope ();
 
     inLoop = wasInLoop;
@@ -500,7 +528,9 @@ void SemanticAnalyzer::visitDoWhileStmt (DoWhileStmt* stmt) {
     inLoop         = true;
 
     symbolTable.enterScope ();
-    if (auto* body = dynamic_cast<CompoundStmt*> (stmt->getBody ())) { visitCompoundStmt (body); }
+    if (auto* body = dynamic_cast<CompoundStmt*> (stmt->getBody ())) {
+        visitCompoundStmt (body);
+    }
     symbolTable.exitScope ();
 
     SemanticType* condType = getExprType (stmt->getCondition ());
@@ -535,7 +565,9 @@ void SemanticAnalyzer::visitForStmt (ForStmt* stmt) {
     bool wasInLoop = inLoop;
     inLoop         = true;
 
-    if (auto* body = dynamic_cast<CompoundStmt*> (stmt->getBody ())) { visitCompoundStmt (body); }
+    if (auto* body = dynamic_cast<CompoundStmt*> (stmt->getBody ())) {
+        visitCompoundStmt (body);
+    }
 
     inLoop = wasInLoop;
     symbolTable.exitScope ();
@@ -554,8 +586,8 @@ void SemanticAnalyzer::visitReturnStmt (ReturnStmt* stmt) {
 
         if (!isTypeCompatible (expectedType, actualType)) {
             reportError (stmt->loc,
-            "Return type mismatch: expected '" + expectedType->toString () + "', got '" +
-            actualType->toString () + "'");
+            "Return type mismatch: expected '" + expectedType->toString () +
+            "', got '" + actualType->toString () + "'");
         }
     } else {
         if (expectedType->getKind () != SemanticType::Kind::VOID) {
@@ -582,8 +614,8 @@ void SemanticAnalyzer::visitMatchStmt (MatchStmt* stmt) {
 
         if (!isTypeCompatible (matchType, caseType)) {
             reportError (matchCase->loc,
-            "Match case type '" + caseType->toString () + "' does not match expression type '" +
-            matchType->toString () + "'");
+            "Match case type '" + caseType->toString () +
+            "' does not match expression type '" + matchType->toString () + "'");
         }
 
         symbolTable.enterScope ();
@@ -606,7 +638,9 @@ SemanticType* SemanticAnalyzer::visitBinaryOpExpr (BinaryOpExpr* expr) {
     SemanticType* leftType  = getExprType (expr->getLeft ());
     SemanticType* rightType = getExprType (expr->getRight ());
 
-    if (!leftType || !rightType) { return new PrimitiveType (SemanticType::Kind::ERROR); }
+    if (!leftType || !rightType) {
+        return new PrimitiveType (SemanticType::Kind::ERROR);
+    }
 
     return inferBinaryOpType (expr->getOperator (), leftType, rightType, expr->loc);
 }
@@ -636,8 +670,8 @@ SemanticType* SemanticAnalyzer::visitFunctionCallExpr (FunctionCallExpr* expr) {
     // Check argument count
     if (args.size () != paramTypes.size ()) {
         reportError (expr->loc,
-        "Function expects " + std::to_string (paramTypes.size ()) + " arguments, got " +
-        std::to_string (args.size ()));
+        "Function expects " + std::to_string (paramTypes.size ()) +
+        " arguments, got " + std::to_string (args.size ()));
         return cloneType (funcType->getReturnType ());
     }
 
@@ -656,7 +690,8 @@ SemanticType* SemanticAnalyzer::visitFunctionCallExpr (FunctionCallExpr* expr) {
         // Check for qubit passing
         if (isQubitType (paramTypes[i])) {
             // Must pass by reference (identifier only)
-            if (!dynamic_cast<IdentifierExpr*> (args[i]) && !dynamic_cast<IndexAccessExpr*> (args[i])) {
+            if (!dynamic_cast<IdentifierExpr*> (args[i]) &&
+            !dynamic_cast<IndexAccessExpr*> (args[i])) {
                 reportError (expr->loc, "Qubits must be passed by reference");
             }
         }
@@ -682,11 +717,14 @@ SemanticType* SemanticAnalyzer::visitIndexAccessExpr (IndexAccessExpr* expr) {
     SemanticType* targetType = getExprType (expr->getTarget ());
     SemanticType* indexType  = getExprType (expr->getIndex ());
 
-    if (!targetType || !indexType) { return new PrimitiveType (SemanticType::Kind::ERROR); }
+    if (!targetType || !indexType) {
+        return new PrimitiveType (SemanticType::Kind::ERROR);
+    }
 
     // Check if target is indexable
     if (targetType->getKind () != SemanticType::Kind::ARRAY) {
-        reportError (expr->loc, "Cannot index non-array type '" + targetType->toString () + "'");
+        reportError (expr->loc,
+        "Cannot index non-array type '" + targetType->toString () + "'");
         return new PrimitiveType (SemanticType::Kind::ERROR);
     }
 
@@ -718,7 +756,8 @@ SemanticType* SemanticAnalyzer::visitMemberAccessExpr (MemberAccessExpr* expr) {
         return new PrimitiveType (SemanticType::Kind::INT);
     }
 
-    reportError (expr->loc, "Type '" + targetType->toString () + "' has no member '" + memberName + "'");
+    reportError (expr->loc,
+    "Type '" + targetType->toString () + "' has no member '" + memberName + "'");
     return new PrimitiveType (SemanticType::Kind::ERROR);
 }
 
@@ -744,8 +783,9 @@ SemanticType* SemanticAnalyzer::visitLambdaExpr (LambdaExpr* expr) {
     symbolTable.exitScope ();
 
     // Resolve return type
-    SemanticType* retType = expr->getReturnType () ? resolveType (expr->getReturnType ()) :
-                                                     new PrimitiveType (SemanticType::Kind::VOID);
+    SemanticType* retType = expr->getReturnType () ?
+    resolveType (expr->getReturnType ()) :
+    new PrimitiveType (SemanticType::Kind::VOID);
 
     return new FunctionType (paramTypes, retType);
 }
@@ -768,8 +808,8 @@ SemanticType* SemanticAnalyzer::visitBracedInitList (BracedInitList* expr) {
 
         if (!currType || !isTypeCompatible (elemType, currType)) {
             reportError (expr->loc,
-            "Inconsistent types in initializer list: expected '" + elemType->toString () +
-            "', got '" + currType->toString () + "'");
+            "Inconsistent types in initializer list: expected '" +
+            elemType->toString () + "', got '" + currType->toString () + "'");
         }
     }
 
@@ -779,7 +819,9 @@ SemanticType* SemanticAnalyzer::visitBracedInitList (BracedInitList* expr) {
 SemanticType* SemanticAnalyzer::visitQuantumStateList (QuantumStateList* expr) {
     const auto& states = expr->getStates ();
 
-    if (states.empty ()) { return new PrimitiveType (SemanticType::Kind::ERROR); }
+    if (states.empty ()) {
+        return new PrimitiveType (SemanticType::Kind::ERROR);
+    }
 
     // All states must be qubits
     for (auto* state : states) {
@@ -791,15 +833,18 @@ SemanticType* SemanticAnalyzer::visitQuantumStateList (QuantumStateList* expr) {
         }
     }
 
-    return new ArrayType (new PrimitiveType (SemanticType::Kind::QUBIT), static_cast<int> (states.size ()));
+    return new ArrayType (new PrimitiveType (SemanticType::Kind::QUBIT),
+    static_cast<int> (states.size ()));
 }
 
 // ===================================================================
 //                      Type Inference for Operators
 // ===================================================================
 
-SemanticType*
-SemanticAnalyzer::inferBinaryOpType (const std::string& op, SemanticType* left, SemanticType* right, Location loc) {
+SemanticType* SemanticAnalyzer::inferBinaryOpType (const std::string& op,
+SemanticType* left,
+SemanticType* right,
+Location loc) {
     auto leftKind  = left->getKind ();
     auto rightKind = right->getKind ();
 
@@ -812,8 +857,10 @@ SemanticAnalyzer::inferBinaryOpType (const std::string& op, SemanticType* left, 
         }
 
         // Both must be numeric
-        bool leftNumeric = (leftKind == SemanticType::Kind::INT || leftKind == SemanticType::Kind::FLOAT);
-        bool rightNumeric = (rightKind == SemanticType::Kind::INT || rightKind == SemanticType::Kind::FLOAT);
+        bool leftNumeric =
+        (leftKind == SemanticType::Kind::INT || leftKind == SemanticType::Kind::FLOAT);
+        bool rightNumeric = (rightKind == SemanticType::Kind::INT ||
+        rightKind == SemanticType::Kind::FLOAT);
 
         if (!leftNumeric || !rightNumeric) {
             reportError (loc, "Arithmetic operators require numeric types");
@@ -832,7 +879,8 @@ SemanticAnalyzer::inferBinaryOpType (const std::string& op, SemanticType* left, 
     if (op == "==" || op == "!=" || op == "<" || op == ">" || op == "<=" || op == ">=") {
         if (!isTypeCompatible (left, right)) {
             reportError (loc,
-            "Cannot compare incompatible types '" + left->toString () + "' and '" + right->toString () + "'");
+            "Cannot compare incompatible types '" + left->toString () +
+            "' and '" + right->toString () + "'");
         }
 
         // Qubits cannot be compared
@@ -876,7 +924,9 @@ SemanticAnalyzer::inferBinaryOpType (const std::string& op, SemanticType* left, 
     return new PrimitiveType (SemanticType::Kind::ERROR);
 }
 
-SemanticType* SemanticAnalyzer::inferUnaryOpType (const std::string& op, SemanticType* operand, Location loc) {
+SemanticType* SemanticAnalyzer::inferUnaryOpType (const std::string& op,
+SemanticType* operand,
+Location loc) {
     auto kind = operand->getKind ();
 
     // Arithmetic negation: -, +
@@ -923,7 +973,8 @@ void SemanticAnalyzer::checkQubitUsage (Expr* expr, Location loc) {
 
     if (isQubitType (type)) {
         // Ensure qubit is accessed by reference only
-        if (!dynamic_cast<IdentifierExpr*> (expr) && !dynamic_cast<IndexAccessExpr*> (expr)) {
+        if (!dynamic_cast<IdentifierExpr*> (expr) &&
+        !dynamic_cast<IndexAccessExpr*> (expr)) {
             reportError (loc, "Invalid qubit usage - must be accessed by reference");
         }
     }

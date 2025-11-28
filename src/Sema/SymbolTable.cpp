@@ -1,4 +1,4 @@
-#include <SymbolTable.hpp>
+#include "Sema/SymbolTable.hpp"
 
 namespace Heisen {
 
