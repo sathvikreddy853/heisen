@@ -1,7 +1,7 @@
 #ifndef HEISEN_FORMATTING_FUNCTIONS_HPP
 #define HEISEN_FORMATTING_FUNCTIONS_HPP
 
-#include <Macros.hpp>
+#include "Macros.hpp"
 
 namespace Heisen {
 

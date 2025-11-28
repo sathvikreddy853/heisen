@@ -1,21 +1,19 @@
 #ifndef HEISEN_QIR_CODEGEN_HPP
 #define HEISEN_QIR_CODEGEN_HPP
 
-#include <AST.hpp>
-#include <ASTTraversal.hpp>
-#include <Macros.hpp>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/Module.h>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/Value.h>
-#include <llvm/IR/Function.h>
-#include <llvm/IR/Type.h>
-#include <llvm/IR/BasicBlock.h>
-#include <llvm/IR/Constants.h>
-#include <llvm/IR/Verifier.h>
-#include <llvm/Support/raw_ostream.h>
-#include <stack>
-#include <map>
+#include "AST/AST.hpp"
+#include "AST/ASTTraversal.hpp"
+#include "Macros.hpp"
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Value.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Type.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Constants.h"
+#include "llvm/IR/Verifier.h"
+#include "llvm/Support/raw_ostream.h"
 
 /**
  * @brief QIR Code Generator for Heisen Language

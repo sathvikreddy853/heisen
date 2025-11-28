@@ -1,7 +1,7 @@
-#include <QIRCodeGen.hpp>
-#include <llvm/Support/FileSystem.h>
-#include <llvm/Bitcode/BitcodeWriter.h>
-#include <llvm/IR/LegacyPassManager.h>
+#include "QIRCodeGen.hpp"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Bitcode/BitcodeWriter.h"
+#include "llvm/IR/LegacyPassManager.h"
 
 QIRCodeGen::QIRCodeGen(const std::string& moduleName) 
     : currentFunction(nullptr), currentBlock(nullptr), lastValue(nullptr) {

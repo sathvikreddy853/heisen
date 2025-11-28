@@ -1,9 +1,8 @@
 #ifndef HEISEN_AST_TRAVERSAL_HPP
 #define HEISEN_AST_TRAVERSAL_HPP
 
-#include <Macros.hpp>
+#include "Macros.hpp"
 
-// Forward declarations for all AST node types
 class ASTNode;
 class Expr;
 class Stmt;
@@ -90,10 +89,6 @@ class AST_Traversal {
 public:
     virtual ~AST_Traversal() = default;
 
-    // ===================================================================
-    //                      Expression Visitors
-    // ===================================================================
-    
     virtual void visit(IntLiteralExpr* node) {}
     virtual void visit(FloatLiteralExpr* node) {}
     virtual void visit(BoolLiteralExpr* node) {}
@@ -109,23 +104,14 @@ public:
     virtual void visit(LambdaExpr* node) {}
     virtual void visit(BracedInitList* node) {}
     
-    // Quantum state expressions
     virtual void visit(QuantumStateIdentifier* node) {}
     virtual void visit(QuantumStateIndexAccess* node) {}
     virtual void visit(QuantumStateList* node) {}
-    
-    // ===================================================================
-    //                      Declaration Visitors
-    // ===================================================================
     
     virtual void visit(VariableDecl* node) {}
     virtual void visit(ParameterDecl* node) {}
     virtual void visit(FunctionDecl* node) {}
     virtual void visit(GateDecl* node) {}
-    
-    // ===================================================================
-    //                      Statement Visitors
-    // ===================================================================
     
     virtual void visit(CompoundStmt* node) {}
     virtual void visit(DeclarationStmt* node) {}
@@ -142,26 +128,14 @@ public:
     virtual void visit(ReturnStmt* node) {}
     virtual void visit(PrintStmt* node) {}
     
-    // ===================================================================
-    //                      Quantum Statement Visitors
-    // ===================================================================
-    
     virtual void visit(ApplyGateStmt* node) {}
     virtual void visit(MeasureStmt* node) {}
     virtual void visit(ResetStmt* node) {}
-    
-    // ===================================================================
-    //                      Gate Visitors
-    // ===================================================================
     
     virtual void visit(SimpleGateNode* node) {}
     virtual void visit(ParametricGateNode* node) {}
     virtual void visit(TensoredGateNode* node) {}
     virtual void visit(GateCompositionNode* node) {}
-    
-    // ===================================================================
-    //                      Type Visitors
-    // ===================================================================
     
     virtual void visit(BaseTypeNode* node) {}
     virtual void visit(ArrayTypeNode* node) {}
@@ -186,10 +160,6 @@ public:
 class RecursiveASTVisitor : public AST_Traversal {
 public:
     virtual ~RecursiveASTVisitor() = default;
-
-    // ===================================================================
-    //                      Expression Visitors
-    // ===================================================================
     
     void visit(BinaryOpExpr* node) override;
     void visit(UnaryOpExpr* node) override;
@@ -202,18 +172,10 @@ public:
     void visit(BracedInitList* node) override;
     void visit(QuantumStateList* node) override;
     
-    // ===================================================================
-    //                      Declaration Visitors
-    // ===================================================================
-    
     void visit(VariableDecl* node) override;
     void visit(ParameterDecl* node) override;
     void visit(FunctionDecl* node) override;
     void visit(GateDecl* node) override;
-    
-    // ===================================================================
-    //                      Statement Visitors
-    // ===================================================================
     
     void visit(CompoundStmt* node) override;
     void visit(DeclarationStmt* node) override;
@@ -227,26 +189,14 @@ public:
     void visit(ForStmt* node) override;
     void visit(ReturnStmt* node) override;
     
-    // ===================================================================
-    //                      Quantum Statement Visitors
-    // ===================================================================
-    
     void visit(ApplyGateStmt* node) override;
     void visit(MeasureStmt* node) override;
     void visit(ResetStmt* node) override;
-    
-    // ===================================================================
-    //                      Gate Visitors
-    // ===================================================================
     
     void visit(SimpleGateNode* node) override;
     void visit(ParametricGateNode* node) override;
     void visit(TensoredGateNode* node) override;
     void visit(GateCompositionNode* node) override;
-    
-    // ===================================================================
-    //                      Type Visitors
-    // ===================================================================
     
     void visit(ArrayTypeNode* node) override;
     void visit(FunctionTypeNode* node) override;

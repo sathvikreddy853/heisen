@@ -5,7 +5,6 @@
 #include <Macros.hpp>
 #include <Token.hpp>
 
-// Forward declarations
 class Expr;
 class Stmt;
 class Type;

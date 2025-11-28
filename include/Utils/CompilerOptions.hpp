@@ -1,7 +1,7 @@
 #ifndef HEISEN_COMPILER_OPTIONS_HPP
 #define HEISEN_COMPILER_OPTIONS_HPP
 
-#include <Macros.hpp>
+#include "Macros.hpp"
 
 extern int yydebug;
 

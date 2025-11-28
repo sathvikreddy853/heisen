@@ -349,4 +349,4 @@ void SemanticAnalyzer::visitResetStmt (ResetStmt* stmt) {
     }
 }
 
-}
+} // namespace Heisen

@@ -4,7 +4,7 @@
 #include "AST/AST.hpp"
 #include "AST/ASTTraversal.hpp"
 #include "Macros.hpp"
-#include "Symbol.hpp"
+#include "Sema/Symbol.hpp"
 #include "Sema/SymbolTable.hpp"
 #include "Sema/Scope.hpp"
 #include "Sema/SemaType.hpp"
