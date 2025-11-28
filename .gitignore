@@ -21,10 +21,12 @@ references/
 
 # ignore binaries
 build/
+build_test/
 *.a
 *.o
 *.out
 *.zip
+output.ll
 
 # ignore files generated from compiling LATEX code
 docs/*
