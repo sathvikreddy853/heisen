@@ -5,34 +5,19 @@
 
 namespace Heisen {
 
-void printHeader (const std::string& title, bool useColor = true) {
+void printHeader (const std::string& title) {
     std::string separator (60, '=');
-
-    if (useColor) {
-        std::cout << "\033[1;36m" << separator << "\033[0m" << std::endl;
-        std::cout << "\033[1;36m  " << title << "\033[0m" << std::endl;
-        std::cout << "\033[1;36m" << separator << "\033[0m" << std::endl;
-    } else {
-        std::cout << separator << std::endl;
-        std::cout << "  " << title << std::endl;
-        std::cout << separator << std::endl;
-    }
+    std::cout << BOLD << CYAN << separator << RESET_COLOR << std::endl;
+    std::cout << BOLD << CYAN << "  " << title << RESET_COLOR << std::endl;
+    std::cout << BOLD << CYAN << separator << RESET_COLOR << std::endl;
 }
 
-void printSuccess (const std::string& message, bool useColor = true) {
-    if (useColor) {
-        std::cout << "\033[1;32m" << message << "\033[0m" << std::endl;
-    } else {
-        std::cout << message << std::endl;
-    }
+void printSuccess (const std::string& message) {
+    std::cout << BOLD << GREEN << message << RESET_COLOR << std::endl;
 }
 
-void printError (const std::string& message, bool useColor = true) {
-    if (useColor) {
-        std::cerr << "\033[1;31m" << message << "\033[0m" << std::endl;
-    } else {
-        std::cerr << message << std::endl;
-    }
+void printError (const std::string& message) {
+    std::cerr << BOLD << RED << message << RESET_COLOR << std::endl;
 }
 
 } // namespace Heisen

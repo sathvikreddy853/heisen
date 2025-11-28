@@ -40,7 +40,7 @@
 #include <variant>
 #include <vector>
 
-#define LOG(x) /* std::cout << x << std::endl */
+#define LOG(x)  /* std::cout << x << std::endl */
 #define LOGs(x) /* std::cout << x << ' ' */
 
 #define DBG(...) dbg (__FILE__, __LINE__, __VA_ARGS__)
@@ -50,6 +50,7 @@ namespace Heisen {
 
 static const std::string GREEN       = "\033[32m";
 static const std::string RED         = "\033[31m";
+static const std::string CYAN        = "\033[36m";
 static const std::string BOLD        = "\033[1m";
 static const std::string RESET_COLOR = "\033[0m";
 
