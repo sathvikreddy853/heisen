@@ -66,7 +66,8 @@ Or with stdin:
 ```
 
 ## Compiler Options
-- `-a, --print-ast`: Print the AST after parsing
+- `--dump-ast`: Dump the AST after parsing
+- `--dump-symtab`: Dump the symbol table after. semantic analysis
 - `-s, --stats`: Print AST statistics
 - `-o, --output <file>`: Specify output file
 - `-h, --help`: Show help message
@@ -78,9 +79,14 @@ Generate QIR output:
 ./build/heisen -o output.ll examples/testcase.hsn
 ```
 
-Print AST with statistics:
+Dump AST with statistics:
 ```shell
-./build/heisen -a -s examples/testcase.hsn
+./build/heisen --dump-ast -s examples/testcase.hsn
+```
+
+Dump symbol table:
+```shell
+./build/heisen --dump-symtab examples/testcase.hsn
 ```
 
 ## Building with Make (Legacy)
