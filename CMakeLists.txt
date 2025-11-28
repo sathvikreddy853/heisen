@@ -1,10 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.22.1)
-PROJECT(mini-heisen LANGUAGES CXX)
+PROJECT(heisen LANGUAGES CXX)
 
 SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_POSITION_INDEPENDENT_CODE OFF)
-
 
 option(CODEGEN "Enable code generation with LLVM" ON)
 
@@ -96,35 +95,40 @@ ADD_CUSTOM_TARGET(run
 INSTALL(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
 
-enable_testing()
-find_package(GTest REQUIRED)
-include(GoogleTest)
 
-file(GLOB_RECURSE TEST_SOURCES
-    ${CMAKE_SOURCE_DIR}/test/Lex/*.cpp
-)
+option(BUILD_TESTS "Build unit tests" OFF)
 
-add_executable(lexer_tests
-    ${TEST_SOURCES}
-    ${BISON_Parser_OUTPUTS}
-    ${FLEX_Lexer_OUTPUTS}
-)
+if(BUILD_TESTS)
+    enable_testing()
+    find_package(GTest REQUIRED)
+    include(GoogleTest)
 
-target_include_directories(lexer_tests PRIVATE
-    ${INC_DIR}
-    ${INC_DIR}/Lex   
-    ${INC_DIR}/AST
-    ${INC_DIR}/Parse
-    ${INC_DIR}/Sema
-    ${INC_DIR}/Utils   
-    ${CMAKE_BINARY_DIR}
-    ${CMAKE_SOURCE_DIR}/test/Lex
-)
+    file(GLOB_RECURSE TEST_SOURCES
+        ${CMAKE_SOURCE_DIR}/unittests/Lex/*.cpp
+    )
 
-target_link_libraries(lexer_tests PRIVATE
-    GTest::gtest
-    GTest::gtest_main
-)
+    add_executable(lexer_tests
+        ${TEST_SOURCES}
+        ${BISON_Parser_OUTPUTS}
+        ${FLEX_Lexer_OUTPUTS}
+    )
 
-gtest_discover_tests(lexer_tests)
+    target_include_directories(lexer_tests PRIVATE
+        ${INC_DIR}
+        ${INC_DIR}/Lex   
+        ${INC_DIR}/AST
+        ${INC_DIR}/Parse
+        ${INC_DIR}/Sema
+        ${INC_DIR}/Utils   
+        ${CMAKE_BINARY_DIR}
+        ${CMAKE_SOURCE_DIR}/unittests/Lex
+    )
+
+    target_link_libraries(lexer_tests PRIVATE
+        GTest::gtest
+        GTest::gtest_main
+    )
+
+    gtest_discover_tests(lexer_tests)
+endif()
 

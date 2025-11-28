@@ -20,7 +20,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cmake -S . -B build -DCODEGEN=ON
+          cmake -S . -B build -DCODEGEN=ON -DBUILD_TESTS=ON
 
       - name: Build
         run: |
