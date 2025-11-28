@@ -1,9 +1,9 @@
 #include "AST/AST.hpp"
 #include "AST/ASTTraversal.hpp"
-#include "Utils/CompilerOptions.hpp"
-#include "Utils/FormattingFunctions.hpp"
 #include "Macros.hpp"
 #include "Sema/Sema.hpp"
+#include "Utils/CompilerOptions.hpp"
+#include "Utils/FormattingFunctions.hpp"
 #ifdef ENABLE_CODEGEN
 #include <QIRCodeGen.hpp>
 #endif
@@ -16,7 +16,6 @@ extern FILE* yyin;
 int main (int argc, char** argv) {
     Heisen::CompilerOptions opts = Heisen::parseArgs (argc, argv);
 
-    // Open input file
     FILE* inputFile = nullptr;
     if (!opts.inputFile.empty ()) {
         inputFile = fopen (opts.inputFile.c_str (), "r");
@@ -43,9 +42,15 @@ int main (int argc, char** argv) {
     if (opts.verbose)
         Heisen::printHeader ("Phase 2: Analysis", opts.enableColor);
     Heisen::SemanticAnalyzer analyzer;
+
+    // Set source filename for better error reporting
+    if (!opts.inputFile.empty ()) {
+        analyzer.setSourceFilename (opts.inputFile);
+    }
+
     if (!analyzer.analyze (translationUnit)) {
         Heisen::printError ("Semantic analysis failed.", opts.enableColor);
-        // (Error printing logic omitted for brevity)
+        analyzer.printErrors ();
         return 1;
     } else {
         Heisen::printSuccess ("Semantic Analysis Passed", opts.enableColor);
@@ -57,13 +62,10 @@ int main (int argc, char** argv) {
         if (opts.verbose)
             Heisen::printHeader ("Phase 3: QIR Generation", opts.enableColor);
 
-        // Generate QIR code
         try {
             QIRCodeGen codeGen ("heisen_module");
-            // Pass the entire translation unit (statements + decls)
             codeGen.generateCode (translationUnit);
 
-            // Verify
             std::string errorMsg;
             if (!codeGen.verify (errorMsg)) {
                 Heisen::printError ("QIR Verification Failed:", opts.enableColor);
@@ -71,7 +73,6 @@ int main (int argc, char** argv) {
                 return 1;
             }
 
-            // Write Output
             std::string outName = opts.outputFile.empty () ? "output.ll" : opts.outputFile;
             codeGen.writeToFile (outName);
 

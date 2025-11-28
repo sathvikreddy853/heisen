@@ -21,17 +21,17 @@ void printHeader (const std::string& title, bool useColor = true) {
 
 void printSuccess (const std::string& message, bool useColor = true) {
     if (useColor) {
-        std::cout << "\033[1;32m✓ " << message << "\033[0m" << std::endl;
+        std::cout << "\033[1;32m" << message << "\033[0m" << std::endl;
     } else {
-        std::cout << "✓ " << message << std::endl;
+        std::cout << message << std::endl;
     }
 }
 
 void printError (const std::string& message, bool useColor = true) {
     if (useColor) {
-        std::cerr << "\033[1;31m✗ " << message << "\033[0m" << std::endl;
+        std::cerr << "\033[1;31m" << message << "\033[0m" << std::endl;
     } else {
-        std::cerr << "✗ " << message << std::endl;
+        std::cerr << message << std::endl;
     }
 }
 
