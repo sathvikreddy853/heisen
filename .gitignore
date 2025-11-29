@@ -6,6 +6,7 @@
 
 # ignores vscode workspace config folders
 .vscode/
+.VSCodeCounter/
 *.code-workspace
 
 # ignores jetbrains workspace config folders

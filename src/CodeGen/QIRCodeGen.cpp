@@ -9,7 +9,6 @@ QIRCodeGen::QIRCodeGen (const std::string& moduleName)
     module  = std::make_unique<llvm::Module> (moduleName, *context);
     builder = std::make_unique<llvm::IRBuilder<>> (*context);
 
-    // Initialize QIR Runtime declarations
     declareQIRRuntime ();
 }
 
@@ -24,9 +23,7 @@ void QIRCodeGen::declareQIRRuntime () {
 }
 
 void QIRCodeGen::declareQubitManagement () {
-    // %Qubit*
     llvm::Type* qubitPtrType = llvm::PointerType::getUnqual (*context);
-    // %Array*
     llvm::Type* arrayPtrType = llvm::PointerType::getUnqual (*context);
 
     // __quantum__rt__qubit_allocate
@@ -79,12 +76,11 @@ void QIRCodeGen::declareResultManagement () {
 }
 
 void QIRCodeGen::declareQuantumGates () {
-    llvm::Type* qubitPtrType = llvm::PointerType::getUnqual (*context); // %Qubit*
-    llvm::Type* resultPtrType = llvm::PointerType::getUnqual (*context); // %Result*
-    llvm::Type* voidTy   = builder->getVoidTy ();
-    llvm::Type* doubleTy = builder->getDoubleTy ();
+    llvm::Type* qubitPtrType  = llvm::PointerType::getUnqual (*context);
+    llvm::Type* resultPtrType = llvm::PointerType::getUnqual (*context);
+    llvm::Type* voidTy        = builder->getVoidTy ();
+    llvm::Type* doubleTy      = builder->getDoubleTy ();
 
-    // Helper to create simple 1-qubit gate declaration
     auto create1QGate = [&] (const std::string& name) {
         return llvm::Function::Create (
         llvm::FunctionType::get (voidTy, { qubitPtrType }, false),
@@ -99,7 +95,6 @@ void QIRCodeGen::declareQuantumGates () {
     runtime.qisT     = create1QGate ("__quantum__qis__t__body");
     runtime.qisReset = create1QGate ("__quantum__qis__reset__body");
 
-    // Rotations: (double, %Qubit*)
     llvm::FunctionType* rotType =
     llvm::FunctionType::get (voidTy, { doubleTy, qubitPtrType }, false);
     runtime.qisRx = llvm::Function::Create (rotType,
@@ -109,7 +104,6 @@ void QIRCodeGen::declareQuantumGates () {
     runtime.qisRz = llvm::Function::Create (rotType,
     llvm::Function::ExternalLinkage, "__quantum__qis__rz__body", module.get ());
 
-    // 2-Qubit Gates
     llvm::FunctionType* twoQType =
     llvm::FunctionType::get (voidTy, { qubitPtrType, qubitPtrType }, false);
     runtime.qisCNOT = llvm::Function::Create (twoQType,
@@ -119,13 +113,11 @@ void QIRCodeGen::declareQuantumGates () {
     runtime.qisSWAP = llvm::Function::Create (twoQType,
     llvm::Function::ExternalLinkage, "__quantum__qis__swap__body", module.get ());
 
-    // 3-Qubit Gates
     llvm::FunctionType* threeQType = llvm::FunctionType::get (
     voidTy, { qubitPtrType, qubitPtrType, qubitPtrType }, false);
     runtime.qisCCNOT = llvm::Function::Create (threeQType,
     llvm::Function::ExternalLinkage, "__quantum__qis__ccnot__body", module.get ());
 
-    // Measurement: %Result* @__quantum__qis__m__body(%Qubit*)
     llvm::FunctionType* measType =
     llvm::FunctionType::get (resultPtrType, { qubitPtrType }, false);
     runtime.qisMeasure = llvm::Function::Create (measType,
