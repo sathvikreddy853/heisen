@@ -4,6 +4,7 @@
 #include "Sema/Sema.hpp"
 #include "Utils/CompilerOptions.hpp"
 #include "Utils/FormattingFunctions.hpp"
+
 #ifdef ENABLE_CODEGEN
 #include <QIRCodeGen.hpp>
 #endif

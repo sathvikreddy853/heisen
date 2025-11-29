@@ -35,7 +35,6 @@ void SemanticAnalyzer::initializeBuiltins () {
 }
 
 bool SemanticAnalyzer::analyze (std::vector<ASTNode*>& translationUnit) {
-    LOG ("============ SEM ANALYSIS START=============");
     // First pass: collect all function declarations
     for (auto* node : translationUnit) {
         if (auto* funcDecl = dynamic_cast<FunctionDecl*> (node)) {

@@ -108,12 +108,10 @@ int SemanticAnalyzer::countGatesInNode(GateNode* gate) {
     // Both gates must operate on the SAME number of qubits
     if (auto* compGate = dynamic_cast<GateCompositionNode*>(gate)) {
         int leftReq = countGatesInNode(compGate->getLeft());
-        int rightReq = countGatesInNode(compGate->getRight());
-        std::cout<<"left req: "<<leftReq<<" RightREq: "<<rightReq<<"\n";
+        int rightReq = countGatesInNode(compGate->getRight());;
         // Both sides must have the same qubit requirement
         if (leftReq > 0 && rightReq > 0 && leftReq != rightReq) {
             // This will be caught in checkGateApplication, just return -1 for now
-             std::cout<<"returning -1\n";
             return -1;
         }
         
@@ -123,7 +121,7 @@ int SemanticAnalyzer::countGatesInNode(GateNode* gate) {
         }
         return (leftReq > 0) ? leftReq : rightReq;
     }
-    std::cout<<"returning -1\n";
+    
     return -1; // Unknown
 }
 

@@ -41,8 +41,6 @@ Scope* SymbolTable::getCurrentScope () const {
 }
 
 void SymbolTable::print () const {
-    std::cout << "=== Symbol Table ===" << std::endl;
-
     int scopeNum = 0;
     for (const auto* scope : allScopes) {
         const auto& symbols = scope->getSymbols ();
@@ -52,8 +50,6 @@ void SymbolTable::print () const {
         }
         scopeNum++;
     }
-
-    std::cout << "====================" << std::endl;
 }
 
 }; // namespace Heisen
