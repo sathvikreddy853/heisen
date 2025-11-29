@@ -1,0 +1,70 @@
+# Test Case: All Semantic Errors
+# Note: The compiler stops at the first error.
+
+func test_type_mismatches() {
+    let i: int = 10;
+    let f: float = 3.14;
+    let b: bool = true;
+
+    let i2: int = 3.14; 
+    let b2: bool = 10;
+    let res1: int = 1 + true;
+
+    if (true < 10) { print("Error"); }
+    let res3: int = -true;
+}
+
+func test_scope_and_declarations() {
+    let x: int = 5;
+    let x: int = 10;
+    y = 20;
+}
+
+func test_control_flow() {
+    break;
+    continue;
+}
+
+func test_return_errors() : int {
+    return 3.14;
+}
+
+func test_void_return() {
+    return 10;
+}
+
+func test_quantum_safety() {
+    let q: qubit[2];
+    let q2: qubit[2];
+    
+    let res: int = q[0] + q[1];
+    if (q[0] == q[1]) {
+        print("Error");
+    }
+
+    let i: int = 0;
+    let b: bit;
+    measure i => b;
+
+    H @ i;
+    RX(1.0, 2.0) @ q[0];
+}
+
+func test_function_calls() {
+    test_return_errors(1);
+
+    let s: float = sqrt(10); 
+    let s2: float = sqrt(true); 
+
+    let x: int = 10;
+    x();
+}
+
+func test_arrays() {
+    let arr: int[5];
+
+    let x: int = 10;
+    let y: int = x[0];
+    
+    let z: int = arr[3.14];
+}
