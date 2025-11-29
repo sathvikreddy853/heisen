@@ -1,5 +1,5 @@
-#include "AST.hpp"
-#include "ASTTraversal.hpp"
+#include "AST/AST.hpp"
+#include "AST/ASTTraversal.hpp"
 
 void ASTPrinter::indent () {
     if (stateStack.empty ()) return;
