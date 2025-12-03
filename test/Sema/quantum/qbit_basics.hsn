@@ -1,3 +1,0 @@
-let q2: qubit;
-let q3: qubit = q2;
-H @ q2;

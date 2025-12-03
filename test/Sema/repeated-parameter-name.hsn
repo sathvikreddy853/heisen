@@ -1,3 +1,0 @@
-func add (x: int, x: int) : int {
-    return x + x;
-}

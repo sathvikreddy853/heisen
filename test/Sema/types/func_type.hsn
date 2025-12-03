@@ -1,9 +1,0 @@
-
-let q1: qubit = 2 ;
-let a : int;
-let b: string;
-let c: bool;
-let d : int;
-let e : float;
-let f: ((int)=>int);
-# let error : (int)=>int;
