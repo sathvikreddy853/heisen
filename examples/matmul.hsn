@@ -1,0 +1,26 @@
+func matmul (A: int[][], B: int[][]) : int[][] {
+    let m, n = A.shape;
+    let p, q = B.shape;
+
+    if (n != p) {
+        panic("Matrices must have appropriate dimensions");
+    }
+
+    let C: int[m][q];
+    for (i: int = 0; i < m; i += 1) {
+        for (j: int = 0; j < q; j += 1) {
+            C[i][j] = 0;
+            for (k: int = 0; k < n; k += 1) {
+                C[i][j] += A[i][k] * B[k][j];
+            }
+        }
+    }
+
+    return C;
+}   
+
+let A: int[2][2] = [[1, 2], [3, 4]];
+let B: int[2][2] = [[5, 6], [7, 8]];
+let C: int[2][2] = matmul(A, B);
+
+print(C);

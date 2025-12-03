@@ -1,0 +1,26 @@
+# ignore all files without an extension
+*
+!*.*
+!*/
+!Makefile
+
+# ignores vscode workspace config folders
+.vscode/
+*.code-workspace
+
+# cache and temporary files
+.DS_Store
+__pycache__/
+tmp/
+temp/
+
+# ignore binaries
+build/
+*.a
+*.o
+*.out
+*.zip
+
+# ignore files generated from compiling LATEX code
+docs/*
+!docs/*.pdf
