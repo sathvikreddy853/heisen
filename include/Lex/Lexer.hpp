@@ -18,7 +18,7 @@ class Lexer {
 
     public:
     std::vector<Token> tokenize ();
-    void skipWhitespace ();
+    void skip_whitespace ();
 };
 
 } // namespace Heisen
