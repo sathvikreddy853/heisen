@@ -20,8 +20,9 @@ int main (int argc, const char* argv[]) {
     auto source = read_input_file (argv[1]);
     std::cout << source << std::endl;
 
-    std::cout << source.length() << std::endl;
-    tokenize (source);
+    vars.source = source;
+    tokenize ();
+    std::cout << tokens.size() << std::endl;
 
     for (auto& token : tokens) {
         std::cout << token << std::endl;

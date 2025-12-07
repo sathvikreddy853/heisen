@@ -8,9 +8,20 @@
 
 namespace Heisen {
 
-inline std::vector<std::string> tokens;
+struct Vars {
+    std::string source;
+    int curr = 0;
+    void advance () {
+        curr += 1;
+        if (curr > source.length ()) {
+            throw "Invalid Increment";
+        }
+    }
+};
 
-void tokenize (const std::string &source);
+inline std::vector<std::string> tokens;
+inline Vars vars;
+void tokenize ();
 
 class Lexer {
     private:
