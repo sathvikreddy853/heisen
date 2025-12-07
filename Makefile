@@ -1,5 +1,6 @@
 CXX := clang++
-CXXFLAGS := -std=c++26 -Wall -Wextra -Iinclude
+# WFLAGS := -Wall -Wextra
+CXXFLAGS := -std=c++26 -Iinclude $(WFLAGS)
 SRC_DIR := src
 BUILD_DIR := build
 TARGET := heisen

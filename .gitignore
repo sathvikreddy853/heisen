@@ -13,6 +13,7 @@
 __pycache__/
 tmp/
 temp/
+testcase.hsn
 
 # ignore binaries
 build/

@@ -8,6 +8,10 @@
 
 namespace Heisen {
 
+inline std::vector<std::string> tokens;
+
+void tokenize (const std::string &source);
+
 class Lexer {
     private:
     std::vector<std::string> source;
