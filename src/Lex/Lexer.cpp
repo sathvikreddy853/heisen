@@ -10,7 +10,7 @@ void tokenize_identifier () {
         token.push_back (c);
         vars.advance ();
         c = vars.source[vars.curr];
-    } while (std::isalnum (vars.source[vars.curr]) or vars.source[vars.curr] == '_');
+    } while (std::isalnum (c) or c == '_');
     std::cout << std::endl;
     tokens.push_back(token);
 }

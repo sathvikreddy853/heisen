@@ -14,7 +14,7 @@ struct Vars {
     void advance () {
         curr += 1;
         if (curr > source.length ()) {
-            throw "Invalid Increment";
+            throw std::out_of_range("invalid increment");
         }
     }
 };

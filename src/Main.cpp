@@ -1,12 +1,5 @@
 #include "Lex/Lexer.hpp"
-#include "Lex/Token.hpp"
-#include "Macros.hpp"
 #include "Support/Support.hpp"
-
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <vector>
 
 using namespace Heisen;
 

@@ -7,6 +7,9 @@ TARGET := heisen
 
 SRCS := $(shell find $(SRC_DIR) -name '*.cpp')
 OBJS := $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
+DEPS := $(OBJS:.o=.d)
+
+.PHONY: all clean
 
 all: $(TARGET)
 
@@ -17,7 +20,7 @@ $(TARGET): $(OBJS)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	@printf "[COMPILE] Compiling $<\n"
-	@$(CXX) $(CXXFLAGS) -c -o $@ $<
+	@$(CXX) $(CXXFLAGS) -MMD -MP -MF $(@:.o=.d) -c -o $@ $<
 
 $(BUILD_DIR):
 	@printf "[MKDIR] Creating directory $(BUILD_DIR)\n"
@@ -27,4 +30,4 @@ clean:
 	@printf "[CLEAN] Removing all the build files\n"
 	@rm -rf $(BUILD_DIR) $(TARGET)
 
-.PHONY: all clean
+-include $(DEPS)
