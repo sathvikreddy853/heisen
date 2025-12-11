@@ -1,8 +1,8 @@
 #include "Macros.hpp"
 
-namespace Heisen {
+namespace heisen {
 
 void emit_error (const std::string& msg);
 std::string read_input_file (const std::string& filename);
 
-} // namespace Heisen
+} // namespace heisen

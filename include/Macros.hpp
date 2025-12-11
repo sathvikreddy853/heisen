@@ -1,12 +1,17 @@
 #ifndef HEISEN_MACROS_HPP
 #define HEISEN_MACROS_HPP
 
-#include <iostream>
-#include <string>
+#include <filesystem>
+#include <print>
+#include <source_location>
 
-namespace Heisen {
+namespace heisen {
 
-#define LOG(x) std::cout << BOLD << "LOG" << RESET << "(" << __FILE__ << ")(" << __LINE__ << "):" << x << std::endl;
+void LOG (auto msg, std::source_location loc = std::source_location::current ()) {
+    std::println ("[{}:{}] - {}",
+    std::filesystem::path (loc.file_name ()).filename ().string (),
+    loc.line (), msg);
+}
 
 const std::string RESET = "\033[0m";
 const std::string BOLD  = "\033[1m";
@@ -16,7 +21,6 @@ const std::string GREEN = "\033[32m";
 const std::string BLUE  = "\033[34m";
 const std::string CYAN  = "\033[36m";
 
+} // namespace heisen
 
-} // namespace Heisen
-
-#endif // HEISEN_MACROS_HPP 
+#endif // HEISEN_MACROS_HPP

@@ -1,45 +1,37 @@
 #include "Lex/Lexer.hpp"
 
-namespace Heisen {
+#include <iostream>
+
+namespace heisen {
 
 void tokenize_identifier () {
     std::string token;
     char c = vars.source[vars.curr];
     do {
-        std::cout << c << '-';
         token.push_back (c);
         vars.advance ();
         c = vars.source[vars.curr];
     } while (std::isalnum (c) or c == '_');
-    std::cout << std::endl;
-    tokens.push_back(token);
+    tokens.push_back (token);
 }
 
 void tokenize () {
-    while (vars.curr < vars.source.length ()) {
+    while (vars.curr < vars.length) {
         char c = vars.source[vars.curr];
         if (std::isspace (c)) {
             vars.advance ();
         } else if (std::isalnum (c)) {
-            // std::string token;
             tokenize_identifier ();
-            // while (std::isalnum (c)) {
-            //     std::cout << c << '-';
-            //     token.push_back (c);
-            //     vars.advance ();
-            //     c = vars.source[vars.curr];
-            // }
-            // std::cout << std::endl;
-            // tokens.push_back (token);
         } else if (c == '+') {
-            std::string token;
-            std::cout << c << '-' << std::endl;
-            token.push_back (c);
-            tokens.push_back (token);
-            vars.advance ();
+            vars.advance();
+            if (vars.curr < vars.length and vars.source[vars.curr] == '=') {
+                tokens.push_back("+=");
+                vars.advance ();
+            } else {
+                tokens.push_back("+");
+            }
         } else {
             std::string token;
-            std::cout << c << '-' << std::endl;
             token.push_back (c);
             tokens.push_back (token);
             vars.advance ();
@@ -47,4 +39,4 @@ void tokenize () {
     }
 }
 
-} // namespace Heisen
+} // namespace heisen

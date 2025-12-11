@@ -6,15 +6,17 @@
 
 #include <vector>
 
-namespace Heisen {
+namespace heisen {
 
 struct Vars {
     std::string source;
+    int length;
     int curr = 0;
+    
     void advance () {
         curr += 1;
         if (curr > source.length ()) {
-            throw std::out_of_range("invalid increment");
+            throw std::out_of_range ("invalid increment");
         }
     }
 };
@@ -36,6 +38,6 @@ class Lexer {
     void skip_whitespace ();
 };
 
-} // namespace Heisen
+} // namespace heisen
 
 #endif // HEISEN_LEXER_HPP

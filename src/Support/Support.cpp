@@ -1,12 +1,13 @@
 #include "Support/Support.hpp"
 
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
-namespace Heisen {
+namespace heisen {
 
 void emit_error (const std::string& msg) {
-    using namespace Heisen;
+    using namespace heisen;
     std::cerr << BOLD << RED << "error: " << RESET << BOLD << msg << RESET
               << std::endl;
 }
@@ -24,4 +25,4 @@ std::string read_input_file (const std::string& filename) {
     return source;
 }
 
-} // namespace Heisen
+} // namespace heisen
