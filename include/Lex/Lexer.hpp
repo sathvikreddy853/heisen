@@ -8,34 +8,19 @@
 
 namespace heisen {
 
-struct Vars {
+struct Lexer {
     std::string source;
-    int length;
-    int curr = 0;
-    
-    void advance () {
-        curr += 1;
-        if (curr > source.length ()) {
-            throw std::out_of_range ("invalid increment");
-        }
-    }
-};
+    std::vector<std::string> tokens;
 
-inline std::vector<std::string> tokens;
-inline Vars vars;
-void tokenize ();
+    u32 length;
+    u32 curr = 0;
 
-class Lexer {
-    private:
-    std::vector<std::string> source;
-    int current = 0;
-    int start   = 0;
-    Lexer (const std::vector<std::string>& source) : source (source) {
-    }
+    explicit Lexer (const std::string &source) : source(source), length(source.length()) {}
 
-    public:
-    std::vector<Token> tokenize ();
-    void skip_whitespace ();
+    std::vector<std::string> tokenize ();
+    void tokenize_impl ();
+    void tokenize_identifier ();
+    void advance ();
 };
 
 } // namespace heisen

@@ -4,37 +4,50 @@
 
 namespace heisen {
 
-void tokenize_identifier () {
+void Lexer::tokenize_identifier () {
     std::string token;
-    char c = vars.source[vars.curr];
+    char c = source[curr];
     do {
         token.push_back (c);
-        vars.advance ();
-        c = vars.source[vars.curr];
+        advance ();
+        c = source[curr];
     } while (std::isalnum (c) or c == '_');
-    tokens.push_back (token);
+    this->tokens.push_back (token);
 }
 
-void tokenize () {
-    while (vars.curr < vars.length) {
-        char c = vars.source[vars.curr];
+std::vector<std::string> Lexer::tokenize () {
+    this->tokenize_impl ();
+    LOG(tokens.size ());
+    return tokens;
+}
+
+void Lexer::advance () {
+    curr += 1;
+    if (curr > length) {
+        throw std::out_of_range ("invalid increment");
+    }
+}
+
+void Lexer::tokenize_impl () {
+    while (curr < length) {
+        char c = source[curr];
         if (std::isspace (c)) {
-            vars.advance ();
+            advance ();
         } else if (std::isalnum (c)) {
             tokenize_identifier ();
         } else if (c == '+') {
-            vars.advance();
-            if (vars.curr < vars.length and vars.source[vars.curr] == '=') {
-                tokens.push_back("+=");
-                vars.advance ();
+            advance ();
+            if (curr < length and source[curr] == '=') {
+                tokens.push_back ("+=");
+                advance ();
             } else {
-                tokens.push_back("+");
+                tokens.push_back ("+");
             }
         } else {
             std::string token;
             token.push_back (c);
             tokens.push_back (token);
-            vars.advance ();
+            advance ();
         }
     }
 }

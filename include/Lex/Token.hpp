@@ -8,17 +8,17 @@ namespace heisen {
 
 struct Loc {
     public:
-    int row, col;
+    u32 row, col;
     explicit Loc () : row (-1), col (-1) {}
-    explicit Loc (int row, int col) : row (row), col (col) {}
+    explicit Loc (u32 row, u32 col) : row (row), col (col) {}
 };
 
 struct Token {
     std::string str;
     Loc loc;
 
-    Token (std::string str, int row, int col)
-    : str (str), loc (Loc (row, col)) {}
+    Token (std::string str, u32 row, u32 col)
+    : str (str), loc (row, col) {}
 
     friend std::ostream& operator<< (std::ostream& out, const Token& token) {
         out << "\"" << token.str << "\"\t\t(" << token.loc.row << ", "

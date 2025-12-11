@@ -3,19 +3,6 @@
 
 using namespace heisen;
 
-bool isprint (const std::string &str) {
-    if (str.empty())
-        return false;
-    
-    for (auto c: str) {
-        if (not std::isprint(c)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 int main (int argc, const char* argv[]) {
     if (argc != 2) {
         emit_error ("no input file specified");
@@ -26,13 +13,11 @@ int main (int argc, const char* argv[]) {
     auto source = read_input_file (argv[1]);
     std::cout << source << std::endl;
 
-    vars.source = source;
-    vars.length = source.length();
-    tokenize ();
-    std::cout << tokens.size () << std::endl;
+    Lexer lexer (source);
+    auto tokens = lexer.tokenize ();
 
     for (auto& token : tokens) {
-        std::cout << token << std::endl;
+        LOG (token);
     }
 
     return 0;
