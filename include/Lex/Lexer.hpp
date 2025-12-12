@@ -15,12 +15,16 @@ struct Lexer {
     u32 length;
     u32 curr = 0;
 
-    explicit Lexer (const std::string &source) : source(source), length(source.length()) {}
+    explicit Lexer(const std::string& source)
+    : source(source), length(source.length()) {}
 
-    std::vector<std::string> tokenize ();
-    void tokenize_impl ();
-    void tokenize_identifier ();
-    void advance ();
+    std::vector<std::string> tokenize();
+    void tokenize_impl();
+    void tokenize_identifier();
+    void advance();
+    bool is_valid();
+    char peek();
+    void skip_whitespace();
 };
 
 } // namespace heisen
