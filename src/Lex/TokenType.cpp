@@ -2,7 +2,7 @@
 
 namespace heisen {
 
-const char* TokenType::to_str() {
+const char* TokenType::to_str() const {
     // FIX-REQUIRED
     return "FIX-REQUIRED";
 }
