@@ -9,11 +9,14 @@
 namespace heisen {
 
 struct Lexer {
-    std::string source;
-    std::vector<std::string> tokens;
+    const std::string_view source;
+    const u32 length;
 
-    u32 length;
+    std::vector<std::string> tokens;
     u32 curr = 0;
+
+    explicit Lexer(const std::string_view& source)
+    : source(source), length(source.length()) {}
 
     explicit Lexer(const std::string& source)
     : source(source), length(source.length()) {}
@@ -21,10 +24,12 @@ struct Lexer {
     std::vector<std::string> tokenize();
     void tokenize_impl();
     void tokenize_identifier();
-    void advance();
-    bool is_valid();
-    char peek();
+
     void skip_whitespace();
+    void advance();
+
+    bool is_valid() const;
+    char peek() const;
 };
 
 } // namespace heisen
