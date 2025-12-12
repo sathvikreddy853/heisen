@@ -106,7 +106,7 @@ struct Token {
     : str(str), type(type), loc(row, col) {}
 
     friend std::ostream& operator<<(std::ostream& out, const Token& token) {
-        out << "\"" << token.str << "\"\t\t(" << token.loc.row << ", "
+        out << "Token(" << token.str << ", " << token.loc.row << ", "
             << token.loc.col << ")";
         return out;
     }
