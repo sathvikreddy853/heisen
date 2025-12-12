@@ -22,8 +22,8 @@ struct Lexer {
     : source(source), length(source.length()) {}
 
     std::vector<std::string> tokenize();
-    void tokenize_impl();
     void tokenize_identifier();
+    void scan_token();
 
     void skip_whitespace();
     void advance();
