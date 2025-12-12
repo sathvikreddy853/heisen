@@ -12,8 +12,10 @@ struct Lexer {
     const std::string_view source;
     const u32 length;
 
-    std::vector<std::string> tokens;
+    std::vector<Token> tokens;
     u32 curr = 0;
+    u32 col = 1;
+    u32 row = 1;
 
     explicit Lexer(const std::string_view& source)
     : source(source), length(source.length()) {}
@@ -21,7 +23,7 @@ struct Lexer {
     explicit Lexer(const std::string& source)
     : source(source), length(source.length()) {}
 
-    std::vector<std::string> tokenize();
+    std::vector<Token> tokenize();
     void tokenize_identifier();
     void scan_token();
 

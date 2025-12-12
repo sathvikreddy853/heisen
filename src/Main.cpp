@@ -17,7 +17,7 @@ int main (int argc, const char* argv[]) {
     auto tokens = lexer.tokenize ();
 
     for (auto& token : tokens) {
-        LOG (token);
+        std::cout << token << std::endl;
     }
 
     return 0;

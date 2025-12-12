@@ -67,6 +67,12 @@ enum class TokenType {
     PercentAssign,  // %=
     ExpAssign,      // **=
 
+    // Identifiers and Literals
+    Identifier,
+    IntegerLiteral,
+    FloatLiteral,
+    StringLiteral,
+
     // Punctuation
     LParen,         // (
     RParen,         // )
@@ -81,6 +87,7 @@ enum class TokenType {
 
     // Special
     EndOfFile,
+    Unknown
 };
 
 struct Loc {
