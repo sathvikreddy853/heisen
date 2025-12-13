@@ -3,13 +3,13 @@
 
 #include "Macros.hpp"
 
-#include <iostream>
 #include <format>
+#include <iostream>
 
 namespace heisen {
 
 struct TokenType {
-    enum Value {
+    enum Value : i32 {
         // Keywords
         Int,
         Float,
@@ -72,7 +72,7 @@ struct TokenType {
 
         // Identifiers and Literals
         Identifier,
-        IntegerLiteral,
+        IntLiteral,
         FloatLiteral,
         StringLiteral,
 
@@ -97,14 +97,18 @@ struct TokenType {
 
     TokenType(Value v) : value(v) {}
 
-    const char* to_str() const;
+    bool operator==(TokenType other) const;
+    bool operator!=(TokenType other) const;
+    bool operator==(Value other) const;
+    bool operator!=(Value other) const;
+
+    std::string to_str() const;
     friend std::ostream& operator<<(std::ostream& os, TokenType type);
 };
 
 } // namespace heisen
 
-template <>
-struct std::formatter<heisen::TokenType> {
+template <> struct std::formatter<heisen::TokenType> {
     constexpr auto parse(std::format_parse_context& ctx) {
         return ctx.begin();
     }

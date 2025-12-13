@@ -23,22 +23,13 @@ struct Token {
     Token(std::string str, TokenType type, u32 row, u32 col)
     : str(str), type(type), loc(row, col) {}
 
-    const char* to_str() const {
-        // FIX-REQUIRED
-        return "FIX-REQUIRED";
-    }
-
-    friend std::ostream& operator<<(std::ostream& out, const Token& token) {
-        out << "Token(" << token.type << ", " << token.str << ", " << token.loc.row << ", "
-            << token.loc.col << ")";
-        return out;
-    }
+    std::string to_str() const;
+    friend std::ostream& operator<<(std::ostream& out, const Token& token);
 };
 
 } // namespace heisen
 
-template <>
-struct std::formatter<heisen::Token> {
+template <> struct std::formatter<heisen::Token> {
     constexpr auto parse(std::format_parse_context& ctx) {
         return ctx.begin();
     }
