@@ -4,12 +4,12 @@ namespace heisen {
 
 std::string TokenType::to_str() const {
     switch (value) {
-    case Int: return RED + "Int" + RESET; break;
-    case Float: return RED + "Float" + RESET; break;
-    case Bool: return RED + "Bool" + RESET; break;
-    case String: return RED + "String" + RESET; break;
-    case Bit: return RED + "Bit" + RESET; break;
-    case Qubit: return RED + "Qubit" + RESET; break;
+    case Int: return "Int"; break;
+    case Float: return "Float"; break;
+    case Bool: return "Bool"; break;
+    case String: return "String"; break;
+    case Bit: return "Bit"; break;
+    case Qubit: return "Qubit"; break;
     case Cast: return "Cast"; break;
     case Generic: return "Generic"; break;
     case And: return "And"; break;
@@ -73,7 +73,7 @@ std::string TokenType::to_str() const {
     case Semicolon: return "Semicolon"; break;
     case Dot: return "Dot"; break;
     case EndOfFile: return "EndOfFile"; break;
-    case Unknown: return RED + BOLD + "Unknown" + RESET; break;
+    case Unknown: return "Unknown"; break;
     default: return "InvalidToken"; break;
     }
 }

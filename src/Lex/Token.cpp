@@ -5,27 +5,37 @@
 namespace heisen {
 
 std::string Token::to_str() const {
-    std::stringstream ss;
-    std::stringstream type_ss;
+    std::stringstream token_stream;
+    std::stringstream token_type_stream;
 
     switch (type.value) {
     case TokenType::Identifier:
-        type_ss << GREEN << BOLD << type << RESET;
-        type_ss << "(" << GREEN << str << RESET << ")";
+        token_type_stream << LIGHT_BLUE << type << RESET;
+        token_type_stream << "(" << LIGHT_BLUE << str << RESET << ")";
         break;
     case TokenType::IntLiteral:
     case TokenType::FloatLiteral:
     case TokenType::StringLiteral:
-        type_ss << YELLOW << BOLD << type << RESET;
-        type_ss << "(" << YELLOW << str << RESET << ")";
+        token_type_stream << YELLOW << BOLD << type << RESET;
+        token_type_stream << "(" << YELLOW << str << RESET << ")";
         break;
 
-    default: type_ss << type; break;
+    case TokenType::Int:
+    case TokenType::Float:
+    case TokenType::Bool:
+    case TokenType::String:
+    case TokenType::Bit:
+    case TokenType::Qubit:
+        token_type_stream << RED << BOLD << type << RESET;
+        break;
+
+    default: token_type_stream << type; break;
     }
 
-    ss << "Token[ " << type_ss.str() << " Loc(" << loc.row << ":" << loc.col << ") ]";
+    token_stream << "Token[ " << token_type_stream.str() << " Loc(" << loc.row
+                 << ":" << loc.col << ") ]";
 
-    std::string str = ss.str();
+    std::string str = token_stream.str();
     return str;
 }
 
