@@ -5,42 +5,10 @@
 
 namespace heisen {
 
-const std::map<std::string, TokenType> keywords = {
-    { "int", TokenType::Int },
-    { "float", TokenType::Float },
-    { "bool", TokenType::Bool },
-    { "string", TokenType::String },
-    { "bit", TokenType::Bit },
-    { "qubit", TokenType::Qubit },
-    { "cast", TokenType::Cast },
-    { "and", TokenType::And },
-    { "or", TokenType::Or },
-    { "not", TokenType::Not },
-    { "try", TokenType::Try },
-    { "throw", TokenType::Throw },
-    { "catch", TokenType::Catch },
-    { "let", TokenType::Let },
-    { "const", TokenType::Const },
-    { "break", TokenType::Break },
-    { "continue", TokenType::Continue },
-    { "generic", TokenType::Generic },
-    { "struct", TokenType::Struct },
-    { "scope", TokenType::Scope },
-    { "if", TokenType::If },
-    { "elif", TokenType::Elif },
-    { "else", TokenType::Else },
-    { "match", TokenType::Match },
-    { "with", TokenType::With },
-    { "true", TokenType::True },
-    { "false", TokenType::False },
-    { "for", TokenType::For },
-    { "while", TokenType::While },
-    { "func", TokenType::Func },
-    { "return", TokenType::Return },
-    { "gate", TokenType::Gate },
-    { "circuit", TokenType::Circuit },
-    { "measure", TokenType::Measure },
-    { "reset", TokenType::Reset },
+const std::map<std::string_view, TokenType> keywords = {
+    #define KEYWORD(X, Y) {Y, TokenType::X},
+    #include "Lex/TokenType.def"
+    #undef KEYWORD
 };
 
 std::vector<Token> Lexer::tokenize() {
@@ -129,6 +97,12 @@ void Lexer::tokenize_identifier() {
     }
 
     std::string_view token = source.substr(start, curr - start);
+
+    if (keywords.find(token) != keywords.end()) {
+        tokens.emplace_back(keywords.at(token), row, col - (curr - start));
+        return;
+    }
+
     tokens.emplace_back(token, TokenType::Identifier, row, col - (curr - start));
 }
 

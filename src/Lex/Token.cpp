@@ -59,7 +59,7 @@ std::string Token::to_str() const {
     case TokenType::Circuit:
     case TokenType::Measure:
     case TokenType::Reset:
-        token_type_stream << LIGHT_GREEN << BOLD << type << RESET;
+        token_type_stream << DIM_BLUE << BOLD << type << RESET;
         break;
 
     case TokenType::Plus:

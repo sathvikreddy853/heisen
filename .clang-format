@@ -4,7 +4,7 @@ UseTab: Never
 Language: Cpp
 Standard: Cpp11
 
-ColumnLimit: 80
+ColumnLimit: 90
 
 BreakBeforeBraces: Attach
 AllowShortBlocksOnASingleLine: false
