@@ -2,8 +2,8 @@ func add (A: int[][], B: int[][]) : int[][] {
     let m, n = A.shape;
     let p, q = B.shape;
 
-    if (m != p || n != q) {
-        panic("Matrices must have the same dimensions");
+    if (m != p or n != q) {
+        let s: string = "test";
     }
 
     let C: int[m][n];

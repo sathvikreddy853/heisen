@@ -61,11 +61,11 @@ std::string TokenType::to_str() const {
     case SingleArrow: return "SingleArrow"; break;
     case DoubleArrow: return "DoubleArrow"; break;
     case Identifier: return "Identifier"; break;
-    case IntLiteral: return YELLOW + "IntLiteral" + RESET; break;
-    case FloatLiteral: return YELLOW + "FloatLiteral" + RESET; break;
-    case StringLiteral: return YELLOW + "StringLiteral" + RESET; break;
-    case LParen: return "LParen"; break;
+    case IntLiteral: return "IntLiteral"; break;
+    case FloatLiteral: return "FloatLiteral"; break;
+    case StringLiteral: return "StringLiteral"; break;
     case RParen: return "RParen"; break;
+    case LParen: return "LParen"; break;
     case LCurly: return "LCurly"; break;
     case RCurly: return "RCurly"; break;
     case LBracket: return "LBracket"; break;
