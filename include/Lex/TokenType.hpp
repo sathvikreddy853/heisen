@@ -70,6 +70,9 @@ struct TokenType {
         PercentAssign, // %=
         ExpAssign,     // **=
 
+        SingleArrow,   // ->
+        DoubleArrow,   // =?
+
         // Identifiers and Literals
         Identifier,
         IntLiteral,
@@ -79,8 +82,8 @@ struct TokenType {
         // Punctuation
         LParen,    // (
         RParen,    // )
-        LBrace,    // {
-        RBrace,    // }
+        LCurly,    // {
+        RCurly,    // }
         LBracket,  // [
         RBracket,  // ]
         Comma,     // ,

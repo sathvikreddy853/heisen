@@ -5,6 +5,7 @@
 #include "Macros.hpp"
 
 #include <iostream>
+#include <optional>
 
 namespace heisen {
 
@@ -16,12 +17,39 @@ struct Loc {
 };
 
 struct Token {
-    std::string str;
+    std::optional<std::string_view> str;
     TokenType type;
     Loc loc;
 
-    Token(std::string str, TokenType type, u32 row, u32 col)
-    : str(str), type(type), loc(row, col) {}
+    explicit Token(TokenType type, u32 row, u32 col)
+    : str(std::nullopt), type(type), loc(row, col) {
+        switch (type.value) {
+        case TokenType::Identifier:
+        case TokenType::IntLiteral:
+        case TokenType::StringLiteral:
+        case TokenType::FloatLiteral:
+            throw std::runtime_error(std::format(
+            "invalid constructor called for token of type {}", type));
+            break;
+
+        default: break;
+        }
+    }
+
+    explicit Token(std::string_view str, TokenType type, u32 row, u32 col)
+    : str(str), type(type), loc(row, col) {
+        switch (type.value) {
+        case TokenType::Identifier:
+        case TokenType::IntLiteral:
+        case TokenType::StringLiteral:
+        case TokenType::FloatLiteral: break;
+
+        default:
+            throw std::runtime_error(std::format(
+            "invalid constructor called for token of type {}", type));
+            break;
+        }
+    }
 
     std::string to_str() const;
     friend std::ostream& operator<<(std::ostream& out, const Token& token);

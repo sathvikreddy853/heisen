@@ -53,43 +53,99 @@ void Lexer::scan_token() {
     skip_whitespace();
     if (not is_valid()) return;
 
-    char c = source[curr];
+    start  = curr;
+    char c = advance();
+
     if (std::isalnum(c)) {
         tokenize_identifier();
-    } else if (c == '+') {
-        advance();
-        if (curr < length and source[curr] == '=') {
-            tokens.emplace_back("+=", TokenType::PlusAssign, row, col - 1);
-            advance();
-        } else {
-            tokens.emplace_back("+", TokenType::Plus, row, col - 1);
-        }
-    } else {
-        std::string token;
-        token.push_back(c);
-        tokens.emplace_back(token, TokenType::Unknown, row, col);
-        advance();
+        return;
     }
+
+    switch (c) {
+    case '+':
+        tokens.emplace_back(
+        match('=') ? TokenType::PlusAssign : TokenType::Plus, row, col - 1);
+        break;
+    case '-':
+        tokens.emplace_back(
+        match('=') ? TokenType::MinusAssign : TokenType::Minus, row, col - 1);
+        break;
+    case '*':
+        if (match('*')) {
+            tokens.emplace_back(
+            match('=') ? TokenType::ExpAssign : TokenType::Exp, row, col - 1);
+        } else {
+            tokens.emplace_back(
+            match('=') ? TokenType::StarAssign : TokenType::Star, row, col - 1);
+        }
+        break;
+    case '/':
+        tokens.emplace_back(
+        match('=') ? TokenType::SlashAssign : TokenType::Slash, row, col - 1);
+        break;
+    case '%':
+        tokens.emplace_back(
+        match('=') ? TokenType::PercentAssign : TokenType::Percent, row, col - 1);
+        break;
+    case '=':
+        if (match('=')) {
+            tokens.emplace_back(TokenType::Equal, row, col - 1);
+        } else if (match('>')) {
+            tokens.emplace_back(TokenType::DoubleArrow, row, col - 1);
+        } else {
+            tokens.emplace_back(TokenType::Assign, row, col - 1);
+        }
+        break;
+    case '!':
+        tokens.emplace_back(
+        match('=') ? TokenType::NotEqual : TokenType::Unknown, row, col - 1);
+        break;
+    case '<':
+        tokens.emplace_back(
+        match('=') ? TokenType::LessEqual : TokenType::Less, row, col - 1);
+        break;
+    case '>':
+        tokens.emplace_back(
+        match('=') ? TokenType::GreaterEqual : TokenType::Greater, row, col - 1);
+        break;
+    case '(': tokens.emplace_back(TokenType::LParen, row, col - 1); break;
+    case ')': tokens.emplace_back(TokenType::RParen, row, col - 1); break;
+    case '{': tokens.emplace_back(TokenType::LCurly, row, col - 1); break;
+    case '}': tokens.emplace_back(TokenType::LCurly, row, col - 1); break;
+    case '[': tokens.emplace_back(TokenType::LBracket, row, col - 1); break;
+    case ']': tokens.emplace_back(TokenType::RBracket, row, col - 1); break;
+    case ',': tokens.emplace_back(TokenType::Comma, row, col - 1); break;
+    case ':': tokens.emplace_back(TokenType::Colon, row, col - 1); break;
+    case ';': tokens.emplace_back(TokenType::Semicolon, row, col - 1); break;
+    case '.': tokens.emplace_back(TokenType::Dot, row, col - 1); break;
+
+    default: tokens.emplace_back(TokenType::Unknown, row, col - 1); break;
+    }
+}
+
+bool Lexer::match(char expected) {
+    if (not is_valid()) return false;
+    if (source[curr] != expected) return false;
+    advance();
+    return true;
 }
 
 void Lexer::tokenize_identifier() {
-    std::string token;
-    char c    = source[curr];
-    int start = col;
-    do {
-        token.push_back(c);
-        advance();
-        c = source[curr];
-    } while (std::isalnum(c) or c == '_');
-    tokens.emplace_back(token, TokenType::Identifier, row, start);
+    while (std::isalnum(peek()) or peek() == '_') {
+        (void)advance();
+    }
+
+    std::string_view token = source.substr(start, curr - start);
+    tokens.emplace_back(token, TokenType::Identifier, row, col - (curr - start));
 }
 
-void Lexer::advance() {
-    curr += 1;
-    col += 1;
-    if (curr > length) {
-        throw std::out_of_range("invalid increment");
+char Lexer::advance() {
+    if (not is_valid()) {
+        throw std::runtime_error("invalid increment");
     }
+
+    col++;
+    return source[curr++];
 }
 
 bool Lexer::is_valid() const {
@@ -109,7 +165,7 @@ void Lexer::skip_whitespace() {
             row += 1;
             col = 1;
         } else if (is_valid() and std::isspace(peek())) {
-            advance();
+            (void)advance();
         } else {
             break;
         }

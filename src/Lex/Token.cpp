@@ -11,13 +11,13 @@ std::string Token::to_str() const {
     switch (type.value) {
     case TokenType::Identifier:
         token_type_stream << LIGHT_BLUE << type << RESET;
-        token_type_stream << "(" << LIGHT_BLUE << str << RESET << ")";
+        token_type_stream << "(" << LIGHT_BLUE << str.value() << RESET << ")";
         break;
     case TokenType::IntLiteral:
     case TokenType::FloatLiteral:
     case TokenType::StringLiteral:
         token_type_stream << YELLOW << BOLD << type << RESET;
-        token_type_stream << "(" << YELLOW << str << RESET << ")";
+        token_type_stream << "(" << YELLOW << str.value() << RESET << ")";
         break;
 
     case TokenType::Int:
@@ -26,6 +26,10 @@ std::string Token::to_str() const {
     case TokenType::String:
     case TokenType::Bit:
     case TokenType::Qubit:
+        token_type_stream << RED << BOLD << type << RESET;
+        break;
+
+    case TokenType::Unknown:
         token_type_stream << RED << BOLD << type << RESET;
         break;
 

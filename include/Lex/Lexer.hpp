@@ -16,6 +16,7 @@ struct Lexer {
     u32 curr = 0;
     u32 col = 1;
     u32 row = 1;
+    u32 start = 0;
 
     explicit Lexer(const std::string_view& source)
     : source(source), length(source.length()) {}
@@ -28,8 +29,9 @@ struct Lexer {
     void scan_token();
 
     void skip_whitespace();
-    void advance();
-
+    
+    char advance();
+    bool match(char);
     bool is_valid() const;
     char peek() const;
 };
