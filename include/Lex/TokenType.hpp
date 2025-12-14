@@ -10,90 +10,11 @@ namespace heisen {
 
 struct TokenType {
     enum Value : i32 {
-        // Keywords
-        Int,
-        Float,
-        Bool,
-        String,
-        Bit,
-        Qubit,
-        Cast,
-        Generic,
-        And,
-        Or,
-        Not,
-        Try,
-        Throw,
-        Catch,
-        Let,
-        Const,
-        Break,
-        Continue,
-        Return,
-        Func,
-        Struct,
-        Scope,
-        If,
-        Elif,
-        Else,
-        Match,
-        With,
-        True,
-        False,
-        For,
-        While,
-        Gate,
-        Circuit,
-        Measure,
-        Reset,
 
-        // Operators
-        Plus,    // +
-        Minus,   // -
-        Star,    // *
-        Slash,   // /
-        Percent, // %
-        Exp,     // **
-        Assign,  // =
+#define TOK(X) X,
+#include "Lex/TokenType.def"
+#undef TOK
 
-        Equal,        // ==
-        NotEqual,     // !=
-        Less,         // <
-        LessEqual,    // <=
-        Greater,      // >
-        GreaterEqual, // >=
-
-        PlusAssign,    // +=
-        MinusAssign,   // -=
-        StarAssign,    // *=
-        SlashAssign,   // /=
-        PercentAssign, // %=
-        ExpAssign,     // **=
-
-        SingleArrow,   // ->
-        DoubleArrow,   // =?
-
-        // Identifiers and Literals
-        Identifier,
-        IntLiteral,
-        FloatLiteral,
-        StringLiteral,
-
-        // Punctuation
-        LParen,    // (
-        RParen,    // )
-        LCurly,    // {
-        RCurly,    // }
-        LBracket,  // [
-        RBracket,  // ]
-        Comma,     // ,
-        Colon,     // :
-        Semicolon, // ;
-        Dot,       // .
-
-        // Special
-        EndOfFile,
-        Unknown
     };
 
     Value value;

@@ -7,38 +7,118 @@
 #define KEYWORD(X, Y) TOK(X)
 #endif
 
-KEYWORD(Int,        "int")
-KEYWORD(Float,      "float")
-KEYWORD(Bool,       "bool")
-KEYWORD(String,     "string")
-KEYWORD(Bit,        "bit")
-KEYWORD(Qubit,      "qubit")
-KEYWORD(Cast,       "cast")
-KEYWORD(And,        "and")
-KEYWORD(Or,         "or")
-KEYWORD(Not,        "not")
-KEYWORD(Try,        "try")
-KEYWORD(Throw,      "throw")
-KEYWORD(Catch,      "catch")
-KEYWORD(Let,        "let")
-KEYWORD(Const,      "const")
-KEYWORD(Break,      "break")
-KEYWORD(Continue,   "continue")
-KEYWORD(Generic,    "generic")
-KEYWORD(Struct,     "struct")
-KEYWORD(Scope,      "scope")
-KEYWORD(If,         "if")
-KEYWORD(Elif,       "elif")
-KEYWORD(Else,       "else")
-KEYWORD(Match,      "match")
-KEYWORD(With,       "with")
-KEYWORD(True,       "true")
-KEYWORD(False,      "false")
-KEYWORD(For,        "for")
-KEYWORD(While,      "while")
-KEYWORD(Func,       "func")
-KEYWORD(Return,     "return")
-KEYWORD(Gate,       "gate")
-KEYWORD(Circuit,    "circuit")
-KEYWORD(Measure,    "measure")
-KEYWORD(Reset,      "reset")
+#ifndef TYPENAME
+#define TYPENAME(X, Y) TOK(X)
+#endif
+
+#ifndef OPERATOR
+#define OPERATOR(X, Y) TOK(X)
+#endif
+
+#ifndef IDENTIFIER
+#define IDENTIFIER(X, Y) TOK(X)
+#endif
+
+#ifndef LITERAL
+#define LITERAL(X, Y) TOK(X)
+#endif
+
+#ifndef PUNCTUATOR
+#define PUNCTUATOR(X, Y) TOK(X)
+#endif
+
+#ifndef END_OF_FILE
+#define END_OF_FILE(X, Y) TOK(X)
+#endif
+
+#ifndef UNKNOWN_TOK
+#define UNKNOWN_TOK(X, Y) TOK(X)
+#endif
+
+TYPENAME(Int, "int")
+TYPENAME(Float, "float")
+TYPENAME(Bool, "bool")
+TYPENAME(String, "string")
+TYPENAME(Bit, "bit")
+TYPENAME(Qubit, "qubit")
+
+KEYWORD(Cast, "cast")
+KEYWORD(And, "and")
+KEYWORD(Or, "or")
+KEYWORD(Not, "not")
+KEYWORD(Try, "try")
+KEYWORD(Throw, "throw")
+KEYWORD(Catch, "catch")
+KEYWORD(Let, "let")
+KEYWORD(Const, "const")
+KEYWORD(Break, "break")
+KEYWORD(Continue, "continue")
+KEYWORD(Generic, "generic")
+KEYWORD(Struct, "struct")
+KEYWORD(Scope, "scope")
+KEYWORD(If, "if")
+KEYWORD(Elif, "elif")
+KEYWORD(Else, "else")
+KEYWORD(Match, "match")
+KEYWORD(With, "with")
+KEYWORD(True, "true")
+KEYWORD(False, "false")
+KEYWORD(For, "for")
+KEYWORD(While, "while")
+KEYWORD(Func, "func")
+KEYWORD(Return, "return")
+KEYWORD(Gate, "gate")
+KEYWORD(Circuit, "circuit")
+KEYWORD(Measure, "measure")
+KEYWORD(Reset, "reset")
+
+OPERATOR(Plus, "Plus")
+OPERATOR(Minus, "Minus")
+OPERATOR(Star, "Star")
+OPERATOR(Slash, "Slash")
+OPERATOR(Percent, "Percent")
+OPERATOR(Exp, "Exp")
+OPERATOR(Assign, "Assign")
+OPERATOR(Equal, "Equal")
+OPERATOR(NotEqual, "NotEqual")
+OPERATOR(Less, "Less")
+OPERATOR(LessEqual, "LessEqual")
+OPERATOR(Greater, "Greater")
+OPERATOR(GreaterEqual, "GreaterEqual")
+OPERATOR(PlusAssign, "PlusAssign")
+OPERATOR(MinusAssign, "MinusAssign")
+OPERATOR(StarAssign, "StarAssign")
+OPERATOR(SlashAssign, "SlashAssign")
+OPERATOR(PercentAssign, "PercentAssign")
+OPERATOR(ExpAssign, "ExpAssign")
+OPERATOR(SingleArrow, "SingleArrow")
+OPERATOR(DoubleArrow, "DoubleArrow")
+
+IDENTIFIER(Identifier, "Identifier")
+LITERAL(IntLiteral, "IntLiteral")
+LITERAL(FloatLiteral, "FloatLiteral")
+LITERAL(StringLiteral, "StringLiteral")
+
+PUNCTUATOR(RParen, "RParen")
+PUNCTUATOR(LParen, "LParen")
+PUNCTUATOR(LCurly, "LCurly")
+PUNCTUATOR(RCurly, "RCurly")
+PUNCTUATOR(LBracket, "LBracket")
+PUNCTUATOR(RBracket, "RBracket")
+PUNCTUATOR(Comma, "Comma")
+PUNCTUATOR(Colon, "Colon")
+PUNCTUATOR(Semicolon, "Semicolon")
+PUNCTUATOR(Dot, "Dot")
+
+END_OF_FILE(EndOfFile, "EndofFile")
+UNKNOWN_TOK(Unknown, "Unknown")
+
+#undef TOK
+#undef KEYWORD
+#undef TYPENAME
+#undef OPERATOR
+#undef IDENTIFIER
+#undef LITERAL
+#undef PUNCTUATOR
+#undef END_OF_FILE
+#undef UNKNOWN_TOK

@@ -6,13 +6,18 @@
 namespace heisen {
 
 const std::map<std::string_view, TokenType> keywords = {
-    #define KEYWORD(X, Y) {Y, TokenType::X},
-    #include "Lex/TokenType.def"
-    #undef KEYWORD
+
+#define KEYWORD(X, Y) { Y, TokenType::X },
+#include "Lex/TokenType.def"
+#undef KEYWORD
+
 };
 
 std::vector<Token> Lexer::tokenize() {
-    while (is_valid()) scan_token();
+    while (is_valid()) {
+        scan_token();
+    }
+    tokens.emplace_back(TokenType::EndOfFile, row, col);
     LOG(tokens.size());
     return tokens;
 }
@@ -75,6 +80,7 @@ void Lexer::scan_token() {
     case '>':
         tokens.emplace_back(match('=') ? TokenType::GreaterEqual : TokenType::Greater, row, col - 1);
         break;
+
     case '(': tokens.emplace_back(TokenType::LParen, row, col - 1); break;
     case ')': tokens.emplace_back(TokenType::RParen, row, col - 1); break;
     case '{': tokens.emplace_back(TokenType::LCurly, row, col - 1); break;
@@ -126,8 +132,9 @@ void Lexer::tokenize_numeric(bool is_float) {
 }
 
 void Lexer::tokenize_str_literal() {
+    /// FIX: Handle multi-line comments here
+
     while (peek() != '\"') {
-        std::cout << peek() ;
         (void)advance();
     }
     (void)advance();
@@ -172,11 +179,13 @@ void Lexer::skip_whitespace() {
     while (true) {
         char c = peek();
         if (is_valid() and c == '\n') {
-            curr += 1;
+            (void)advance();
             row += 1;
             col = 1;
         } else if (is_valid() and std::isspace(peek())) {
             (void)advance();
+        } else if (is_valid() and c == '#') {
+            /// FIX: Handle single-line comments here
         } else {
             break;
         }
