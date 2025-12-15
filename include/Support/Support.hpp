@@ -1,3 +1,6 @@
+#ifndef HEISEN_SUPPORT_HPP
+#define HEISEN_SUPPORT_HPP
+
 #include "Macros.hpp"
 
 namespace heisen {
@@ -18,3 +21,5 @@ inline bool isprint(const std::string& str) {
 }
 
 } // namespace heisen
+
+#endif // HEISEN_SUPPORT_HPP
