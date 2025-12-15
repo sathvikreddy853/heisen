@@ -1,6 +1,6 @@
 func add (A: int[][], B: int[][]) : int[][] {
-    let m, n = A.shape;
-    let p, q = B.shape;
+    let m, n = A.size;
+    let p, q = B.size;
 
     if (m != p or n != q) {
         let s: string = "test";
@@ -16,7 +16,11 @@ func add (A: int[][], B: int[][]) : int[][] {
     return C;
 }
 
-let A: int[2][2] = [[1, 2], [3, 4]];
-let B: int[2][2] = [[5, 6], [7, 8]];
+let A: int[2][2] = [[1, 2], 
+                    [3, 4]];
+
+let B: int[2][2] = [[5, 6], 
+                    [7, 8]];
+
 let C: int[2][2] = add(A, B);
-print(C);   
+print(C);

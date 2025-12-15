@@ -28,8 +28,8 @@ struct Token {
         case TokenType::IntLiteral:
         case TokenType::StringLiteral:
         case TokenType::FloatLiteral:
-            throw std::runtime_error(std::format(
-            "invalid constructor called for token of type {}", type));
+            throw std::runtime_error(
+            std::format("invalid constructor called for token of type {}", type));
             break;
 
         default: break;
@@ -45,8 +45,8 @@ struct Token {
         case TokenType::FloatLiteral: break;
 
         default:
-            throw std::runtime_error(std::format(
-            "invalid constructor called for token of type {}", type));
+            throw std::runtime_error(
+            std::format("invalid constructor called for token of type {}", type));
             break;
         }
     }

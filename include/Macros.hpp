@@ -50,12 +50,11 @@ const std::string DIM_YELLOW  = "\033[38;2;255;202;40m";
 // Diagnostics
 
 inline void LOG(auto msg, std::source_location loc = std::source_location::current()) {
-    std::println("[{}:{}] {}",
-    std::filesystem::path(loc.file_name()).filename().string(), loc.line(), msg);
+    std::println("[{}:{}] {}", std::filesystem::path(loc.file_name()).filename().string(),
+    loc.line(), msg);
 }
 
-inline void panic(std::string_view msg,
-std::source_location loc = std::source_location::current()) {
+inline void panic(std::string_view msg, std::source_location loc = std::source_location::current()) {
     std::println("{}Panic at {}:{} → {}{}", RED, loc.file_name(), loc.line(), msg, RESET);
     std::abort();
 }

@@ -53,11 +53,9 @@ SpaceBeforeAssignmentOperators: true
 
 SpaceBeforeParensOptions:
   AfterControlStatements: true
-  AfterFunctions: false
   AfterFunctionDefinitionName: false
   AfterFunctionDeclarationName: false
   AfterIfMacros: false
-  AfterOverloadedOperators: false
   BeforeNonEmptyParentheses: false
 
 SpaceInEmptyParentheses: false

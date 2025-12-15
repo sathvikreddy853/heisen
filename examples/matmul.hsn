@@ -1,6 +1,6 @@
 func matmul (A: int[][], B: int[][]) : int[][] {
-    let m, n = A.shape;
-    let p, q = B.shape;
+    let m, n = A.size;
+    let p, q = B.size;
 
     if (n != p) {
         panic("Matrices must have appropriate dimensions");

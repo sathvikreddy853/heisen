@@ -54,8 +54,7 @@ std::string Token::to_str() const {
     default: token_type_stream << type; break;
     }
 
-    token_stream << "Token(" << token_type_stream.str() << ", " << loc.row << ":"
-                 << loc.col << ")";
+    token_stream << "Token(" << token_type_stream.str() << ", " << loc.row << ":" << loc.col << ")";
 
     std::string str = token_stream.str();
     return str;
