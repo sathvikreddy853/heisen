@@ -7,6 +7,10 @@ namespace heisen {
 
 const std::map<std::string_view, TokenType> keywords = {
 
+#define TYPENAME(X, Y) { Y, TokenType::X },
+#include "Lex/TokenType.def"
+#undef TYPENAME
+
 #define KEYWORD(X, Y) { Y, TokenType::X },
 #include "Lex/TokenType.def"
 #undef KEYWORD
