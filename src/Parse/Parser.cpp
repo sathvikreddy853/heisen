@@ -19,7 +19,8 @@ bool Parser::parse_statement() {
         if (not match(TokenType::Colon)) throw std::runtime_error("not colon");
         if (not parse_type()) throw std::runtime_error("not a type");
         if (match(TokenType::Semicolon)) return true;
-        if (not match(TokenType::Assign)) throw std::runtime_error("not an assignemnt statement");
+        if (not match(TokenType::Assign))
+            throw std::runtime_error("not an assignemnt statement");
         if (not parse_expression()) throw std::runtime_error("not a expression");
         break;
     default: throw std::runtime_error("invalid parse");
