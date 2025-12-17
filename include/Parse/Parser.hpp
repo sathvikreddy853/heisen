@@ -15,10 +15,18 @@ struct Parser {
 
     explicit Parser(const std::vector<Token>& tokens) : tokens(tokens) {}
 
+    u32 curr = 0;
+
     bool parse();
     bool parse_function_definition();
-    bool parse_expression();
     bool parse_statement();
+
+    bool parse_type();
+    bool parse_expression();
+
+    Token peek();
+    Token consume();
+    bool match(TokenType);
 };
 
 } // namespace heisen

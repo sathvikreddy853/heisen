@@ -17,13 +17,13 @@ int main(int argc, const char* argv[]) {
     Lexer lexer(source);
     auto tokens = lexer.tokenize();
 
-    // for (auto& token : tokens) {
-    //     std::cout << token << std::endl;
-    // }
+    for (auto& token : tokens) {
+        std::cout << token << std::endl;
+    }
 
     Parser parser(tokens);
-
     bool parse_outcome = parser.parse_statement();
+    std::cout << std::boolalpha << parse_outcome << std::endl;
 
     return 0;
 }
